@@ -26,10 +26,10 @@ public class KafkaService {
 
     public void sendMessage(TestDTO message) {
         logger.info("Producer Message : {}", message);
+        // DTO를 JSON으로 맵핑
         JSONObject json = new JSONObject();
         json.put("title", message.getTitle());
         json.put("text", message.getText());
-
         this.kafkaTemplate.send(TOPIC, json);
 //        for (int i = 0; i < 10; i++) {
 //            this.kafkaTemplate.send(TOPIC, json);
