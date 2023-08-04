@@ -43,7 +43,7 @@ spring:
 kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&response_type=code
 
 ```
-https://kauth.kakao.com/oauth/authorize?client_id=066776e452014ee0743de831d167b35a&redirect_uri=http://localhost:8080/outh/kakao&response_type=code
+https://kauth.kakao.com/oauth/authorize?client_id=066776e452014ee0743de831d167b35a&redirect_uri=http://localhost:8080/auth/kakao&response_type=code
 ```
 
 `액세스 토큰 요청으로 받을 수 있는 정보`  

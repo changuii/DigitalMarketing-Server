@@ -2,14 +2,14 @@ package dev.gateway.apigateway.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.security.auth.UserPrincipal;
+import dev.gateway.apigateway.Entity.KakaoUserDetails;
 import dev.gateway.apigateway.dto.KakaoAuthorization;
-import dev.gateway.apigateway.dto.KakaoDTO;
 import org.springframework.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -45,14 +45,23 @@ public class JwtTokenFilter extends GenericFilterBean {
                 !(apiResponse.getStatusCodeValue() == 400) &&
         !(apiResponse.getStatusCodeValue() == 401))
         {
+            // 검증완료
             // String으로 들어온 response값을 parsing
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
             KakaoAuthorization dto = objectMapper.readValue(apiResponse.getBody(), KakaoAuthorization.class);
             logger.info(dto.toString());
+//            Authentication authentication;
+//            UserDetails userDetails =
+//            SecurityContextHolder.getContext().setAuthentication();
             Authentication authentication;
+            KakaoUserDetails kakaoUserDetails = new KakaoUserDetails(
+                    dto.getId(),
+            );
             UserDetails userDetails =
-            SecurityContextHolder.getContext().setAuthentication();
+            authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         }
 
