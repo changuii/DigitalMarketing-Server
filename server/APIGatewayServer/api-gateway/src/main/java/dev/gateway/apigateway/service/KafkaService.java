@@ -14,7 +14,7 @@ public class KafkaService {
 
 
     // topic name
-    private static final String TOPIC = "test1";
+    private static final String TOPIC = "test2";
     private final KafkaTemplate<String, JSONObject> kafkaTemplate;
     private static final Logger logger = LoggerFactory.getLogger(KafkaService.class);
 
@@ -29,7 +29,8 @@ public class KafkaService {
         // DTO를 JSON으로 맵핑
         JSONObject json = new JSONObject();
         json.put("title", message.getTitle());
-        json.put("text", message.getText());
+        json.put("text", message.getContent());
+        json.put("id", message.getId());
         this.kafkaTemplate.send(TOPIC, json);
 //        for (int i = 0; i < 10; i++) {
 //            this.kafkaTemplate.send(TOPIC, json);

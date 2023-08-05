@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class TestDTO {
+    private String id;
     private String title;
-    private String text;
+    private String content;
 }
