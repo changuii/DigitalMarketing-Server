@@ -22,16 +22,13 @@ import javax.persistence.Id;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesPostEntity { // 제품정보 엔티티 extends해야함
+public class SalesPostEntity extends ProductEntity { // 제품정보 엔티티 extends해야함
 
     // salesPost: 게시글
     @Id
     @NotNull
     private long postNumber;
-
-
     private String category;
-
     private String postTitle;
     private String postAuthor;
     private String postDate;

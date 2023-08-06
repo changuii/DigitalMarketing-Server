@@ -17,14 +17,10 @@ public class ProductEntity {
 
     // product_info: 제품정보
     @Id
-    private String storeLocation;
-
     private String productSerialnum;
     private String productName;
     private int productPrice;
     private int productAmount;
     private int productDeliveryFee;
-
-
-
+    private String storeLocation;
 }
