@@ -60,3 +60,31 @@ public class KakaoDTO {
 }
 ```
 
+카카오 유저정보 json 형태
+```json
+{
+  "id":2949133506,
+  "connected_at":"2023-08-04T16:11:06Z",
+  "properties":{
+    "nickname":"창의",
+    "profile_image":"http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg",
+    "thumbnail_image":"http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_110x110.jpg"},
+  "kakao_account":{
+    "profile_nickname_needs_agreement":false,
+    "profile_image_needs_agreement":false,
+  "profile":{
+    "nickname":"창의",
+    "thumbnail_image_url":"http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_110x110.jpg",
+    "profile_image_url":"http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg",
+    "is_default_image":true},
+  "has_email":true,
+  "email_needs_agreement":false,
+  "is_email_valid":true,
+  "is_email_verified":true,
+  "email":"rhljh201@daum.net"}
+}
+```
+
+필요한 데이터 : 닉네임, 이메일, 성별, 연령대, 생일
+
+

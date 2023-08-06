@@ -27,6 +27,7 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    // email
     @Column(nullable = false, unique = true)
     private String uid;
 
@@ -37,11 +38,22 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
+    private String age;
+
+    @Column(nullable = false)
+    private String birthday;
+
+    @Column(nullable = false)
+    private String address;
+
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
-
-
 
     // 계정이 가지고 있는 권한을 리턴합니다.
     @Override

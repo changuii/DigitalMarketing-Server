@@ -20,6 +20,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         // 액세스 권한이 없는 리소스에 접근할 경우 발생하는 예외
         // 돌아갈 리다이렉트 주소를 작성
-        response.sendRedirect("/");
+        response.sendRedirect("/auth/redir");
     }
 }

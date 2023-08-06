@@ -86,7 +86,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request){
         logger.info("[JwtTokenProvider] resolveToken, 헤더에서 토큰 값 추출");
-        return request.getHeader("Authentication");
+        return request.getHeader("Authorization");
     }
 
     public boolean validateToken(String token){

@@ -15,5 +15,9 @@ public class LoginDto {
 
     private String email;
     private String password;
-
+    private String name;
+    private String gender;
+    private String age;
+    private String birthday;
+    private String address;
 }

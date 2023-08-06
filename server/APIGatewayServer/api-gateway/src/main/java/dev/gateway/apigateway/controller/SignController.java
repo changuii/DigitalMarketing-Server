@@ -6,23 +6,22 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.gateway.apigateway.dto.KakaoDTO;
 import dev.gateway.apigateway.dto.LoginDto;
-import dev.gateway.apigateway.dto.SignInResultDto;
-import dev.gateway.apigateway.dto.SignUpResultDto;
 import dev.gateway.apigateway.service.SignService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/auth")
@@ -38,10 +37,22 @@ public class SignController {
         this.signService = signService;
     }
 
-    @PostMapping
-    public void kakaoSign(){
-
+    @GetMapping
+    public JSONObject kakaocodeTest(JSONObject jsonObject){
+        return jsonObject;
     }
+
+    @PostMapping("/test")
+    public ResponseEntity<String> kakaoSign(){
+        logger.info("인증, 인가 확인용");
+        return ResponseEntity.status(201).body("성공");
+    }
+
+    @GetMapping("redir")
+    public ResponseEntity<String> redir(){
+        return ResponseEntity.status(401).body("redirect 되었습니다.");
+    }
+
 
     @GetMapping("/token")
     public ResponseEntity<JSONObject> createToken(
@@ -81,12 +92,18 @@ public class SignController {
         logger.info(dto.getAccess_token());
         logger.info("token 생성 완료");
         JSONObject responseJSON = new JSONObject();
-        responseJSON.put("token", dto.getAccess_token());
+        responseJSON.put("access_token", dto.getAccess_token());
+        // 카카오에서 받은 토큰 반환
         return ResponseEntity.status(201).body(responseJSON);
     }
 
 
-
+    @GetMapping("/kakaotest")
+    public String asd(
+            @RequestParam String code
+    ){
+        return code;
+    }
     @GetMapping("/kakao")
     public JSONObject kakaoCode(
             @RequestParam String code
@@ -139,16 +156,13 @@ public class SignController {
             @RequestBody LoginDto loginDto
     ) throws RuntimeException{
         logger.info("[signIn] 로그인을 시도하고 있습니다. email : {} password : {}", loginDto.getEmail(), loginDto.getPassword());
-        SignInResultDto signInResultDto = signService.signIn(loginDto.getEmail(), loginDto.getPassword());
+        ResponseEntity<JSONObject> response = signService.signIn(loginDto.getEmail(), loginDto.getPassword());
 
-        if(signInResultDto.getCode() == 0){
-            logger.info("[signIn] 정상적으로 로그인되었습니다. email:{} token : {}", loginDto.getEmail(), signInResultDto.getToken());
+        if(response.getStatusCode().value() == 200){
+            logger.info("[signIn] 정상적으로 로그인되었습니다. email:{} token : {}", loginDto.getEmail(), response.getBody().get("access_token"));
         }
 
-
-        JSONObject json = new JSONObject();
-        json.put("access_token", signInResultDto.getToken());
-        return ResponseEntity.status(200).body(json);
+        return response;
     }
 
 
@@ -157,16 +171,72 @@ public class SignController {
             @RequestBody LoginDto loginDto
     ){
         logger.info("[signUp] 회원가입을 수행합니다. email : {} password : {}", loginDto.getEmail(), loginDto.getPassword());
-        SignUpResultDto signUpResultDto = signService.signUp(loginDto.getEmail(), loginDto.getPassword(), "test", "USER");
-        logger.info("[signUp] 회원가입을 완료했습니다. email : {} password : {}", loginDto.getPassword(), loginDto.getPassword() );
+        // 이메일 비밀번호, 이름, 역할(어드민, 유저, 셀러), 성별, 연령대, 생일, 주소
+        ResponseEntity response = signService.signUp(loginDto.getEmail(), loginDto.getPassword(), loginDto.getName(), "USER",
+                loginDto.getGender(), loginDto.getAge(), loginDto.getBirthday(), loginDto.getAddress());
 
-        JSONObject json = new JSONObject();
-        json.put("email", loginDto.getEmail());
-        json.put("password", loginDto.getPassword());
+        if(response.getStatusCodeValue() == 201){
+            logger.info("[signUp] 회원가입을 완료했습니다. email : {} password : {}", loginDto.getPassword(), loginDto.getPassword());
+        }
 
-        return ResponseEntity.status(201).body(json);
+        return response;
     }
 
+    @PostMapping("/kakao/signup")
+    public ResponseEntity<JSONObject> kakaoSignup(
+            @RequestBody JSONObject jsonObject
+    ) throws JsonProcessingException {
+        String authCode = jsonObject.get("authCode").toString();
+
+        String token = signService.kakaoCodeValidation(jsonObject);
+        if(token.equals("fail")){
+            return ResponseEntity.badRequest().body(new JSONObject());
+        }
+        JSONObject userData = signService.getKakoUserData(token);
+        if(userData.get("result").equals("fail")){
+            return ResponseEntity.badRequest().body(new JSONObject());
+        }
+        LinkedHashMap kakaoAccount = (LinkedHashMap) userData.get("kakao_account");
+        LinkedHashMap profile = (LinkedHashMap) kakaoAccount.get("profile");
+
+        try{
+            logger.info(kakaoAccount.get("email").toString());
+            logger.info(profile.get("nickname").toString());
+            logger.info(kakaoAccount.get("gender").toString());
+            logger.info(kakaoAccount.get("age_range").toString());
+            logger.info(kakaoAccount.get("birthday").toString());
+        }catch(NullPointerException e){
+            logger.info("약관 미동의 에러");
+            return ResponseEntity.badRequest().body(new JSONObject());
+        }
+        signService.signUp(kakaoAccount.get("email").toString(),"KAKAO_USER" ,profile.get("nickname").toString(),
+                "USER", kakaoAccount.get("gender").toString(), kakaoAccount.get("age_range").toString(),
+                kakaoAccount.get("birthday").toString(), jsonObject.get("address").toString());
+
+
+        return ResponseEntity.ok().body(jsonObject);
+    }
+
+    @PostMapping("/kakao/signin")
+    public ResponseEntity<JSONObject> kakaoSignin(
+            @RequestBody JSONObject jsonObject
+    ) throws JsonProcessingException {
+        String authCode = jsonObject.get("authCode").toString();
+
+        String token = signService.kakaoCodeValidation(jsonObject);
+        if(token.equals("fail")){
+            return ResponseEntity.badRequest().body(new JSONObject());
+        }
+        JSONObject userData = signService.getKakoUserData(token);
+        if(userData.get("result").equals("fail")){
+            return ResponseEntity.badRequest().body(new JSONObject());
+        }
+
+        LinkedHashMap kakaoAccount = (LinkedHashMap) userData.get("kakao_account");
+
+        ResponseEntity response = signService.signIn(kakaoAccount.get("email").toString(), "KAKAO_USER");
+        return response;
+    }
 
 
 }
