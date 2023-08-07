@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 
 //==========================================================================================
@@ -18,16 +19,18 @@ import javax.persistence.Id;
 
 
 @Entity
+@Table(name = "SalesPost")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesPostEntity extends ProductEntity { // 제품정보 엔티티 extends해야함
+public class SalesPostEntity { // 제품정보 엔티티 extends해야함
 
     // salesPost: 게시글
     @Id
     @NotNull
     private long postNumber;
+
     private String category;
     private String postTitle;
     private String postAuthor;
@@ -37,6 +40,4 @@ public class SalesPostEntity extends ProductEntity { // 제품정보 엔티티 e
     private long postHitCount;
     private long postLike;
     private String storeLocation;
-
-
 }

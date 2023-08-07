@@ -7,8 +7,10 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "Product")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +19,8 @@ public class ProductEntity {
 
     // product_info: 제품정보
     @Id
-    private String productSerialnum;
+    private String productSerialNumber;
+
     private String productName;
     private int productPrice;
     private int productAmount;

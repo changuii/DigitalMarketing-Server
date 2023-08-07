@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "Inquiry")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,6 +19,8 @@ import javax.persistence.Id;
 public class InquiryEntity {
 
     @Id
-    private String inquriryAuthor;
+    private Long inquiryNumber;
+
+    private String inquiryAuthor;
     private String inquiryContents;
 }
