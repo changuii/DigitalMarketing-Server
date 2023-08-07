@@ -3,6 +3,8 @@ package dev.gateway.apigateway.dto;
 
 import lombok.*;
 
+
+// 토큰 발급용
 @Getter
 @Setter
 @NoArgsConstructor

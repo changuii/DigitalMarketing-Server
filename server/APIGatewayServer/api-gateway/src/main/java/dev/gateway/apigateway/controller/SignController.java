@@ -37,6 +37,8 @@ public class SignController {
         this.signService = signService;
     }
 
+
+    // 테스트용 코드들
     @GetMapping
     public JSONObject kakaocodeTest(JSONObject jsonObject){
         return jsonObject;
@@ -97,13 +99,6 @@ public class SignController {
         return ResponseEntity.status(201).body(responseJSON);
     }
 
-
-    @GetMapping("/kakaotest")
-    public String asd(
-            @RequestParam String code
-    ){
-        return code;
-    }
     @GetMapping("/kakao")
     public JSONObject kakaoCode(
             @RequestParam String code
@@ -148,10 +143,10 @@ public class SignController {
 
         return json;
     }
+    // ==================================================================
 
-;
 
-    @PostMapping("signin")
+    @PostMapping("/signin")
     public ResponseEntity<JSONObject> signIn(
             @RequestBody LoginDto loginDto
     ) throws RuntimeException{
@@ -190,10 +185,12 @@ public class SignController {
 
         String token = signService.kakaoCodeValidation(jsonObject);
         if(token.equals("fail")){
+            logger.info("code검증 및 토큰 발급실패 : 회원가입 실패");
             return ResponseEntity.badRequest().body(new JSONObject());
         }
         JSONObject userData = signService.getKakoUserData(token);
         if(userData.get("result").equals("fail")){
+            logger.info("kakao로부터 유저 데이터 요청 실패 : 회원가입 실패");
             return ResponseEntity.badRequest().body(new JSONObject());
         }
         LinkedHashMap kakaoAccount = (LinkedHashMap) userData.get("kakao_account");
@@ -225,10 +222,12 @@ public class SignController {
 
         String token = signService.kakaoCodeValidation(jsonObject);
         if(token.equals("fail")){
+            logger.info("code검증 및 토큰 발급실패 : 로그인 실패");
             return ResponseEntity.badRequest().body(new JSONObject());
         }
         JSONObject userData = signService.getKakoUserData(token);
         if(userData.get("result").equals("fail")){
+            logger.info("kakao로부터 유저 데이터 요청 실패 : 로그인 실패");
             return ResponseEntity.badRequest().body(new JSONObject());
         }
 

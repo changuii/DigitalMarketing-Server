@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.gateway.apigateway.Entity.UserEntity;
-import dev.gateway.apigateway.config.JwtTokenProvider;
+import dev.gateway.apigateway.config.security.JwtTokenProvider;
 import dev.gateway.apigateway.dto.KakaoDTO;
 import dev.gateway.apigateway.repository.UserRepository;
 import org.json.simple.JSONObject;
@@ -45,6 +45,7 @@ public class SignServiceImpl implements SignService{
     public ResponseEntity<JSONObject> signUp(String email, String password, String name, String role, String gender, String age, String birthday, String address) {
         logger.info("[getSignUpResult] 회원가입 정보 전달");
         UserEntity userEntity;
+        // 규칙 설정
         if(role.equalsIgnoreCase("admin")){
             userEntity = UserEntity.builder()
                     .uid(email)
@@ -82,6 +83,7 @@ public class SignServiceImpl implements SignService{
 
         }
 
+        // 생성한 유저 엔티티를 DB에 저장
         UserEntity savedUser = userRepository.save(userEntity);
         JSONObject json = new JSONObject();
         json.put("email", savedUser.getUid());
@@ -156,9 +158,10 @@ public class SignServiceImpl implements SignService{
 
         // API 호출
         String url = "https://kauth.kakao.com/oauth/token";
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestMessage, String.class);
-
-        if(responseEntity.getStatusCodeValue() == 400){
+        ResponseEntity<String> responseEntity;
+        try{
+            responseEntity = restTemplate.postForEntity(url, requestMessage, String.class);
+        }catch (Exception e){
             logger.info("카카오 토큰 발급 실패");
             return "fail";
         }
@@ -191,14 +194,17 @@ public class SignServiceImpl implements SignService{
 
         // API 호출
         String url = "https://kapi.kakao.com/v2/user/me";
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestMessage, String.class);
+        ResponseEntity<String> responseEntity;
 
-        if(responseEntity.getStatusCodeValue() == 400){
+        try{
+            responseEntity = restTemplate.postForEntity(url, requestMessage, String.class);
+        } catch (Exception e){
             logger.info("카카오 유저 정보 발급 실패");
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("result", "fail");
             return jsonObject;
         }
+
         logger.info("카카오 유저 정보 발급 성공");
 
         logger.info(responseEntity.getBody());

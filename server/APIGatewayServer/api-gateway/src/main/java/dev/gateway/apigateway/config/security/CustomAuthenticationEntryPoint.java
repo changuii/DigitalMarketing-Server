@@ -1,4 +1,4 @@
-package dev.gateway.apigateway.config;
+package dev.gateway.apigateway.config.security;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

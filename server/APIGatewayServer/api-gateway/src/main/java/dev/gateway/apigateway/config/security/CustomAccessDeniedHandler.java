@@ -1,4 +1,4 @@
-package dev.gateway.apigateway.config;
+package dev.gateway.apigateway.config.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
