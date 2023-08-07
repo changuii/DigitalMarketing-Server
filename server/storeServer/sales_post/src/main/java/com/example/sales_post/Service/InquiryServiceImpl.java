@@ -20,7 +20,7 @@ public class InquiryServiceImpl implements InquriyService {
         this.inquiryRepository = inquiryRepository;
     }
 
-    public boolean createInquiry(JSONObject jsonObject){
+    public void createInquiry(JSONObject jsonObject){
         InquiryEntity inquiryEntity = new InquiryEntity();
         String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
         Long inquiryNumber = Long.valueOf(inquiryNumberStr);
@@ -28,7 +28,6 @@ public class InquiryServiceImpl implements InquriyService {
         inquiryEntity.setInquiryAuthor((String) jsonObject.get("inquiryAuthor"));
         inquiryEntity.setInquiryContents((String) jsonObject.get("inquiryContents"));
         inquiryRepository.save(inquiryEntity);
-        return true;
     }
 
     public JSONObject readInquiry(String author){
@@ -73,7 +72,7 @@ public class InquiryServiceImpl implements InquriyService {
         return jsonObjectList;
     }
 
-    public boolean updateInquiry(JSONObject jsonObject){
+    public void updateInquiry(JSONObject jsonObject){
         String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
         Long inquiryNumber = Long.valueOf(inquiryNumberStr);
         Optional<InquiryEntity> OpInquiryEntity = inquiryRepository.findById(inquiryNumber);
@@ -82,9 +81,7 @@ public class InquiryServiceImpl implements InquriyService {
             inquiryEntity.setInquiryAuthor((String) jsonObject.get("inquiryAuthor"));
             inquiryEntity.setInquiryContents((String) jsonObject.get("inquiryContents"));
             inquiryRepository.save(inquiryEntity);
-            return true;
         }
-        return false;
     }
 
     public void deletePost(Long id){

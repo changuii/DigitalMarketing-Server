@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface InquriyService {
-    public boolean createInquiry(JSONObject jsonObject);
+    public void createInquiry(JSONObject jsonObject);
     public JSONObject readRecentInquiry(String author);
-    public boolean updateInquiry(JSONObject jsonObject);
+    public void updateInquiry(JSONObject jsonObject);
     public void deletePost(Long id);
 }
