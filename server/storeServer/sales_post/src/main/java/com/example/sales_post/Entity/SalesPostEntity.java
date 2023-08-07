@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -22,21 +23,38 @@ import javax.persistence.Id;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesPostEntity extends ProductEntity { // 제품정보 엔티티 extends해야함
+public class SalesPostEntity extends ProductEntity {
 
     // salesPost: 게시글
     @Id
     @NotNull
     private long postNumber;
-    private String category;
-    private String postTitle;
-    private String postAuthor;
-    private String postDate;
-    private String postContents;
-    private String postPicture;
-    private long postHitCount;
-    private long postLike;
-    private String storeLocation;
 
+    @Column
+    private String category;
+
+    @Column
+    private String postTitle;
+
+    @Column
+    private String postAuthor;
+
+    @Column
+    private String postDate;
+
+    @Column
+    private String postContents;
+
+    @Column
+    private String postPicture;
+
+    @Column
+    private long postHitCount;
+
+    @Column
+    private long postLike;
+
+    @Column
+    private String storeLocation;
 
 }
