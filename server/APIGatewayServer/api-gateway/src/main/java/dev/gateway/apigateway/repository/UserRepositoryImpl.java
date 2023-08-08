@@ -45,6 +45,26 @@ public class UserRepositoryImpl implements UserRepository {
 
     }
 
+    @Override
+    public Boolean isEmailDuplicateCheck(String uid) {
+        String sql = "SELECT uid FROM User WHERE uid = ?";
+        try {
+            String userEntity = jdbcTemplate.queryForObject(sql, String.class, uid);
+            if(!userEntity.isEmpty()) {
+                return true;
+            }
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public void updateRoleByUid(String uid, String role) {
+        String sql = "UPDATE User SET role = ? WHERE uid = ?";
+        jdbcTemplate.update(sql, role, uid);
+    }
+
     private RowMapper<UserEntity> UserRowMapper() { //테이블 결과의 행과 객체를 반환해주는 rowmapper
         ArrayList<String> roles = new ArrayList<>();
         return (rs, rowNum) -> { //해당 컬럼을 찾아 객체로 매핑

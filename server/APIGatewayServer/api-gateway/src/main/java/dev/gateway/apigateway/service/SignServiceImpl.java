@@ -40,6 +40,19 @@ public class SignServiceImpl implements SignService{
         this.passwordEncoder = passwordEncoder;
     }
 
+    public boolean emailDuplicateCheck(String email){
+        boolean check = userRepository.isEmailDuplicateCheck(email);
+        if(check){
+            return true;
+        }
+        return false;
+    }
+
+    public void registrationSeller(String uid){
+        userRepository.updateRoleByUid(uid, "ROLE_SELLER");
+    }
+
+
 
     @Override
     public ResponseEntity<JSONObject> signUp(String email, String password, String name, String role, String gender, String age, String birthday, String address) {
@@ -86,17 +99,19 @@ public class SignServiceImpl implements SignService{
         // 생성한 유저 엔티티를 DB에 저장
         UserEntity savedUser = userRepository.save(userEntity);
         JSONObject json = new JSONObject();
-        json.put("email", savedUser.getUid());
+
 //        SignUpResultDto signUpResultDto = new SignInResultDto();
 
         logger.info("[getSignUpResult] userEntity 값이 들어왔는지 확인 후 결과 값 주입");
         if(!savedUser.getUid().isEmpty()){
             logger.info("[getSignUpResult] 정상 처리 완료");
+            json.put("result", "success");
             return ResponseEntity.status(201).body(json);
 //            setSuccessReslut(signUpResultDto);
         } else{
             logger.info("[getSignUpResult]  실패 처리 완료");
-            return ResponseEntity.status(400).body(json);
+            json.put("result", "email Null");
+            return ResponseEntity.badRequest().body(json);
 //            setFailResult(signUpResultDto);
 
         }

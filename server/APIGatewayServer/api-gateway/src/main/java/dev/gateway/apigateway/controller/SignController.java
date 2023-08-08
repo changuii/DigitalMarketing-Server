@@ -168,6 +168,12 @@ public class SignController {
         logger.info("[signUp] 회원가입을 수행합니다. email : {} password : {}", loginDto.getEmail(), loginDto.getPassword());
         // 이메일 비밀번호, 이름, 역할(어드민, 유저, 셀러), 성별, 연령대, 생일, 주소
         logger.info(loginDto.toString());
+        if(signService.emailDuplicateCheck(loginDto.getEmail())){
+            JSONObject json = new JSONObject();
+            json.put("result", "Email Duplicate");
+            return ResponseEntity.badRequest().body(json);
+        }
+
 
         ResponseEntity response = signService.signUp(loginDto.getEmail(), loginDto.getPassword(), loginDto.getName(), "USER",
                 loginDto.getGender(), loginDto.getAge(), loginDto.getBirthday(), loginDto.getAddress());
@@ -197,6 +203,12 @@ public class SignController {
         }
         LinkedHashMap kakaoAccount = (LinkedHashMap) userData.get("kakao_account");
         LinkedHashMap profile = (LinkedHashMap) kakaoAccount.get("profile");
+
+        if(signService.emailDuplicateCheck(kakaoAccount.get("email").toString())){
+            JSONObject json = new JSONObject();
+            json.put("result", "Email Duplicate");
+            return ResponseEntity.badRequest().body(json);
+        }
 
         try{
             logger.info(kakaoAccount.get("email").toString());
@@ -239,5 +251,16 @@ public class SignController {
         return response;
     }
 
+    @PostMapping("/seller")
+    public ResponseEntity<JSONObject> registrationSeller(
+            @RequestParam String sellerNumber,
+            @RequestParam String email
+    )
+    {
+        signService.registrationSeller(email);
+        JSONObject json = new JSONObject();
+        json.put("result", "success");
 
+        return ResponseEntity.ok().body(json);
+    }
 }

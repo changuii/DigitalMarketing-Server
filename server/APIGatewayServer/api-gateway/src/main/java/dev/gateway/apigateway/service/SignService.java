@@ -12,4 +12,6 @@ public interface SignService {
     ResponseEntity<JSONObject> signIn(String email, String password) throws RuntimeException;
     public JSONObject getKakoUserData( String accessToken)throws JsonProcessingException;
     public String kakaoCodeValidation(JSONObject jsonObject) throws JsonProcessingException;
+    public boolean emailDuplicateCheck(String email);
+    public void registrationSeller(String uid);
 }
