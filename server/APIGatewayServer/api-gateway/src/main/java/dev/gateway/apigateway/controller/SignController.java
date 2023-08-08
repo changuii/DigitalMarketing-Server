@@ -167,6 +167,8 @@ public class SignController {
     ){
         logger.info("[signUp] 회원가입을 수행합니다. email : {} password : {}", loginDto.getEmail(), loginDto.getPassword());
         // 이메일 비밀번호, 이름, 역할(어드민, 유저, 셀러), 성별, 연령대, 생일, 주소
+        logger.info(loginDto.toString());
+
         ResponseEntity response = signService.signUp(loginDto.getEmail(), loginDto.getPassword(), loginDto.getName(), "USER",
                 loginDto.getGender(), loginDto.getAge(), loginDto.getBirthday(), loginDto.getAddress());
 

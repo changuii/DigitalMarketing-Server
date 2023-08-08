@@ -7,51 +7,39 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Builder
-@Table
 public class UserEntity implements UserDetails {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     // email
-    @Column(nullable = false, unique = true)
     private String uid;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(nullable = false)
+
     private String password;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String gender;
 
-    @Column(nullable = false)
     private String age;
 
-    @Column(nullable = false)
     private String birthday;
 
-    @Column(nullable = false)
     private String address;
 
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
