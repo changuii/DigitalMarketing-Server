@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 //==========================================================================================
@@ -28,7 +26,7 @@ public class SalesPostEntity { // 제품정보 엔티티 extends해야함
 
     // salesPost: 게시글
     @Id
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long postNumber;
 
     private String category;

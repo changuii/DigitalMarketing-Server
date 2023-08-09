@@ -19,34 +19,28 @@ public class InquiryController {
         this.inquiryServiceImpl = inquiryServiceImpl;
     }
 
-    @GetMapping("/")
-    public JSONObject getInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readInquiry((String) jsonObject.get("author"));
-    }
     @GetMapping("/recent")
     public JSONObject getRecentInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readRecentInquiry((String) jsonObject.get("author"));
+        return inquiryServiceImpl.readRecentInquiry(jsonObject);
     }
 
     @GetMapping("/all")
     public List<JSONObject> getAllInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readAllInquiry((String) jsonObject.get("author"));
+        return inquiryServiceImpl.readAllInquiry(jsonObject);
     }
 
     @PostMapping("/")
-    public void postInquiry(@RequestBody JSONObject jsonObject){
-        inquiryServiceImpl.createInquiry(jsonObject);
+    public JSONObject postInquiry(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.createInquiry(jsonObject);
     }
 
     @PutMapping("/")
-    public void putInquiry(@RequestBody JSONObject jsonObject){
-        inquiryServiceImpl.updateInquiry(jsonObject);
+    public JSONObject putInquiry(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.updateInquiry(jsonObject);
     }
 
     @DeleteMapping("/")
-    public void deleteInquiry(@RequestBody JSONObject jsonObject){
-        String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
-        Long inquiryNumber = Long.valueOf(inquiryNumberStr);
-        inquiryServiceImpl.deletePost(inquiryNumber);
+    public JSONObject deleteInquiry(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.deleteInquiry(jsonObject);
     }
 }

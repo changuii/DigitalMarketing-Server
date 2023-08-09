@@ -1,90 +1,102 @@
 package com.example.sales_post.Service;
 
+import com.example.sales_post.DAO.InquiryDaoImpl;
 import com.example.sales_post.Entity.InquiryEntity;
-import com.example.sales_post.Repository.InquiryRepository;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InquiryServiceImpl implements InquriyService {
 
-    private final InquiryRepository inquiryRepository;
+    private final InquiryDaoImpl inquiryDaoImpl;
 
-    public InquiryServiceImpl(
-            @Autowired InquiryRepository inquiryRepository){
-        this.inquiryRepository = inquiryRepository;
+    public InquiryServiceImpl(@Autowired InquiryDaoImpl inquiryDaoImpl){
+        this.inquiryDaoImpl = inquiryDaoImpl;
     }
 
-    public void createInquiry(JSONObject jsonObject){
-        InquiryEntity inquiryEntity = new InquiryEntity();
+    public JSONObject createInquiry(JSONObject jsonObject){
+        InquiryEntity inquiryEntity = jsonToEntity(jsonObject);
+        boolean result = inquiryDaoImpl.createInquiry(inquiryEntity);
+        return resultJsonObject(result);
+    }
+
+    public JSONObject readRecentInquiry(JSONObject jsonObject){
+        JSONObject resultJsonObject;
+        InquiryEntity inquiryEntity = inquiryDaoImpl
+                .readRecentInquiry((String) jsonObject.get("inquiryAuthor"));
+        if (inquiryEntity != null) {
+            resultJsonObject = resultJsonObject(true, inquiryEntity);
+        } else{
+            resultJsonObject = resultJsonObject(false);
+        }
+        return resultJsonObject;
+    }
+
+    public List<JSONObject> readAllInquiry(JSONObject jsonObject) {
+        List<InquiryEntity> inquiryEntityList = inquiryDaoImpl
+                .readAllInquiry((String) jsonObject.get("inquiryAuthor"));
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+
+        if (inquiryEntityList == null || inquiryEntityList.isEmpty()) {
+            JSONObject resultJsonObject = resultJsonObject(false);
+            jsonObjectList.add(resultJsonObject);
+        } else{
+            for (InquiryEntity entity : inquiryEntityList) {
+                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                jsonObjectList.add(resultJsonObject);
+            }
+        }
+        return jsonObjectList;
+    }
+
+    public JSONObject updateInquiry(JSONObject jsonObject){
+        InquiryEntity inquiryEntity = jsonToEntity(jsonObject);
+        boolean result = inquiryDaoImpl.updateInquiry(inquiryEntity);
+        return resultJsonObject(result);
+    }
+
+    public JSONObject deleteInquiry(JSONObject jsonObject){
         String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
         Long inquiryNumber = Long.valueOf(inquiryNumberStr);
-        inquiryEntity.setInquiryNumber(inquiryNumber);
-        inquiryEntity.setInquiryAuthor((String) jsonObject.get("inquiryAuthor"));
-        inquiryEntity.setInquiryContents((String) jsonObject.get("inquiryContents"));
-        inquiryRepository.save(inquiryEntity);
+        boolean result = inquiryDaoImpl.deleteInquiry(inquiryNumber);
+        return resultJsonObject(result);
     }
 
-    public JSONObject readInquiry(String author){
+    public InquiryEntity jsonToEntity(JSONObject jsonObject){
+        String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
+        Long inquiryNumber = Long.valueOf(inquiryNumberStr);
+
+        InquiryEntity inquiryEntity = InquiryEntity.builder()
+                .inquiryNumber(inquiryNumber)
+                .inquiryAuthor((String) jsonObject.get("inquiryAuthor"))
+                .inquiryContents((String) jsonObject.get("inquiryContents"))
+                .build();
+        return inquiryEntity;
+    }
+
+    public JSONObject entityToJson(InquiryEntity inquiryEntity){
         JSONObject jsonObject = new JSONObject();
-        InquiryEntity inquiryEntity = inquiryRepository.findByInquiryAuthor(author);
         jsonObject.put("inquiryNumber", inquiryEntity.getInquiryNumber());
         jsonObject.put("inquiryAuthor", inquiryEntity.getInquiryAuthor());
         jsonObject.put("inquiryContents", inquiryEntity.getInquiryContents());
         return jsonObject;
     }
 
-    public JSONObject readRecentInquiry(String author){
+    public JSONObject resultJsonObject(boolean result){
         JSONObject jsonObject = new JSONObject();
-        InquiryEntity inquiryEntity = inquiryRepository.findTopByInquiryAuthorOrderByInquiryNumberDesc(author);
-        if (inquiryEntity != null) {
-            jsonObject.put("inquiryNumber", inquiryEntity.getInquiryNumber());
-            jsonObject.put("inquiryAuthor", inquiryEntity.getInquiryAuthor());
-            jsonObject.put("inquiryContents", inquiryEntity.getInquiryContents());
-        } else {
-            jsonObject.put("message", "No recent inquiry found for the author");
-        }
+        jsonObject.put("result", result);
         return jsonObject;
     }
 
-    public List<JSONObject> readAllInquiry(String author) {
-        List<InquiryEntity> inquiryEntityList = inquiryRepository.findAllByInquiryAuthor(author);
-        List<JSONObject> jsonObjectList = new ArrayList<>();
-
-        if (inquiryEntityList == null || inquiryEntityList.isEmpty()) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("message", "No recent inquiry found for the author");
-            jsonObjectList.add(jsonObject);
-        } else{
-            for (InquiryEntity entity : inquiryEntityList) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("inquiryNumber", entity.getInquiryNumber());
-                jsonObject.put("inquiryAuthor", entity.getInquiryAuthor());
-                jsonObject.put("inquiryContents", entity.getInquiryContents());
-                jsonObjectList.add(jsonObject);
-            }
-        }
-        return jsonObjectList;
-    }
-
-    public void updateInquiry(JSONObject jsonObject){
-        String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
-        Long inquiryNumber = Long.valueOf(inquiryNumberStr);
-        Optional<InquiryEntity> OpInquiryEntity = inquiryRepository.findById(inquiryNumber);
-        if(OpInquiryEntity.isPresent()) {
-            InquiryEntity inquiryEntity = OpInquiryEntity.get();
-            inquiryEntity.setInquiryAuthor((String) jsonObject.get("inquiryAuthor"));
-            inquiryEntity.setInquiryContents((String) jsonObject.get("inquiryContents"));
-            inquiryRepository.save(inquiryEntity);
-        }
-    }
-
-    public void deletePost(Long id){
-        inquiryRepository.deleteById(id);
+    public JSONObject resultJsonObject(boolean result, InquiryEntity inquiryEntity){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("inquiryNumber", inquiryEntity.getInquiryNumber());
+        jsonObject.put("inquiryAuthor", inquiryEntity.getInquiryAuthor());
+        jsonObject.put("inquiryContents", inquiryEntity.getInquiryContents());
+        jsonObject.put("result", result);
+        return jsonObject;
     }
 }
