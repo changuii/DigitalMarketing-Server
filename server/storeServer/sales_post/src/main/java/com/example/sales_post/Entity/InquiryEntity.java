@@ -1,7 +1,9 @@
 package com.example.sales_post.Entity;
 
-import lombok.*;
-
+import lombok.Builder;
+import lombok.Setter;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
@@ -14,25 +16,18 @@ public class InquiryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inquiryNumber;
 
-    private String inquiryAuthor;
+    private String inquiryWriter;
     private String inquiryContents;
 
-//    @ManyToOne
-//    @JoinColumn(name = "postNumber_id")
-//    private SalesPostEntity salesPostEntity;
-
-//    @Builder
-//    public InquiryEntity(Long inquiryNumber, String inquiryAuthor, String inquiryContents, SalesPostEntity salesPostEntity) {
-//        this.inquiryNumber = inquiryNumber;
-//        this.inquiryAuthor = inquiryAuthor;
-//        this.inquiryContents = inquiryContents;
-//        this.salesPostEntity = salesPostEntity;
-//    }
+    @ManyToOne
+    @JoinColumn(name = "postNumber")
+    private SalesPostEntity salesPostEntity;
 
     @Builder
-    public InquiryEntity(Long inquiryNumber, String inquiryAuthor, String inquiryContents) {
+    public InquiryEntity(Long inquiryNumber, String inquiryWriter, String inquiryContents, SalesPostEntity salesPostEntity) {
         this.inquiryNumber = inquiryNumber;
-        this.inquiryAuthor = inquiryAuthor;
+        this.inquiryWriter = inquiryWriter;
         this.inquiryContents = inquiryContents;
+        this.salesPostEntity = salesPostEntity;
     }
 }

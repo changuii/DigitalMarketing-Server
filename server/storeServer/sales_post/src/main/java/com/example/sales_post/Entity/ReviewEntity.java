@@ -1,9 +1,6 @@
 package com.example.sales_post.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,7 +9,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ReviewEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +22,14 @@ public class ReviewEntity {
     @ManyToOne
     @JoinColumn(name = "postNumber_id")
     private SalesPostEntity salesPostEntity;
+
+    @Builder
+    public ReviewEntity(Long reviewNumber, String reviewAuthor, String reviewContents, int reviewStarRating, int reviewLike, SalesPostEntity salesPostEntity) {
+        this.reviewNumber = reviewNumber;
+        this.reviewAuthor = reviewAuthor;
+        this.reviewContents = reviewContents;
+        this.reviewStarRating = reviewStarRating;
+        this.reviewLike = reviewLike;
+        this.salesPostEntity = salesPostEntity;
+    }
 }

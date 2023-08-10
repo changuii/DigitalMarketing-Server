@@ -26,5 +26,6 @@
 //    public void getMessage(JSONObject jsonObject){
 //        logger.info(jsonObject.toString());
 ////        inquiryController.postInquiry(jsonObject);
+//
 //    }
 //}

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesPostRepository extends JpaRepository<SalesPostEntity, Long> {
-
+    SalesPostEntity findByPostNumber(Long postNumber);
 }

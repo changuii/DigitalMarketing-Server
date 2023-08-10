@@ -23,4 +23,5 @@ public class ProductEntity {
     private int productAmount;
     private int productDeliveryFee;
     private String storeLocation;
+
 }

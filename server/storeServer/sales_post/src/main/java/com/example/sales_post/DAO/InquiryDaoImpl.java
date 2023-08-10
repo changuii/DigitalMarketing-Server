@@ -17,7 +17,7 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public boolean createInquiry(InquiryEntity inquiryEntity) {
+    public boolean create(InquiryEntity inquiryEntity) {
         inquiryRepository.save(inquiryEntity);
         Optional<InquiryEntity> oldInquiryEntity = inquiryRepository
                 .findById(inquiryEntity.getInquiryNumber());
@@ -29,21 +29,28 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public InquiryEntity readRecentInquiry(String author) {
+    public InquiryEntity readRecentByWriter(Long postNumber, String Writer) {
         InquiryEntity inquiryEntity = inquiryRepository
-                .findTopByInquiryAuthorOrderByInquiryNumberDesc(author);
+                .findLatestInquiryByWriterAndPostNumber(postNumber, Writer);
         return inquiryEntity;
     }
 
     @Override
-    public List<InquiryEntity> readAllInquiry(String author) {
+    public List<InquiryEntity> readAllByWriter(Long postNumber, String Writer) {
         List<InquiryEntity> inquiryEntityList = inquiryRepository
-                .findAllByInquiryAuthor(author);
+                .findAllByInquiryWriter(Writer);
         return inquiryEntityList;
     }
 
     @Override
-    public boolean updateInquiry(InquiryEntity inquiryEntity) {
+    public List<InquiryEntity> readAll() {
+        List<InquiryEntity> inquiryEntityList = inquiryRepository
+                .findAll();
+        return inquiryEntityList;
+    }
+
+    @Override
+    public boolean update(InquiryEntity inquiryEntity) {
         Optional<InquiryEntity> oldInquiryEntity = inquiryRepository
                 .findById(inquiryEntity.getInquiryNumber());
         if(oldInquiryEntity.isPresent()){
@@ -55,7 +62,7 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public boolean deleteInquiry(Long id) {
+    public boolean delete(Long id) {
         inquiryRepository.deleteById(id);
         Optional<InquiryEntity> oldInquiryEntity = inquiryRepository
                 .findById(id);

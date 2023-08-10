@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Store")
+@RequestMapping("/inquiry")
 public class InquiryController {
     private static final Logger logger = LoggerFactory.getLogger(InquiryController.class);
     private InquiryServiceImpl inquiryServiceImpl;
@@ -19,28 +19,33 @@ public class InquiryController {
         this.inquiryServiceImpl = inquiryServiceImpl;
     }
 
-    @GetMapping("/recent")
-    public JSONObject getRecentInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readRecentInquiry(jsonObject);
+    @GetMapping("/recent-writer")
+    public JSONObject getRecentInquiryByWriter(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.readRecentByWriter(jsonObject);
+    }
+
+    @GetMapping("/all-writer")
+    public List<JSONObject> getAllInquiryByWriter(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.readAllByWriter(jsonObject);
     }
 
     @GetMapping("/all")
     public List<JSONObject> getAllInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readAllInquiry(jsonObject);
+        return inquiryServiceImpl.readAll();
     }
 
     @PostMapping("/")
     public JSONObject postInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.createInquiry(jsonObject);
+        return inquiryServiceImpl.create(jsonObject);
     }
 
     @PutMapping("/")
     public JSONObject putInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.updateInquiry(jsonObject);
+        return inquiryServiceImpl.update(jsonObject);
     }
 
     @DeleteMapping("/")
     public JSONObject deleteInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.deleteInquiry(jsonObject);
+        return inquiryServiceImpl.delete(jsonObject);
     }
 }
