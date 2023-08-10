@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Store")
+@RequestMapping("/inquiry")
 public class InquiryController {
     private static final Logger logger = LoggerFactory.getLogger(InquiryController.class);
     private InquiryServiceImpl inquiryServiceImpl;
@@ -19,34 +19,33 @@ public class InquiryController {
         this.inquiryServiceImpl = inquiryServiceImpl;
     }
 
-    @GetMapping("/")
-    public JSONObject getInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readInquiry((String) jsonObject.get("author"));
+    @GetMapping("/recent-writer")
+    public JSONObject getRecentInquiryByWriter(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.readRecentByWriter(jsonObject);
     }
-    @GetMapping("/recent")
-    public JSONObject getRecentInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readRecentInquiry((String) jsonObject.get("author"));
+
+    @GetMapping("/all-writer")
+    public List<JSONObject> getAllInquiryByWriter(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.readAllByWriter(jsonObject);
     }
 
     @GetMapping("/all")
     public List<JSONObject> getAllInquiry(@RequestBody JSONObject jsonObject){
-        return inquiryServiceImpl.readAllInquiry((String) jsonObject.get("author"));
+        return inquiryServiceImpl.readAll();
     }
 
     @PostMapping("/")
-    public void postInquiry(@RequestBody JSONObject jsonObject){
-        inquiryServiceImpl.createInquiry(jsonObject);
+    public JSONObject postInquiry(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.create(jsonObject);
     }
 
     @PutMapping("/")
-    public void putInquiry(@RequestBody JSONObject jsonObject){
-        inquiryServiceImpl.updateInquiry(jsonObject);
+    public JSONObject putInquiry(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.update(jsonObject);
     }
 
     @DeleteMapping("/")
-    public void deleteInquiry(@RequestBody JSONObject jsonObject){
-        String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
-        Long inquiryNumber = Long.valueOf(inquiryNumberStr);
-        inquiryServiceImpl.deletePost(inquiryNumber);
+    public JSONObject deleteInquiry(@RequestBody JSONObject jsonObject){
+        return inquiryServiceImpl.delete(jsonObject);
     }
 }

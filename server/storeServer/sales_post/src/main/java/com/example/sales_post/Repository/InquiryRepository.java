@@ -9,7 +9,10 @@ import java.util.List;
 
 @Repository
 public interface InquiryRepository extends JpaRepository<InquiryEntity, Long> {
-    InquiryEntity findByInquiryAuthor(String inquiryAuthor);
-    InquiryEntity findTopByInquiryAuthorOrderByInquiryNumberDesc(String inquiryAuthor);
-    List<InquiryEntity> findAllByInquiryAuthor(String inquiryAuthor);
+    @Query(value = "SELECT * FROM inquiry_entity i " +
+            "WHERE i.inquiry_writer = ?2 " +
+            "AND i.post_number = ?1 " +
+            "ORDER BY i.inquiry_number DESC LIMIT 1", nativeQuery = true)
+    InquiryEntity findLatestInquiryByWriterAndPostNumber(Long postNumber, String inquiryWriter);
+    List<InquiryEntity> findAllByInquiryWriter(String inquiryWriter);
 }

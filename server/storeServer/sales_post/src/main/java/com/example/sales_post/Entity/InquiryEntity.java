@@ -1,26 +1,33 @@
 package com.example.sales_post.Entity;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Setter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.stereotype.Repository;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Inquiry")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class InquiryEntity {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inquiryNumber;
 
-    private String inquiryAuthor;
+    private String inquiryWriter;
     private String inquiryContents;
+
+    @ManyToOne
+    @JoinColumn(name = "postNumber")
+    private SalesPostEntity salesPostEntity;
+
+    @Builder
+    public InquiryEntity(Long inquiryNumber, String inquiryWriter, String inquiryContents, SalesPostEntity salesPostEntity) {
+        this.inquiryNumber = inquiryNumber;
+        this.inquiryWriter = inquiryWriter;
+        this.inquiryContents = inquiryContents;
+        this.salesPostEntity = salesPostEntity;
+    }
 }

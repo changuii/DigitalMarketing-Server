@@ -1,23 +1,15 @@
 package com.example.sales_post.Entity;
 
-
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-
-//==========================================================================================
-// 추가 사항: 어노테이션 설정 할 것,
-//==========================================================================================
+import javax.persistence.*;
 
 
 
 @Entity
+@Table(name = "SalesPost")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,7 +18,7 @@ public class SalesPostEntity { // 제품정보 엔티티 extends해야함
 
     // salesPost: 게시글
     @Id
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long postNumber;
 
     private String category;

@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Product")
@@ -16,14 +14,14 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductEntity {
-
-    // product_info: 제품정보
     @Id
-    private String productSerialNumber;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long productSerialNumber;
 
     private String productName;
     private int productPrice;
     private int productAmount;
     private int productDeliveryFee;
     private String storeLocation;
+
 }
