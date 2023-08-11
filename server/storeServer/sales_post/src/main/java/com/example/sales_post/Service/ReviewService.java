@@ -10,7 +10,6 @@ import java.util.List;
 @Service
 public interface ReviewService {
     JSONObject create(JSONObject jsonObject);
-    JSONObject readRecentByWriter(JSONObject jsonObject);
     List<JSONObject> readAllByWriter(JSONObject jsonObject);
     List<JSONObject> readAll();
     JSONObject update(JSONObject jsonObject);

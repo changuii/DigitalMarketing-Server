@@ -8,28 +8,31 @@ import javax.persistence.*;
 @Table(name = "Review")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class ReviewEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reviewNumber;
+    private Long reviewNumber; //리뷰번호 Auto Increment
 
-    private String reviewAuthor;
-    private String reviewContents;
-    private int reviewStarRating;
-    private int reviewLike;
+    private String reviewAuthor; //작성자
+    private String reviewContents; //내용
+    private Integer reviewStarRating; //별점
+    private Integer reviewLike; //좋아요
+    private String reviewDate; //작성날짜
 
     @ManyToOne
-    @JoinColumn(name = "postNumber_id")
-    private SalesPostEntity salesPostEntity;
+    @JoinColumn(name = "postNumber_id") //외래키 생성, SalePostRepository 의 id와 매핑
+    private SalesPostEntity salesPostEntity; //리뷰의 제품 게시글
 
     @Builder
-    public ReviewEntity(Long reviewNumber, String reviewAuthor, String reviewContents, int reviewStarRating, int reviewLike, SalesPostEntity salesPostEntity) {
+    public ReviewEntity(Long reviewNumber, String reviewAuthor, String reviewContents, int reviewStarRating, int reviewLike, String reviewDate, SalesPostEntity salesPostEntity) {
         this.reviewNumber = reviewNumber;
         this.reviewAuthor = reviewAuthor;
         this.reviewContents = reviewContents;
         this.reviewStarRating = reviewStarRating;
         this.reviewLike = reviewLike;
+        this.reviewDate = reviewDate;
         this.salesPostEntity = salesPostEntity;
     }
 }

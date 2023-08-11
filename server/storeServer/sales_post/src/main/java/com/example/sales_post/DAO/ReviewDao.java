@@ -7,8 +7,7 @@ import java.util.List;
 
 public interface ReviewDao {
     boolean create(ReviewEntity reviewEntity);
-    ReviewEntity readRecentByWriter(Long postNumber, Long reviewNumber);
-    List<ReviewEntity> readAllByWriter(Long postNumber, Long reviewNumber);
+    List<ReviewEntity> readAllByWriter(String reviewAuthor);
     List<ReviewEntity> readAll();
     boolean update(ReviewEntity reviewEntity);
     boolean delete(Long reviewNumber);
