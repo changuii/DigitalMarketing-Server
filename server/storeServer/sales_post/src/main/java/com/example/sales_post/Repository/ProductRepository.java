@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, String> {
-    List<ProductEntity> findByproductPriceGreaterThan(int productPrice);
 
+    List<ProductEntity> findByproductPriceGreaterThan(int productPrice);
+    ProductEntity findByProductSerialNumber(Long productSerialNumber);
+    boolean existsByProductSerialNumber(Long productSerialNumber);
 }
