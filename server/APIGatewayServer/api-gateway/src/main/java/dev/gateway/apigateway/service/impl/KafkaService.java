@@ -1,7 +1,6 @@
-package dev.gateway.apigateway.service;
+package dev.gateway.apigateway.service.impl;
 
 
-import dev.gateway.apigateway.dto.TestDTO;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ public class KafkaService {
 
 
     // topic name
-    private static final String TOPIC = "test2";
     private final KafkaTemplate<String, JSONObject> kafkaTemplate;
     private static final Logger logger = LoggerFactory.getLogger(KafkaService.class);
 
@@ -24,13 +22,9 @@ public class KafkaService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(TestDTO message) {
-        logger.info("Producer Message : {}", message);
+    public void sendMessage(JSONObject json, String TOPIC) {
+        logger.info("Producer Message : {}", json.toString());
         // DTO를 JSON으로 맵핑
-        JSONObject json = new JSONObject();
-        json.put("title", message.getTitle());
-        json.put("text", message.getContent());
-        json.put("id", message.getId());
         this.kafkaTemplate.send(TOPIC, json);
 //        for (int i = 0; i < 10; i++) {
 //            this.kafkaTemplate.send(TOPIC, json);

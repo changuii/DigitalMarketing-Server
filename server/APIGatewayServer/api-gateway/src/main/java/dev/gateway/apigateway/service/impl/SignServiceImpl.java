@@ -1,4 +1,4 @@
-package dev.gateway.apigateway.service;
+package dev.gateway.apigateway.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -7,6 +7,7 @@ import dev.gateway.apigateway.Entity.UserEntity;
 import dev.gateway.apigateway.config.security.JwtTokenProvider;
 import dev.gateway.apigateway.dto.KakaoDTO;
 import dev.gateway.apigateway.repository.UserRepository;
+import dev.gateway.apigateway.service.SignService;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import java.util.Collections;
 
 
 @Service
-public class SignServiceImpl implements SignService{
+public class SignServiceImpl implements SignService {
 
     private static final Logger logger = LoggerFactory.getLogger(SignServiceImpl.class);
 

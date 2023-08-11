@@ -1,4 +1,4 @@
-package dev.gateway.apigateway.service;
+package dev.gateway.apigateway.service.impl;
 
 import dev.gateway.apigateway.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
