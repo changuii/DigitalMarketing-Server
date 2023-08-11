@@ -2,22 +2,23 @@ package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.ProductDaoImpl;
 import com.example.sales_post.Entity.ProductEntity;
+import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.ProductRepository;
 import com.sun.istack.Nullable;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class ProductServiceImpl implements ProductService{
     private final ProductDaoImpl productDaoimpl;
-    private final ProductRepository productRepository;
 
-    public ProductServiceImpl(@Autowired ProductDaoImpl productDaoimpl
-                            , @Autowired ProductRepository productRepository) {
+    public ProductServiceImpl(@Autowired ProductDaoImpl productDaoimpl) {
         this.productDaoimpl = productDaoimpl;
-        this.productRepository = productRepository;
     }
 
 
@@ -29,6 +30,24 @@ public class ProductServiceImpl implements ProductService{
         if(productEntity == null) { return resultJsonObject(false); }
         else { return resultJsonObject(true,productEntity); }
     }
+
+    @Override
+    public List<JSONObject> readAll() {
+        List<ProductEntity> productEntityList = productDaoimpl.readAll();
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+
+        if (productEntityList == null || productEntityList.isEmpty()) {
+            JSONObject resultJsonObject = resultJsonObject(false);
+            jsonObjectList.add(resultJsonObject);
+        } else{
+            for (ProductEntity entity : productEntityList) {
+                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                jsonObjectList.add(resultJsonObject);
+            }
+        }
+        return jsonObjectList;
+    }
+
 
     @Override
     public JSONObject create(JSONObject jsonObject) {
@@ -57,7 +76,7 @@ public class ProductServiceImpl implements ProductService{
         @Nullable
         Long oldserialNumber = Long.parseLong((jsonObject.get("productSerialNumber").toString())); //old product
         Long serialNumber = Long.parseLong(jsonObject.get("productSerialNumber").toString()); // new or modify target product
-        ProductEntity productEntity = productRepository.findByProductSerialNumber(oldserialNumber);// get old
+        ProductEntity productEntity = productDaoimpl.read(oldserialNumber);// get old
 
         productEntity = ProductEntity.builder()
                 .productSerialNumber(serialNumber)

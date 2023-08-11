@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Id;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -16,7 +17,6 @@ import java.util.Optional;
 
 @Repository
 public class ProductDaoImpl implements ProductDao{
-
     private final ProductRepository productRepository;
 
     public ProductDaoImpl(@Autowired ProductRepository productRepository) {
@@ -26,6 +26,11 @@ public class ProductDaoImpl implements ProductDao{
     @Override
     public ProductEntity read(Long productSerialNumber) {
         return this.productRepository.findByProductSerialNumber(productSerialNumber);
+    }
+
+    @Override
+    public List<ProductEntity> readAll() {
+        return this.productRepository.findAll();
     }
 
     @Override

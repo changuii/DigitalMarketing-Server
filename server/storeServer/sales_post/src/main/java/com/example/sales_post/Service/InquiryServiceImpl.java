@@ -95,7 +95,6 @@ public class InquiryServiceImpl implements InquriyService {
         String postNumberStr = (String) jsonObject.get("salesPostNumber");
         Long postNumber = Long.parseLong(postNumberStr);
         SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
-
         String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
         Long inquiryNumber = Long.valueOf(inquiryNumberStr);
 

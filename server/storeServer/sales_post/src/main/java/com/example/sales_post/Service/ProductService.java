@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface ProductService {
     JSONObject create(JSONObject jsonObject);
     JSONObject read(JSONObject jsonObject);
+    List<JSONObject> readAll();
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     ProductEntity jsonToEntity(JSONObject jsonObject);

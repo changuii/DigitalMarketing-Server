@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface InquiryDao {
     boolean create(InquiryEntity inquiryEntity);
-    InquiryEntity readRecentByWriter(Long postNumber, String Writer);
-    List<InquiryEntity> readAllByWriter(Long postNumber, String Writer);
+    InquiryEntity readRecentByWriter(Long postNumber, String inquiryWriter);
+    List<InquiryEntity> readAllByWriter(Long postNumber, String inquiryWriter);
     List<InquiryEntity> readAll();
     boolean update(InquiryEntity inquiryEntity);
     boolean delete(Long inquiryNumber);
