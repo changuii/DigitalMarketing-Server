@@ -16,13 +16,9 @@ public class ReviewDaoImpl implements ReviewDao{
     }
     @Override
     public boolean create(ReviewEntity reviewEntity) {
-        if(reviewRepository.existsByReviewAuthor(reviewEntity.getReviewAuthor())) // 중복작성 방지, 제품을 두 번 이상 구매하는 경우도 있는데 일단 넣었음.
-            return false;
-        else{
-            reviewRepository.save(reviewEntity);
+        reviewRepository.save(reviewEntity);
         return true;
         }
-    }
     @Override
     public List<ReviewEntity> readAllByWriter(String reviewAuthor) { //작성자의 모든 리뷰 조회. 작성날짜에 따른 정렬기능 필요
         List<ReviewEntity> reviewEntityList = reviewRepository.readAllByReviewAuthor(reviewAuthor);

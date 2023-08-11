@@ -34,7 +34,7 @@ public class ReviewController {
     }
 
     //작성자의 모든 리뷰 READ
-    @GetMapping("/read-Author")
+    @GetMapping("/read-author")
     public List<JSONObject> readAllByAuthorReview(JSONObject jsonObject){
         logger.info("read-By-Author");
         return reviewService.readAllByWriter(jsonObject);

@@ -1,6 +1,7 @@
 package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.ReviewDaoImpl;
+import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.ReviewEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.SalesPostRepository;
@@ -8,6 +9,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,13 +30,36 @@ public class ReviewServiceImpl implements ReviewService{
     }
     @Override
     public List<JSONObject> readAllByWriter(JSONObject jsonObject) {
-        return null;
+        List<ReviewEntity> reviewEntityList = reviewDaoImpl.readAllByWriter((String) jsonObject.get("reviewAuthor"));
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+
+        if (reviewEntityList == null || reviewEntityList.isEmpty()) {
+            JSONObject resultJsonObject = resultJsonObject(false);
+            jsonObjectList.add(resultJsonObject);
+        } else{
+            for (ReviewEntity entity : reviewEntityList) {
+                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                jsonObjectList.add(resultJsonObject);
+            }
+        }
+        return jsonObjectList;
     }
 
     @Override
     public List<JSONObject> readAll() {
         List<ReviewEntity> reviewEntityList = reviewDaoImpl.readAll();
-        return null;
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+
+        if (reviewEntityList == null || reviewEntityList.isEmpty()) {
+            JSONObject resultJsonObject = resultJsonObject(false);
+            jsonObjectList.add(resultJsonObject);
+        } else{
+            for (ReviewEntity entity : reviewEntityList) {
+                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                jsonObjectList.add(resultJsonObject);
+            }
+        }
+        return jsonObjectList;
     }
 
     @Override
@@ -53,9 +78,9 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public ReviewEntity jsonToEntity(JSONObject jsonObject) {
-        Long postNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
-        SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
 
+        Long postNumber = Long.parseLong((String) jsonObject.get("postNumber_Id"));
+        SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
         Long reviewNumber = Long.valueOf((String) jsonObject.get("reviewNumber"));
 
         ReviewEntity reviewEntity = ReviewEntity.builder()
@@ -86,7 +111,7 @@ public class ReviewServiceImpl implements ReviewService{
         jsonObject.put("reviewContents",reviewEntity.getReviewNumber());
         jsonObject.put("reviewLike",reviewEntity.getReviewNumber());
         jsonObject.put("reviewDate",reviewEntity.getReviewNumber());
-        jsonObject.put("salesPostNumber", reviewEntity.getSalesPostEntity().getPostNumber());
+        jsonObject.put("postNumber_Id", reviewEntity.getSalesPostEntity().getPostNumber());
         jsonObject.put(("result"),result);
         return jsonObject;
     }
