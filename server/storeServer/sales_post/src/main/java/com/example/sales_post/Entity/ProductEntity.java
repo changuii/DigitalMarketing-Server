@@ -1,9 +1,6 @@
 package com.example.sales_post.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,7 +9,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +20,15 @@ public class ProductEntity {
     private int productDeliveryFee;
     private String storeLocation;
 
+    @Builder
+    public ProductEntity(Long productSerialNumber, String productName, int productPrice,
+                         int productAmount, int productDeliveryFee, String storeLocation)
+    {
+        this.productSerialNumber  =   productSerialNumber ;
+        this.productName          =   productName         ;
+        this.productPrice         =   productPrice        ;
+        this.productAmount        =   productAmount       ;
+        this.productDeliveryFee   =   productDeliveryFee  ;
+        this.storeLocation        =   storeLocation       ;
+    }
 }

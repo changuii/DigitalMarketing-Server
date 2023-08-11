@@ -1,3 +1,4 @@
+package com.example.sales_post.Service;
 
 import com.example.sales_post.Entity.SalesPostEntity;
 import org.json.simple.JSONObject;
@@ -6,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class SalesPostServiceImpl implements SalesPostService{
+public class SalesPostServiceImpl implements SalesPostService {
     @Override
     public JSONObject create(JSONObject jsonObject) {
         return null;
@@ -48,8 +49,9 @@ public class SalesPostServiceImpl implements SalesPostService{
     }
 
     @Override
-    public JSONObject resultJsonObject(boolean result, SalesPostEntity salesPostEntity) {
-        return null;
+    public JSONObject resultJsonObject(boolean result, SalesPostEntity salesPostEntity) { return null;}
+
+}
 
 
         //package com.example.sales_post.Service;
