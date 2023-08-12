@@ -32,10 +32,10 @@ def handle_message(data):
             # 유효하면 저장합니다.
             serializer.save()
             # Redis에 성공 메시지를 저장합니다.
-            save_to_redis(request_id, {"status": "success"})
+            save_to_redis(request_id, {"result": "success"})
         else:
             # 유효하지 않으면 Redis에 실패 메시지와 에러 메시지를 저장합니다.
-            save_to_redis(request_id, {"status": "failure", "message": serializer.errors})
+            save_to_redis(request_id, {"result": serializer.errors})
 
     # action이 'PMPOSTUPDATE'일 경우의 로직
     elif action == 'PMPOSTUPDATE':
@@ -49,10 +49,10 @@ def handle_message(data):
                 # 유효하면 저장합니다.
                 serializer.save()
                 # Redis에 성공 메시지를 저장합니다.
-                save_to_redis(request_id, {"status": "success"})
+                save_to_redis(request_id, {"result": "success"})
         except Post.DoesNotExist:
             # Post 객체가 존재하지 않는 경우, Redis에 실패 메시지를 저장합니다.
-            save_to_redis(request_id, {"status": "failure", "message": "Post Not Found"})
+            save_to_redis(request_id, {"result": "Post Not Found"})
 
     # action이 'PMPOSTDELETE'일 경우의 로직
     elif action == 'PMPOSTDELETE':
@@ -62,10 +62,10 @@ def handle_message(data):
             # Post 객체를 삭제합니다.
             post.delete()
             # Redis에 성공 메시지를 저장합니다.
-            save_to_redis(request_id, {"status": "success"})
+            save_to_redis(request_id, {"result": "success"})
         except Post.DoesNotExist:
             # Post 객체가 존재하지 않는 경우, Redis에 실패 메시지를 저장합니다.
-            save_to_redis(request_id, {"status": "failure", "message": "Post Not Found"})
+            save_to_redis(request_id, {"result": "Post Not Found"})
 
     # action이 'PMPOSTREADALL'일 경우의 로직
     elif action == 'PMPOSTREADALL':
@@ -79,12 +79,11 @@ def handle_message(data):
         # 직렬화된 데이터가 있으면 Redis에 성공 메시지와 함께 저장합니다.
         if posts_data:
             save_to_redis(request_id, {
-                "status": "success",
+                "result": "success",
                 "data": posts_data
             })
         else:
             # 데이터가 없으면 Redis에 실패 메시지를 저장합니다.
             save_to_redis(request_id, {
-                "status": "failure",
-                "message": "No posts found"
+                "result": "No posts found"
             })
