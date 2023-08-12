@@ -12,11 +12,12 @@ import java.util.Map;
 public interface InquriyService {
     JSONObject create(JSONObject jsonObject);
     JSONObject readRecentByWriter(JSONObject jsonObject);
-    List<JSONObject> readAllByWriter(JSONObject jsonObject);
-    List<JSONObject> readAll();
+    JSONObject readAllByWriter(JSONObject jsonObject);
+    JSONObject readAll();
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     Map<String, Object> jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(InquiryEntity inquiryEntity);
     JSONObject resultJsonObject(String result);
+    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
 }

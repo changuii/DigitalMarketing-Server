@@ -46,7 +46,7 @@ public class SalesPostServiceImpl implements SalesPostService {
     }
 
     @Override
-    public List<JSONObject> readAllByWriter(JSONObject jsonObject) {
+    public JSONObject readAllByWriter(JSONObject jsonObject) {
         Map<String, Object> salesPostMap = salesPostDaoImpl.readAllByWriter((String) jsonObject.get("postWriter"));
 
         List<SalesPostEntity> salesPostEntityList = (List<SalesPostEntity>) salesPostMap.get("data");
@@ -62,11 +62,11 @@ public class SalesPostServiceImpl implements SalesPostService {
         } else {
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(jsonObjectList);
     }
 
     @Override
-    public List<JSONObject> readAll() {
+    public JSONObject readAll() {
         Map<String, Object> saelsPostMap = salesPostDaoImpl.readAll();
 
         List<SalesPostEntity> salesPostEntityList = (List<SalesPostEntity>) saelsPostMap.get("data");
@@ -82,7 +82,7 @@ public class SalesPostServiceImpl implements SalesPostService {
         } else {
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(jsonObjectList);
     }
 
     @Override
@@ -114,6 +114,13 @@ public class SalesPostServiceImpl implements SalesPostService {
     public JSONObject resultJsonObject(String result) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("data", jsonObjectList);
         return jsonObject;
     }
 }

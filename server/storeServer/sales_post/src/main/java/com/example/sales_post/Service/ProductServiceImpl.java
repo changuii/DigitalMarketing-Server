@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public List<JSONObject> readAll() {
+    public JSONObject readAll() {
         Map<String, Object> productMap = productDaoImpl.readAll();
 
         List<ProductEntity> productEntityList = (List<ProductEntity>) productMap.get("data");
@@ -78,7 +78,7 @@ public class ProductServiceImpl implements ProductService{
         } else{
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(result);
     }
 
 
@@ -133,6 +133,13 @@ public class ProductServiceImpl implements ProductService{
     public JSONObject resultJsonObject(String result){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("data", jsonObjectList);
         return jsonObject;
     }
 }

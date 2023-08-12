@@ -27,35 +27,24 @@ public class ProductController {
 
     //GET
     @GetMapping("/read")
-    public JSONObject getProduct(@RequestBody JSONObject jsonObject) {
+    public JSONObject readProduct(@RequestBody JSONObject jsonObject) {
         return productServiceImpl.read(jsonObject);
     }
 
     @GetMapping("/read-all")
-    public List<JSONObject> getAllProduct() {
+    public JSONObject readAllProduct() {
         return productServiceImpl.readAll();
     }
 
     //POST
     @PostMapping("/create")
-    public JSONObject postProduct(@Validated @RequestBody JSONObject jsonObject, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {// BadRequest에 대한 오류 메세지 출력임 근데 동작 안됨
-            FieldError fieldError = bindingResult.getFieldError();
-            String errorMessage = new StringBuilder("validation error")
-                    .append("field: ").append(fieldError.getField())
-                    .append(", code: ").append(fieldError.getCode())
-                    .append(", message: ").append(fieldError.getDefaultMessage())
-                    .toString();
-
-            System.out.println(errorMessage);
-            return productServiceImpl.resultJsonObject("fail");
-        }
+    public JSONObject createProduct(@RequestBody JSONObject jsonObject) {
         return productServiceImpl.create(jsonObject);
     }
 
     //PUT
     @PutMapping("/update")
-    public JSONObject putProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.update(jsonObject);}
+    public JSONObject updateProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.update(jsonObject);}
 
     //DELETE
     @DeleteMapping("/delete")

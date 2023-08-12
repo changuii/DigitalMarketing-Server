@@ -3,10 +3,8 @@ package com.example.sales_post.Service;
 import com.example.sales_post.DAO.ReviewDaoImpl;
 import com.example.sales_post.DAO.SalesPostDaoImpl;
 import com.example.sales_post.Entity.InquiryEntity;
-import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.ReviewEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
-import com.example.sales_post.Repository.SalesPostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +44,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public List<JSONObject> readAllByWriter(JSONObject jsonObject) {
+    public JSONObject readAllByWriter(JSONObject jsonObject) {
         Map<String, Object> reviewMap = reviewDaoImpl.readAllByWriter((String) jsonObject.get("reviewWriter"));
 
         List<ReviewEntity> reviewEntityList = (List<ReviewEntity>) reviewMap.get("data");
@@ -62,11 +60,11 @@ public class ReviewServiceImpl implements ReviewService{
         } else{
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(jsonObjectList);
     }
 
     @Override
-    public List<JSONObject> readAll() {
+    public JSONObject readAll() {
         Map<String, Object> reviewMap = reviewDaoImpl.readAll();
 
         List<ReviewEntity> reviewEntityList = (List<ReviewEntity>) reviewMap.get("data");
@@ -82,7 +80,7 @@ public class ReviewServiceImpl implements ReviewService{
         } else{
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(jsonObjectList);
     }
 
     @Override
@@ -135,6 +133,13 @@ public class ReviewServiceImpl implements ReviewService{
     public JSONObject resultJsonObject(String result) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("data", jsonObjectList);
         return jsonObject;
     }
 }

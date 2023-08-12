@@ -3,7 +3,6 @@ package com.example.sales_post.Service;
 import com.example.sales_post.DAO.InquiryDaoImpl;
 import com.example.sales_post.DAO.SalesPostDaoImpl;
 import com.example.sales_post.Entity.InquiryEntity;
-import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
@@ -11,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,7 @@ public class InquiryServiceImpl implements InquriyService {
         return resultJsonObject;
     }
 
-    public List<JSONObject> readAllByWriter(JSONObject jsonObject) {
+    public JSONObject readAllByWriter(JSONObject jsonObject) {
         String postNumberStr = (String) jsonObject.get("salesPostNumber");
         Long postNumber = Long.valueOf(postNumberStr);
         Map<String, Object> inquiryMap = inquiryDaoImpl.readAllByWriter(postNumber, (String) jsonObject.get("inquiryWriter"));
@@ -78,11 +79,11 @@ public class InquiryServiceImpl implements InquriyService {
         } else{
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(result);
     }
 
     @Override
-    public List<JSONObject> readAll() {
+    public JSONObject readAll() {
         Map<String, Object> inquiryMap = inquiryDaoImpl.readAll();
 
         List<InquiryEntity> inquiryEntityList = (List<InquiryEntity>) inquiryMap.get("data");
@@ -98,7 +99,7 @@ public class InquiryServiceImpl implements InquriyService {
         } else{
             jsonObjectList.add(resultJsonObject(result));
         }
-        return jsonObjectList;
+        return resultJsonObject(result);
     }
 
     public JSONObject update(JSONObject jsonObject){
@@ -148,6 +149,13 @@ public class InquiryServiceImpl implements InquriyService {
     public JSONObject resultJsonObject(String result){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("data", jsonObjectList);
         return jsonObject;
     }
 }

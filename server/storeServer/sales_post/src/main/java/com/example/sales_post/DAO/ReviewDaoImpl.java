@@ -1,7 +1,6 @@
 package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.ReviewEntity;
-import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

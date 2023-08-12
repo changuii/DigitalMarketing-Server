@@ -11,11 +11,12 @@ import java.util.Map;
 @Service
 public interface ReviewService {
     JSONObject create(JSONObject jsonObject);
-    List<JSONObject> readAllByWriter(JSONObject jsonObject);
-    List<JSONObject> readAll();
+    JSONObject readAllByWriter(JSONObject jsonObject);
+    JSONObject readAll();
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     Map<String, Object> jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(ReviewEntity reviewEntity);
     JSONObject resultJsonObject(String result);
+    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
 }

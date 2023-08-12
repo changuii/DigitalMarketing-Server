@@ -11,10 +11,11 @@ import java.util.Map;
 public interface ProductService {
     JSONObject create(JSONObject jsonObject);
     JSONObject read(JSONObject jsonObject);
-    List<JSONObject> readAll();
+    JSONObject readAll();
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     Map<String, Object> jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(ProductEntity productEntity);
     JSONObject resultJsonObject(String result);
+    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
 }

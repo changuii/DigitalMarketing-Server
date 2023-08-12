@@ -1,9 +1,7 @@
 package com.example.sales_post.DAO;
 
-import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.SalesPostRepository;
-import org.apache.kafka.common.quota.ClientQuotaAlteration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
