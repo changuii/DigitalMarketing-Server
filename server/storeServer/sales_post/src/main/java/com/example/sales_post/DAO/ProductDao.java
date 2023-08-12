@@ -9,6 +9,9 @@ import java.util.Optional;
 public interface ProductDao {
     boolean create(ProductEntity productEntity);
     ProductEntity read(Long productSerialNumber);
+    List<ProductEntity> readAll();
     boolean update(ProductEntity productEntity);
     boolean delete(Long productSerialNumber);
+
+
 }

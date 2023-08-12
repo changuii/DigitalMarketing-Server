@@ -1,6 +1,7 @@
 package com.example.sales_post.Entity;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
