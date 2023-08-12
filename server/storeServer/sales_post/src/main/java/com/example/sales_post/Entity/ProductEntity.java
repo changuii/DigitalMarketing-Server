@@ -1,35 +1,30 @@
 package com.example.sales_post.Entity;
 
-import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
 
+import lombok.*;
 import javax.persistence.*;
+import javax.validation.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Product")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productSerialNumber;
+    private Long productSerialNumber;    //  productSerialNumbe  : 제품 번호
 
-    private String productName;
-    private int productPrice;
-    private int productAmount;
-    private int productDeliveryFee;
-    private String storeLocation;
+    @NotEmpty
+    private String productName;          //  productName         : 제품 이름
+    @NotEmpty
+    private Long productPrice;           //  productPrice        : 제품 가격
 
-    @Builder
-    public ProductEntity(Long productSerialNumber, String productName, int productPrice,
-                         int productAmount, int productDeliveryFee, String storeLocation)
-    {
-        this.productSerialNumber  =   productSerialNumber ;
-        this.productName          =   productName         ;
-        this.productPrice         =   productPrice        ;
-        this.productAmount        =   productAmount       ;
-        this.productDeliveryFee   =   productDeliveryFee  ;
-        this.storeLocation        =   storeLocation       ;
-    }
+    private Long productAmount;          //  productAmount       : 제품 수량
+    private Long productDeliveryFee;     //  productDeliveryFee  : 제품 배달비
+    private String storeLocation;        //  storeLocation       : 가게 위치
+
 }

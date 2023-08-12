@@ -33,20 +33,7 @@ public class ProductController {
 
     //POST
     @PostMapping("/create")
-    public JSONObject postProduct(@Validated @RequestBody JSONObject jsonObject, BindingResult bindingResult){
-        if(bindingResult.hasErrors())
-        {// BadRequest에 대한 오류 메세지 출력임 근데 동작 안됨
-            FieldError fieldError = bindingResult.getFieldError();
-            String errorMessage = new StringBuilder("validation error")
-                    .append("field: ").append(fieldError.getField())
-                    .append(", code: ").append(fieldError.getCode())
-                    .append(", message: ").append(fieldError.getDefaultMessage())
-                    .toString();
-
-            System.out.println(errorMessage);
-            return productServiceImpl.resultJsonObject("fail");
-        }
-        return productServiceImpl.create(jsonObject);}
+    public JSONObject postProduct(@RequestBody JSONObject jsonObject){ return productServiceImpl.create(jsonObject);}
 
     //PUT
     @PutMapping("/update")

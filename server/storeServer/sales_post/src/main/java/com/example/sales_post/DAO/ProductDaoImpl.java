@@ -2,10 +2,20 @@ package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import java.util.Set;
 import java.util.List;
 import java.util.Optional;
+
+
+
+import javax.validation.*;
 
 
 //================================================================================
@@ -29,27 +39,43 @@ public class ProductDaoImpl implements ProductDao{
 //    2.일부 값만 들어오는 경우
 //    3.이미 존재하는 값
 //================================================================================
-    @Override
-    public boolean create(ProductEntity productEntity) {
 
-        Long serialNumber = productEntity.getProductSerialNumber();
-        if (productRepository.existsByProductSerialNumber(serialNumber)){
-            return false;
-        }
-        else {
-            this.productRepository.save(productEntity);
-            return true;
+    @Autowired
+    private Validator validator;
+
+    public String validCheck(ProductEntity productEntity)
+    {
+        Set<ConstraintViolation<ProductEntity>> violations = validator.validate(productEntity);
+
+        if (violations.isEmpty()) {
+            return "success";
+        } else {
+            StringBuilder errorMessage = new StringBuilder();
+            for (ConstraintViolation<ProductEntity> violation : violations) {
+                errorMessage.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("\n");
+            }
+//            return new ValidationException(String.valueOf(errorMessage)).toString();
+            return errorMessage.toString();
         }
     }
 
+
+    @Override
+    public String create(ProductEntity productEntity) {
+        Long serialNumber = productEntity.getProductSerialNumber();
+        String valid = validCheck(productEntity);
+
+        if (!productRepository.existsByProductSerialNumber(serialNumber) && valid.equals("success")) {
+            this.productRepository.save(productEntity);
+        }
+        return valid;
+    }
+
+
+
     @Override
     public ProductEntity read(Long productSerialNumber) {
-        try{
-            return this.productRepository.findByProductSerialNumber(productSerialNumber);
-        }catch(NullPointerException e){
-            return productRepository.re
-        }
-
+        return this.productRepository.findByProductSerialNumber(productSerialNumber);
     }
 
     @Override
@@ -62,7 +88,6 @@ public class ProductDaoImpl implements ProductDao{
 //================================================================================
 //  update 예외사항
 //    1.존재하지 않는 값에대한 업데이트 요청
-//
 //================================================================================
     @Override
     public boolean update(ProductEntity productEntity) {
@@ -70,11 +95,10 @@ public class ProductDaoImpl implements ProductDao{
             if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber()))
             {
                 ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
-                productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
                 productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
-                productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
-                productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
-                productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
+                productEntity.setProductPrice(Optional.ofNullable(productEntity.getProductPrice()).orElse(oldProductEntity.getProductPrice()));
+                productEntity.setProductAmount(Optional.ofNullable(productEntity.getProductAmount()).orElse(oldProductEntity.getProductAmount()));
+                productEntity.setProductDeliveryFee(Optional.ofNullable(productEntity.getProductDeliveryFee()).orElse(oldProductEntity.getProductDeliveryFee()));
                 productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
                 productRepository.save(productEntity);
                 return true;
