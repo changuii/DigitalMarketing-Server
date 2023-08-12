@@ -4,32 +4,26 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "Product")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productSerialNumber;
 
     private String productName;
-    private int productPrice;
-    private int productAmount;
-    private int productDeliveryFee;
+    private Long productPrice;
+    private Long productAmount;
+    private Long productDeliveryFee;
     private String storeLocation;
 
-    @Builder
-    public ProductEntity(Long productSerialNumber, String productName, int productPrice,
-                         int productAmount, int productDeliveryFee, String storeLocation)
-    {
-        this.productSerialNumber  =   productSerialNumber ;
-        this.productName          =   productName         ;
-        this.productPrice         =   productPrice        ;
-        this.productAmount        =   productAmount       ;
-        this.productDeliveryFee   =   productDeliveryFee  ;
-        this.storeLocation        =   storeLocation       ;
-    }
+    @ManyToOne
+    @JoinColumn(name = "postNumber")
+    private SalesPostEntity salesPostEntity;
 }

@@ -28,7 +28,7 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public JSONObject create(JSONObject jsonObject) {
         ReviewEntity reviewEntity = jsonToEntity(jsonObject);
-        boolean result = reviewDaoImpl.create(reviewEntity);
+        String result = reviewDaoImpl.create(reviewEntity);
         return resultJsonObject(result);
     }
     @Override
@@ -37,11 +37,11 @@ public class ReviewServiceImpl implements ReviewService{
         List<JSONObject> jsonObjectList = new ArrayList<>();
 
         if (reviewEntityList == null || reviewEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject(false);
+            JSONObject resultJsonObject = resultJsonObject("success");
             jsonObjectList.add(resultJsonObject);
         } else{
             for (ReviewEntity entity : reviewEntityList) {
-                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                JSONObject resultJsonObject = resultJsonObject("fail", entity);
                 jsonObjectList.add(resultJsonObject);
             }
         }
@@ -54,11 +54,11 @@ public class ReviewServiceImpl implements ReviewService{
         List<JSONObject> jsonObjectList = new ArrayList<>();
 
         if (reviewEntityList == null || reviewEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject(false);
+            JSONObject resultJsonObject = resultJsonObject("success");
             jsonObjectList.add(resultJsonObject);
         } else{
             for (ReviewEntity entity : reviewEntityList) {
-                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                JSONObject resultJsonObject = resultJsonObject("fail", entity);
                 jsonObjectList.add(resultJsonObject);
             }
         }
@@ -68,14 +68,14 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public JSONObject update(JSONObject jsonObject) {
         ReviewEntity reviewEntity = jsonToEntity(jsonObject);
-        boolean result = reviewDaoImpl.update(reviewEntity);
+        String  result = reviewDaoImpl.update(reviewEntity);
         return resultJsonObject(result);
     }
 
     @Override
     public JSONObject delete(JSONObject jsonObject) {
         Long reviewNumber = Long.valueOf((String) jsonObject.get("reviewNumber"));
-        boolean result = reviewDaoImpl.delete(reviewNumber);
+        String result = reviewDaoImpl.delete(reviewNumber);
         return resultJsonObject(result);
     }
 
@@ -84,14 +84,14 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public JSONObject resultJsonObject(boolean result) {
+    public JSONObject resultJsonObject(String result) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
         return jsonObject;
     }
 
     @Override
-    public JSONObject resultJsonObject(boolean result, ReviewEntity reviewEntity) {
+    public JSONObject resultJsonObject(String result, ReviewEntity reviewEntity) {
         JSONObject jsonObject = new JSONObject(objectMapper.convertValue(reviewEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;

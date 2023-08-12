@@ -7,10 +7,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 public interface InquiryDao {
-    boolean create(InquiryEntity inquiryEntity);
+    String create(InquiryEntity inquiryEntity);
     InquiryEntity readRecentByWriter(Long postNumber, String inquiryWriter);
     List<InquiryEntity> readAllByWriter(Long postNumber, String inquiryWriter);
     List<InquiryEntity> readAll();
-    boolean update(InquiryEntity inquiryEntity);
-    boolean delete(Long inquiryNumber);
+    String update(InquiryEntity inquiryEntity);
+    String delete(Long inquiryNumber);
 }

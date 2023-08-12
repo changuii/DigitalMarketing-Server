@@ -15,20 +15,17 @@ import java.util.Map;
 @Service
 public class InquiryServiceImpl implements InquriyService {
     private final InquiryDaoImpl inquiryDaoImpl;
-    private final SalesPostDaoImpl salesPostDaoImpl;
     private final ObjectMapper objectMapper;
 
     public InquiryServiceImpl(@Autowired InquiryDaoImpl inquiryDaoImpl,
-                              @Autowired SalesPostDaoImpl salesPostDaoImpl,
                               @Autowired ObjectMapper objectMapper) {
         this.inquiryDaoImpl = inquiryDaoImpl;
-        this.salesPostDaoImpl = salesPostDaoImpl;
         this.objectMapper = objectMapper;
     }
 
     public JSONObject create(JSONObject jsonObject){
         InquiryEntity inquiryEntity = jsonToEntity(jsonObject);
-        boolean result = inquiryDaoImpl.create(inquiryEntity);
+        String result = inquiryDaoImpl.create(inquiryEntity);
         return resultJsonObject(result);
     }
 
@@ -40,9 +37,9 @@ public class InquiryServiceImpl implements InquriyService {
 
         JSONObject resultJsonObject;
         if (inquiryEntity != null) {
-            resultJsonObject = resultJsonObject(true, inquiryEntity);
+            resultJsonObject = resultJsonObject("success", inquiryEntity);
         } else{
-            resultJsonObject = resultJsonObject(false);
+            resultJsonObject = resultJsonObject("fail");
         }
         return resultJsonObject;
     }
@@ -55,11 +52,11 @@ public class InquiryServiceImpl implements InquriyService {
         List<JSONObject> jsonObjectList = new ArrayList<>();
 
         if (inquiryEntityList == null || inquiryEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject(false);
+            JSONObject resultJsonObject = resultJsonObject("success");
             jsonObjectList.add(resultJsonObject);
         } else{
             for (InquiryEntity entity : inquiryEntityList) {
-                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                JSONObject resultJsonObject = resultJsonObject("fail", entity);
                 jsonObjectList.add(resultJsonObject);
             }
         }
@@ -72,11 +69,11 @@ public class InquiryServiceImpl implements InquriyService {
         List<JSONObject> jsonObjectList = new ArrayList<>();
 
         if (inquiryEntityList == null || inquiryEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject(false);
+            JSONObject resultJsonObject = resultJsonObject("success");
             jsonObjectList.add(resultJsonObject);
         } else{
             for (InquiryEntity entity : inquiryEntityList) {
-                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                JSONObject resultJsonObject = resultJsonObject("fail", entity);
                 jsonObjectList.add(resultJsonObject);
             }
         }
@@ -85,14 +82,14 @@ public class InquiryServiceImpl implements InquriyService {
 
     public JSONObject update(JSONObject jsonObject){
         InquiryEntity inquiryEntity = jsonToEntity(jsonObject);
-        boolean result = inquiryDaoImpl.update(inquiryEntity);
+        String result = inquiryDaoImpl.update(inquiryEntity);
         return resultJsonObject(result);
     }
 
     public JSONObject delete(JSONObject jsonObject){
         String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
         Long inquiryNumber = Long.valueOf(inquiryNumberStr);
-        boolean result = inquiryDaoImpl.delete(inquiryNumber);
+        String result = inquiryDaoImpl.delete(inquiryNumber);
         return resultJsonObject(result);
     }
 
@@ -100,14 +97,14 @@ public class InquiryServiceImpl implements InquriyService {
         return objectMapper.convertValue(jsonObject, InquiryEntity.class);
     }
 
-    public JSONObject resultJsonObject(boolean result){
+    public JSONObject resultJsonObject(String result){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
         return jsonObject;
     }
 
     @Override
-    public JSONObject resultJsonObject(boolean result, InquiryEntity inquiryEntity) {
+    public JSONObject resultJsonObject(String result, InquiryEntity inquiryEntity) {
         JSONObject jsonObject = new JSONObject(objectMapper.convertValue(inquiryEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;

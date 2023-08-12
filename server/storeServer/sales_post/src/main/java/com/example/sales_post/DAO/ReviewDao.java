@@ -7,9 +7,9 @@ import java.util.List;
 
 @Repository
 public interface ReviewDao {
-    boolean create(ReviewEntity reviewEntity);
+    String create(ReviewEntity reviewEntity);
     List<ReviewEntity> readAllByWriter(String reviewWriter);
     List<ReviewEntity> readAll();
-    boolean update(ReviewEntity reviewEntity);
-    boolean delete(Long reviewNumber);
+    String update(ReviewEntity reviewEntity);
+    String delete(Long reviewNumber);
 }

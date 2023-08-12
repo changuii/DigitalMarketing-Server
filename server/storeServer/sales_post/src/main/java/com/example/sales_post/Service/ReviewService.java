@@ -15,6 +15,6 @@ public interface ReviewService {
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     ReviewEntity jsonToEntity(JSONObject jsonObject);
-    JSONObject resultJsonObject(boolean result);
-    JSONObject resultJsonObject(boolean result, ReviewEntity reviewEntity);
+    JSONObject resultJsonObject(String result);
+    JSONObject resultJsonObject(String result, ReviewEntity reviewEntity);
 }

@@ -16,6 +16,6 @@ public interface InquriyService {
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     InquiryEntity jsonToEntity(JSONObject jsonObject);
-    JSONObject resultJsonObject(boolean result);
-    JSONObject resultJsonObject(boolean result, InquiryEntity inquiryEntity);
+    JSONObject resultJsonObject(String result);
+    JSONObject resultJsonObject(String result, InquiryEntity inquiryEntity);
 }

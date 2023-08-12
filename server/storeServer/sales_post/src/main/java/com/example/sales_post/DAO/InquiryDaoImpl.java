@@ -17,12 +17,12 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public boolean create(InquiryEntity inquiryEntity) {
+    public String create(InquiryEntity inquiryEntity) {
         inquiryRepository.save(inquiryEntity);
         if(inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())){
-            return true;
+            return "success";
         } else{
-            return false;
+            return "fail";
         }
     }
 
@@ -48,27 +48,26 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public boolean update(InquiryEntity inquiryEntity) {
+    public String update(InquiryEntity inquiryEntity) {
         if (inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())) {
             InquiryEntity oldInquiryEntity = inquiryRepository.findByInquiryNumber(inquiryEntity.getInquiryNumber());
-            inquiryEntity.setInquiryNumber(Optional.ofNullable(inquiryEntity.getInquiryNumber()).orElse(oldInquiryEntity.getInquiryNumber()));
             inquiryEntity.setInquiryWriter(Optional.ofNullable(inquiryEntity.getInquiryWriter()).orElse(oldInquiryEntity.getInquiryWriter()));
             inquiryEntity.setInquiryContents(Optional.ofNullable(inquiryEntity.getInquiryContents()).orElse(oldInquiryEntity.getInquiryContents()));
             inquiryEntity.setSalesPostEntity(Optional.ofNullable(inquiryEntity.getSalesPostEntity()).orElse(oldInquiryEntity.getSalesPostEntity()));
             inquiryRepository.save(inquiryEntity);
-            return true;
+            return "success";
         } else{
-            return false;
+            return "fail";
         }
     }
 
     @Override
-    public boolean delete(Long inquiryNumber) {
+    public String delete(Long inquiryNumber) {
         inquiryRepository.deleteById(inquiryNumber);
         if(inquiryRepository.existsByInquiryNumber(inquiryNumber)){
-            return false;
+            return "success";
         } else{
-            return true;
+            return "fail";
         }
     }
 }

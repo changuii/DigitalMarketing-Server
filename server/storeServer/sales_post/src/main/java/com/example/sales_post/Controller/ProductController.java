@@ -19,23 +19,27 @@ public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
     //DI
     private final ProductServiceImpl productServiceImpl;
+
     public ProductController(@Autowired ProductServiceImpl productServiceImpl) {
         this.productServiceImpl = productServiceImpl;
     }
 
 
     //GET
-    @GetMapping("/get")
-    public JSONObject getProduct(@RequestBody JSONObject jsonObject) {return productServiceImpl.read(jsonObject);}
+    @GetMapping("/read")
+    public JSONObject getProduct(@RequestBody JSONObject jsonObject) {
+        return productServiceImpl.read(jsonObject);
+    }
 
-    @GetMapping("/get-all")
-    public List<JSONObject> getAllProduct(){return productServiceImpl.readAll();}
+    @GetMapping("/read-all")
+    public List<JSONObject> getAllProduct() {
+        return productServiceImpl.readAll();
+    }
 
     //POST
     @PostMapping("/create")
-    public JSONObject postProduct(@Validated @RequestBody JSONObject jsonObject, BindingResult bindingResult){
-        if(bindingResult.hasErrors())
-        {// BadRequest에 대한 오류 메세지 출력임 근데 동작 안됨
+    public JSONObject postProduct(@Validated @RequestBody JSONObject jsonObject, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {// BadRequest에 대한 오류 메세지 출력임 근데 동작 안됨
             FieldError fieldError = bindingResult.getFieldError();
             String errorMessage = new StringBuilder("validation error")
                     .append("field: ").append(fieldError.getField())
@@ -46,7 +50,8 @@ public class ProductController {
             System.out.println(errorMessage);
             return productServiceImpl.resultJsonObject("fail");
         }
-        return productServiceImpl.create(jsonObject);}
+        return productServiceImpl.create(jsonObject);
+    }
 
     //PUT
     @PutMapping("/update")
