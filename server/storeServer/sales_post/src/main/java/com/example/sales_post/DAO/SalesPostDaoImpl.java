@@ -39,8 +39,7 @@ public class SalesPostDaoImpl implements SalesPostDao {
 
     @Override
     public List<SalesPostEntity> readAllByWriter(String postWriter) {
-        List<SalesPostEntity> salesPostEntityList = salesPostRepository
-                .findAllByPostWriter(postWriter);
+        List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAllByPostWriter(postWriter);
         return salesPostEntityList;
     }
 
@@ -50,45 +49,10 @@ public class SalesPostDaoImpl implements SalesPostDao {
         return salesPostEntityList;
     }
 
-//    @Override
-//    public boolean update(SalesPostEntity salesPostEntity) {
-//        SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostNumber(salesPostEntity.getPostNumber());
-//        if(salesPostRepository.existsByPostNumber(salesPostEntity.getPostNumber())){
-//            if((salesPostEntity.getCategory() == null || salesPostEntity.getCategory().isEmpty())){
-//                salesPostEntity.setCategory(oldSalesPostEntity.getCategory());
-//            }
-//            if((salesPostEntity.getPostTitle() == null || salesPostEntity.getPostTitle().isEmpty())){
-//                salesPostEntity.setPostTitle(oldSalesPostEntity.getPostTitle());
-//            }
-//            if((salesPostEntity.getPostWriter() == null || salesPostEntity.getPostWriter().isEmpty())){
-//                salesPostEntity.setPostWriter(oldSalesPostEntity.getPostWriter());
-//            }
-//            if((salesPostEntity.getPostDate() == null || salesPostEntity.getPostDate().isEmpty())){
-//                salesPostEntity.setPostDate(oldSalesPostEntity.getPostDate());
-//            }
-//            if((salesPostEntity.getPostContents() == null || salesPostEntity.getPostContents().isEmpty())){
-//                salesPostEntity.setPostContents(oldSalesPostEntity.getPostContents());
-//            }
-//            if (salesPostEntity.getPostHitCount() == 0){
-//                salesPostEntity.setPostHitCount(oldSalesPostEntity.getPostHitCount());
-//            }
-//            if (salesPostEntity.getPostLike() == 0){
-//                salesPostEntity.setPostLike(oldSalesPostEntity.getPostLike());
-//            }
-//            if((salesPostEntity.getStoreLocation() == null || salesPostEntity.getStoreLocation().isEmpty())){
-//                salesPostEntity.setStoreLocation(oldSalesPostEntity.getStoreLocation());
-//            }
-//            salesPostRepository.save(salesPostEntity);
-//            return true;
-//        } else{
-//            return false;
-//        }
-//    }
-
     @Override
     public boolean update(SalesPostEntity salesPostEntity) {
-        SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostNumber(salesPostEntity.getPostNumber());
         if (salesPostRepository.existsByPostNumber(salesPostEntity.getPostNumber())) {
+            SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostNumber(salesPostEntity.getPostNumber());
             salesPostEntity.setCategory(Optional.ofNullable(salesPostEntity.getCategory()).orElse(oldSalesPostEntity.getCategory()));
             salesPostEntity.setPostTitle(Optional.ofNullable(salesPostEntity.getPostTitle()).orElse(oldSalesPostEntity.getPostTitle()));
             salesPostEntity.setPostWriter(Optional.ofNullable(salesPostEntity.getPostWriter()).orElse(oldSalesPostEntity.getPostWriter()));

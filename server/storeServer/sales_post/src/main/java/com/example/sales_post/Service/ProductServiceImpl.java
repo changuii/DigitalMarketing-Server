@@ -30,7 +30,6 @@ public class ProductServiceImpl implements ProductService{
         if(productEntity == null) { return resultJsonObject(false); }
         else { return resultJsonObject(true,productEntity); }
     }
-
     @Override
     public List<JSONObject> readAll() {
         List<ProductEntity> productEntityList = productDaoimpl.readAll();

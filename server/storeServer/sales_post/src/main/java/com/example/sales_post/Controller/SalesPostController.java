@@ -19,32 +19,32 @@ public class SalesPostController {
         this.salesPostServiceImpl = salesPostServiceImpl;
     }
 
-    @GetMapping("/recent-writer")
-    public JSONObject getRecentInquiryByWriter(@RequestBody JSONObject jsonObject){
-        return salesPostServiceImpl.readRecentByWriter(jsonObject);
-    }
-
-    @GetMapping("/all-writer")
-    public List<JSONObject> getAllInquiryByWriter(@RequestBody JSONObject jsonObject){
-        return salesPostServiceImpl.readAllByWriter(jsonObject);
-    }
-
-    @GetMapping("/all")
-    public List<JSONObject> getAllInquiry(@RequestBody JSONObject jsonObject){
-        return salesPostServiceImpl.readAll();
-    }
-
-    @PostMapping("/")
+    @PostMapping("/create")
     public JSONObject postInquiry(@RequestBody JSONObject jsonObject){
         return salesPostServiceImpl.create(jsonObject);
     }
 
-    @PutMapping("/")
+    @GetMapping("/read-recent-writer")
+    public JSONObject getRecentInquiryByWriter(@RequestBody JSONObject jsonObject){
+        return salesPostServiceImpl.readRecentByWriter(jsonObject);
+    }
+
+    @GetMapping("/read-all-writer")
+    public List<JSONObject> getAllInquiryByWriter(@RequestBody JSONObject jsonObject){
+        return salesPostServiceImpl.readAllByWriter(jsonObject);
+    }
+
+    @GetMapping("/read-all")
+    public List<JSONObject> getAllInquiry(){
+        return salesPostServiceImpl.readAll();
+    }
+
+    @PutMapping("/update")
     public JSONObject putInquiry(@RequestBody JSONObject jsonObject){
         return salesPostServiceImpl.update(jsonObject);
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("/delete")
     public JSONObject deleteInquiry(@RequestBody JSONObject jsonObject){
         return salesPostServiceImpl.delete(jsonObject);
     }
