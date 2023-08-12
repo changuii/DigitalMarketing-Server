@@ -1,7 +1,7 @@
 import json  # json 모듈을 임포트합니다.
 import redis  # redis 모듈을 임포트합니다.
 from .serializers import PostSerializer  # 현재 패키지의 serializers에서 PostSerializer를 임포트합니다.
-from .models import Post  # 현재 패키지의 models에서 Post 모델을 임포트합니다.
+from .models import Category, Post, Tag  # 현재 패키지의 models에서 Post 모델을 임포트합니다.
 import logging  # 로깅 모듈을 임포트합니다.
 
 # 현재 모듈의 로깅 객체를 가져옵니다.
@@ -87,3 +87,46 @@ def handle_message(data):
             save_to_redis(request_id, {
                 "result": "No posts found"
             })
+    # action이 'PMPOSTREADTAG'일 경우의 로직 (태그별 게시글 조회)
+    elif action == 'PMPOSTREADTAG':
+        tag_name = data.get('tagName')
+        if not tag_name:
+            save_to_redis(request_id, {
+                "result": "Tag name not provided"
+            })
+            return
+        tag = Tag.objects.filter(name=tag_name).first()
+        if not tag:
+            save_to_redis(request_id, {
+                "result": "Tag not found"
+            })
+            return
+        posts = tag.tags.all()  # Updated based on the related_name
+        serializer = PostSerializer(posts, many=True)
+        posts_data = serializer.data
+        save_to_redis(request_id, {
+            "result": "success",
+            "data": posts_data
+        })
+
+    # action이 'PMPOSTREADCATEGORY'일 경우의 로직 (카테고리별 게시글 조회)
+    elif action == 'PMPOSTREADCATEGORY':
+        category_name = data.get('categoryName')
+        if not category_name:
+            save_to_redis(request_id, {
+                "result": "Category name not provided"
+            })
+            return
+        category = Category.objects.filter(name=category_name).first()
+        if not category:
+            save_to_redis(request_id, {
+                "result": "Category not found"
+            })
+            return
+        posts = category.categorys.all()  # Updated based on the related_name
+        serializer = PostSerializer(posts, many=True)
+        posts_data = serializer.data
+        save_to_redis(request_id, {
+            "result": "success",
+            "data": posts_data
+        })
