@@ -4,26 +4,23 @@ import com.example.sales_post.DAO.ProductDaoImpl;
 import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
 public class ProductServiceImpl implements ProductService{
     private final ProductDaoImpl productDaoimpl;
-    private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
 
     public ProductServiceImpl(@Autowired ProductDaoImpl productDaoimpl,
-                              @Autowired ProductRepository productRepository,
                               @Autowired ObjectMapper objectMapper) {
         this.productDaoimpl = productDaoimpl;
-        this.productRepository = productRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -87,28 +84,10 @@ public class ProductServiceImpl implements ProductService{
         return resultJsonObject(result);
     }
 
-
     @Override
     public ProductEntity jsonToEntity(JSONObject jsonObject){
         return objectMapper.convertValue(jsonObject, ProductEntity.class);
     }
-
-//    @Override
-//    public ProductEntity jsonToEntity(JSONObject jsonObject) {
-//        try {
-//            // JSONObject를 ObjectNode로 변환
-//            ObjectNode node = objectMapper.readValue(jsonObject.toJSONString(), ObjectNode.class);
-//
-//            // ObjectNode를 ProductEntity로 변환
-//            ProductEntity productEntity = objectMapper.treeToValue(node, ProductEntity.class);
-//
-//            return productEntity;
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error converting JSON to ProductEntity", e);
-//        }
-//    }
-
-
 
     @Override
     public JSONObject resultJsonObject(String result){
@@ -118,17 +97,9 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public JSONObject resultJsonObject(String result, ProductEntity productEntity){
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("productSerialNumber", productEntity.getProductSerialNumber());
-        jsonObject.put("productName", productEntity.getProductName());
-        jsonObject.put("productPrice", productEntity.getProductPrice());
-        jsonObject.put("productAmount", productEntity.getProductAmount());
-        jsonObject.put("productDeliveryFee", productEntity.getProductDeliveryFee());
-        jsonObject.put("storeLocation", productEntity.getStoreLocation());
+    public JSONObject resultJsonObject(String result, ProductEntity productEntity) {
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(productEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;
     }
-
 }

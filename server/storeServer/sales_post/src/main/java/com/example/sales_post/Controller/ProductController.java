@@ -32,7 +32,7 @@ public class ProductController {
     public List<JSONObject> getAllProduct(){return productServiceImpl.readAll();}
 
     //POST
-    @PostMapping("/post")
+    @PostMapping("/create")
     public JSONObject postProduct(@Validated @RequestBody JSONObject jsonObject, BindingResult bindingResult){
         if(bindingResult.hasErrors())
         {// BadRequest에 대한 오류 메세지 출력임 근데 동작 안됨
@@ -49,7 +49,7 @@ public class ProductController {
         return productServiceImpl.create(jsonObject);}
 
     //PUT
-    @PutMapping("/put")
+    @PutMapping("/update")
     public JSONObject putProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.update(jsonObject);}
 
     //DELETE
