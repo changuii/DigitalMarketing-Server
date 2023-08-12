@@ -51,7 +51,12 @@ public class ProductDaoImpl implements ProductDao{
 
     @Override
     public ProductEntity read(Long productSerialNumber) {
-        return this.productRepository.findByProductSerialNumber(productSerialNumber);
+        try{
+            return this.productRepository.findByProductSerialNumber(productSerialNumber);
+        }catch(NullPointerException e){
+            return productRepository.re
+        }
+
     }
 
     @Override

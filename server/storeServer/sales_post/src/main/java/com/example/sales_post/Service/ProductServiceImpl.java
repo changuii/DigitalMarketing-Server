@@ -4,7 +4,6 @@ import com.example.sales_post.DAO.ProductDaoImpl;
 import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +15,12 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService{
     private final ProductDaoImpl productDaoimpl;
-    private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
 
     public ProductServiceImpl(@Autowired ProductDaoImpl productDaoimpl,
                               @Autowired ProductRepository productRepository,
                               @Autowired ObjectMapper objectMapper) {
         this.productDaoimpl = productDaoimpl;
-        this.productRepository = productRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -92,23 +89,6 @@ public class ProductServiceImpl implements ProductService{
     public ProductEntity jsonToEntity(JSONObject jsonObject){
         return objectMapper.convertValue(jsonObject, ProductEntity.class);
     }
-
-//    @Override
-//    public ProductEntity jsonToEntity(JSONObject jsonObject) {
-//        try {
-//            // JSONObject를 ObjectNode로 변환
-//            ObjectNode node = objectMapper.readValue(jsonObject.toJSONString(), ObjectNode.class);
-//
-//            // ObjectNode를 ProductEntity로 변환
-//            ProductEntity productEntity = objectMapper.treeToValue(node, ProductEntity.class);
-//
-//            return productEntity;
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error converting JSON to ProductEntity", e);
-//        }
-//    }
-
-
 
     @Override
     public JSONObject resultJsonObject(String result){
