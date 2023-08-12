@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -18,7 +19,6 @@ public class ProductServiceImpl implements ProductService{
     private final ObjectMapper objectMapper;
 
     public ProductServiceImpl(@Autowired ProductDaoImpl productDaoimpl,
-                              @Autowired ProductRepository productRepository,
                               @Autowired ObjectMapper objectMapper) {
         this.productDaoimpl = productDaoimpl;
         this.objectMapper = objectMapper;
@@ -84,7 +84,6 @@ public class ProductServiceImpl implements ProductService{
         return resultJsonObject(result);
     }
 
-
     @Override
     public ProductEntity jsonToEntity(JSONObject jsonObject){
         return objectMapper.convertValue(jsonObject, ProductEntity.class);
@@ -98,17 +97,9 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public JSONObject resultJsonObject(String result, ProductEntity productEntity){
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("productSerialNumber", productEntity.getProductSerialNumber());
-        jsonObject.put("productName", productEntity.getProductName());
-        jsonObject.put("productPrice", productEntity.getProductPrice());
-        jsonObject.put("productAmount", productEntity.getProductAmount());
-        jsonObject.put("productDeliveryFee", productEntity.getProductDeliveryFee());
-        jsonObject.put("storeLocation", productEntity.getStoreLocation());
+    public JSONObject resultJsonObject(String result, ProductEntity productEntity) {
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(productEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;
     }
-
 }

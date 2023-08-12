@@ -1,55 +1,99 @@
 package com.example.sales_post.Service;
 
+import com.example.sales_post.DAO.ReviewDaoImpl;
+import com.example.sales_post.DAO.SalesPostDaoImpl;
+import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.ReviewEntity;
+import com.example.sales_post.Entity.SalesPostEntity;
+import com.example.sales_post.Repository.SalesPostRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReviewServiceImpl implements ReviewService{
+    private final ReviewDaoImpl reviewDaoImpl;
+    private final ObjectMapper objectMapper;
+
+    public ReviewServiceImpl (@Autowired ReviewDaoImpl reviewDaoImpl,
+                              @Autowired ObjectMapper objectMapper){
+        this.reviewDaoImpl = reviewDaoImpl;
+        this.objectMapper = objectMapper;
+    }
     @Override
     public JSONObject create(JSONObject jsonObject) {
-        return null;
+        ReviewEntity reviewEntity = jsonToEntity(jsonObject);
+        boolean result = reviewDaoImpl.create(reviewEntity);
+        return resultJsonObject(result);
     }
-
-    @Override
-    public JSONObject readRecentByWriter(JSONObject jsonObject) {
-        return null;
-    }
-
     @Override
     public List<JSONObject> readAllByWriter(JSONObject jsonObject) {
-        return null;
+        List<ReviewEntity> reviewEntityList = reviewDaoImpl.readAllByWriter((String) jsonObject.get("reviewWriter"));
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+
+        if (reviewEntityList == null || reviewEntityList.isEmpty()) {
+            JSONObject resultJsonObject = resultJsonObject(false);
+            jsonObjectList.add(resultJsonObject);
+        } else{
+            for (ReviewEntity entity : reviewEntityList) {
+                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                jsonObjectList.add(resultJsonObject);
+            }
+        }
+        return jsonObjectList;
     }
 
     @Override
     public List<JSONObject> readAll() {
-        return null;
+        List<ReviewEntity> reviewEntityList = reviewDaoImpl.readAll();
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+
+        if (reviewEntityList == null || reviewEntityList.isEmpty()) {
+            JSONObject resultJsonObject = resultJsonObject(false);
+            jsonObjectList.add(resultJsonObject);
+        } else{
+            for (ReviewEntity entity : reviewEntityList) {
+                JSONObject resultJsonObject = resultJsonObject(true, entity);
+                jsonObjectList.add(resultJsonObject);
+            }
+        }
+        return jsonObjectList;
     }
 
     @Override
     public JSONObject update(JSONObject jsonObject) {
-        return null;
+        ReviewEntity reviewEntity = jsonToEntity(jsonObject);
+        boolean result = reviewDaoImpl.update(reviewEntity);
+        return resultJsonObject(result);
     }
 
     @Override
     public JSONObject delete(JSONObject jsonObject) {
-        return null;
+        Long reviewNumber = Long.valueOf((String) jsonObject.get("reviewNumber"));
+        boolean result = reviewDaoImpl.delete(reviewNumber);
+        return resultJsonObject(result);
     }
 
-    @Override
-    public ReviewEntity jsonToEntity(JSONObject jsonObject) {
-        return null;
+    public ReviewEntity jsonToEntity(JSONObject jsonObject){
+        return objectMapper.convertValue(jsonObject, ReviewEntity.class);
     }
 
     @Override
     public JSONObject resultJsonObject(boolean result) {
-        return null;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("result", result);
+        return jsonObject;
     }
 
     @Override
     public JSONObject resultJsonObject(boolean result, ReviewEntity reviewEntity) {
-        return null;
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(reviewEntity, Map.class));
+        jsonObject.put("result", result);
+        return jsonObject;
     }
 }

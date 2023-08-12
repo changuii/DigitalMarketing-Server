@@ -4,8 +4,6 @@ import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import javax.persistence.Id;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,11 +42,6 @@ public class ProductDaoImpl implements ProductDao{
         }
     }
 
-
-
-
-
-
     @Override
     public ProductEntity read(Long productSerialNumber) {
         try{
@@ -73,16 +66,20 @@ public class ProductDaoImpl implements ProductDao{
 //================================================================================
     @Override
     public boolean update(ProductEntity productEntity) {
-        Long oldProduct = productEntity.getProductSerialNumber();
-
         try{
-            if(productRepository.existsByProductSerialNumber(oldProduct))
+            if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber()))
             {
+                ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
+                productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
+                productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
+                productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
+                productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
+                productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
+                productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
                 productRepository.save(productEntity);
                 return true;
             }
         }catch (NullPointerException e){ return false; }
-
         return false;
     }
 
@@ -94,6 +91,4 @@ public class ProductDaoImpl implements ProductDao{
             return true;
         }catch (NullPointerException e){ return false; }
     }
-
-
 }

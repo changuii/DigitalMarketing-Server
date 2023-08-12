@@ -1,10 +1,10 @@
 package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.InquiryEntity;
+import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.InquiryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +19,7 @@ public class InquiryDaoImpl implements InquiryDao{
     @Override
     public boolean create(InquiryEntity inquiryEntity) {
         inquiryRepository.save(inquiryEntity);
-        Optional<InquiryEntity> oldInquiryEntity = inquiryRepository
-                .findById(inquiryEntity.getInquiryNumber());
-        if(oldInquiryEntity.isPresent()){
+        if(inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())){
             return true;
         } else{
             return false;
@@ -29,16 +27,16 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public InquiryEntity readRecentByWriter(Long postNumber, String Writer) {
+    public InquiryEntity readRecentByWriter(Long postNumber, String inquiryWriter) {
         InquiryEntity inquiryEntity = inquiryRepository
-                .findLatestInquiryByWriterAndPostNumber(postNumber, Writer);
+                .findLatestInquiryByWriterAndPostNumber(postNumber, inquiryWriter);
         return inquiryEntity;
     }
 
     @Override
-    public List<InquiryEntity> readAllByWriter(Long postNumber, String Writer) {
+    public List<InquiryEntity> readAllByWriter(Long postNumber, String inquiryWriter) {
         List<InquiryEntity> inquiryEntityList = inquiryRepository
-                .findAllByInquiryWriter(Writer);
+                .findAllByInquiryWriter(inquiryWriter);
         return inquiryEntityList;
     }
 
@@ -51,9 +49,12 @@ public class InquiryDaoImpl implements InquiryDao{
 
     @Override
     public boolean update(InquiryEntity inquiryEntity) {
-        Optional<InquiryEntity> oldInquiryEntity = inquiryRepository
-                .findById(inquiryEntity.getInquiryNumber());
-        if(oldInquiryEntity.isPresent()){
+        if (inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())) {
+            InquiryEntity oldInquiryEntity = inquiryRepository.findByInquiryNumber(inquiryEntity.getInquiryNumber());
+            inquiryEntity.setInquiryNumber(Optional.ofNullable(inquiryEntity.getInquiryNumber()).orElse(oldInquiryEntity.getInquiryNumber()));
+            inquiryEntity.setInquiryWriter(Optional.ofNullable(inquiryEntity.getInquiryWriter()).orElse(oldInquiryEntity.getInquiryWriter()));
+            inquiryEntity.setInquiryContents(Optional.ofNullable(inquiryEntity.getInquiryContents()).orElse(oldInquiryEntity.getInquiryContents()));
+            inquiryEntity.setSalesPostEntity(Optional.ofNullable(inquiryEntity.getSalesPostEntity()).orElse(oldInquiryEntity.getSalesPostEntity()));
             inquiryRepository.save(inquiryEntity);
             return true;
         } else{
@@ -62,11 +63,9 @@ public class InquiryDaoImpl implements InquiryDao{
     }
 
     @Override
-    public boolean delete(Long id) {
-        inquiryRepository.deleteById(id);
-        Optional<InquiryEntity> oldInquiryEntity = inquiryRepository
-                .findById(id);
-        if(oldInquiryEntity.isPresent()){
+    public boolean delete(Long inquiryNumber) {
+        inquiryRepository.deleteById(inquiryNumber);
+        if(inquiryRepository.existsByInquiryNumber(inquiryNumber)){
             return false;
         } else{
             return true;

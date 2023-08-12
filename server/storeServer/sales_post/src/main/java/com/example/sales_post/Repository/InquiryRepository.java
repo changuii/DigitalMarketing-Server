@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface InquiryRepository extends JpaRepository<InquiryEntity, Long> {
+    InquiryEntity findByInquiryNumber(Long inquiryNumber);
+    boolean existsByInquiryNumber(long inquiryNumber);
     @Query(value = "SELECT * FROM inquiry_entity i " +
             "WHERE i.inquiry_writer = ?2 " +
             "AND i.post_number = ?1 " +

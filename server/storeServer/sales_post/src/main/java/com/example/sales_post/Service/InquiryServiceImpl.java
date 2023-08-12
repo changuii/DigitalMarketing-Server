@@ -1,24 +1,29 @@
 package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.InquiryDaoImpl;
+import com.example.sales_post.DAO.SalesPostDaoImpl;
 import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
-import com.example.sales_post.Repository.SalesPostRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class InquiryServiceImpl implements InquriyService {
     private final InquiryDaoImpl inquiryDaoImpl;
-    private final SalesPostRepository salesPostRepository;
+    private final SalesPostDaoImpl salesPostDaoImpl;
+    private final ObjectMapper objectMapper;
 
     public InquiryServiceImpl(@Autowired InquiryDaoImpl inquiryDaoImpl,
-                              @Autowired SalesPostRepository salesPostRepository){
-        this.salesPostRepository = salesPostRepository;
+                              @Autowired SalesPostDaoImpl salesPostDaoImpl,
+                              @Autowired ObjectMapper objectMapper) {
         this.inquiryDaoImpl = inquiryDaoImpl;
+        this.salesPostDaoImpl = salesPostDaoImpl;
+        this.objectMapper = objectMapper;
     }
 
     public JSONObject create(JSONObject jsonObject){
@@ -92,20 +97,7 @@ public class InquiryServiceImpl implements InquriyService {
     }
 
     public InquiryEntity jsonToEntity(JSONObject jsonObject){
-        String postNumberStr = (String) jsonObject.get("salesPostNumber");
-        Long postNumber = Long.parseLong(postNumberStr);
-        SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
-
-        String inquiryNumberStr = (String) jsonObject.get("inquiryNumber");
-        Long inquiryNumber = Long.valueOf(inquiryNumberStr);
-
-        InquiryEntity inquiryEntity = InquiryEntity.builder()
-                .inquiryNumber(inquiryNumber)
-                .inquiryWriter((String) jsonObject.get("inquiryWriter"))
-                .inquiryContents((String) jsonObject.get("inquiryContents"))
-                .salesPostEntity(salesPostEntity)
-                .build();
-        return inquiryEntity;
+        return objectMapper.convertValue(jsonObject, InquiryEntity.class);
     }
 
     public JSONObject resultJsonObject(boolean result){
@@ -114,12 +106,9 @@ public class InquiryServiceImpl implements InquriyService {
         return jsonObject;
     }
 
-    public JSONObject resultJsonObject(boolean result, InquiryEntity inquiryEntity){
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("salesPostNumber", inquiryEntity.getSalesPostEntity().getPostNumber());
-        jsonObject.put("inquiryNumber", inquiryEntity.getInquiryNumber());
-        jsonObject.put("inquiryWriter", inquiryEntity.getInquiryWriter());
-        jsonObject.put("inquiryContents", inquiryEntity.getInquiryContents());
+    @Override
+    public JSONObject resultJsonObject(boolean result, InquiryEntity inquiryEntity) {
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(inquiryEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;
     }
