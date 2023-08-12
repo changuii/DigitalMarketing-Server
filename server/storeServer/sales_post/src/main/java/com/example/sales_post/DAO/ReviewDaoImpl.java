@@ -6,7 +6,9 @@ import com.example.sales_post.Repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -20,23 +22,38 @@ public class ReviewDaoImpl implements ReviewDao{
     @Override
     public String create(ReviewEntity reviewEntity) {
         reviewRepository.save(reviewEntity);
+
         if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
             return "success";
         } else {
-            return "fail";
+            return "Error: Failed to create review";
         }
     }
 
     @Override
-    public List<ReviewEntity> readAllByWriter(String reviewWriter) { //작성자의 모든 리뷰 조회. 작성날짜에 따른 정렬기능 필요
-        List<ReviewEntity> reviewEntityList = reviewRepository.readAllByReviewWriter(reviewWriter);
-        return reviewEntityList;
+    public Map<String, Object> readAllByWriter(String reviewWriter) {
+        List<ReviewEntity> reviewEntityList = reviewRepository.findAllByReviewWriter(reviewWriter);
+        Map<String, Object> result = new HashMap<>();
+        if(reviewEntityList.isEmpty()){
+            result.put("result", "Error: No reviews found fot writer");
+        } else{
+            result.put("data", reviewEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<ReviewEntity> readAll() { //모든 리뷰 조회
+    public Map<String, Object> readAll() {
         List<ReviewEntity> reviewEntityList = reviewRepository.findAll();
-        return reviewEntityList;
+        Map<String, Object> result = new HashMap<>();
+        if(reviewEntityList.isEmpty()){
+            result.put("result", "Error: No reviews found");
+        } else{
+            result.put("data", reviewEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
@@ -52,7 +69,7 @@ public class ReviewDaoImpl implements ReviewDao{
             reviewRepository.save(reviewEntity);
             return "success";
         } else{
-            return "fail";
+            return "Error: Review not found";
         }
     }
 
@@ -62,7 +79,7 @@ public class ReviewDaoImpl implements ReviewDao{
         if (reviewRepository.existsByReviewNumber(reviewNumber)) {
             return "success";
         } else {
-            return "fail";
+            return "Error: Review not found";
         }
     }
 }

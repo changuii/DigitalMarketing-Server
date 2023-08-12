@@ -8,6 +8,7 @@ import javax.persistence.*;
 @Table(name = "Inquiry")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class InquiryEntity {
@@ -19,6 +20,6 @@ public class InquiryEntity {
     private String inquiryContents;
 
     @ManyToOne
-    @JoinColumn(name = "postNumber")
+    @JoinColumn(name = "salesPostNumber")
     private SalesPostEntity salesPostEntity;
 }

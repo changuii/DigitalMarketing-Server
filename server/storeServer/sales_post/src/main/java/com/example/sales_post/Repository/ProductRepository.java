@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, String> {
     ProductEntity findByProductSerialNumber(Long productSerialNumber);
+    void deleteByProductSerialNumber(Long productSerialNumber);
     boolean existsByProductSerialNumber(Long productSerialNumber);
 }

@@ -4,14 +4,11 @@ import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
-
-//================================================================================
-//                      전체적으로 NULL값에 대한 예외처리 필요
-//================================================================================
-
 
 @Repository
 public class ProductDaoImpl implements ProductDao{
@@ -22,68 +19,67 @@ public class ProductDaoImpl implements ProductDao{
         this.productRepository = productRepository;
     }
 
-
-//================================================================================
-//  create 예외사항
-//    1.빈 값이 들어오는 경우
-//    2.일부 값만 들어오는 경우
-//    3.이미 존재하는 값
-//================================================================================
     @Override
-    public boolean create(ProductEntity productEntity) {
+    public String create(ProductEntity productEntity) {
+        productRepository.save(productEntity);
 
-        Long serialNumber = productEntity.getProductSerialNumber();
-        if (productRepository.existsByProductSerialNumber(serialNumber)){
-            return false;
-        }
-        else {
-            this.productRepository.save(productEntity);
-            return true;
+        if (productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber())) {
+            return "success";
+        } else {
+            return "Error: Failed to create product";
         }
     }
 
     @Override
-    public ProductEntity read(Long productSerialNumber) {
-        return this.productRepository.findByProductSerialNumber(productSerialNumber);
+    public Map<String, Object> read(Long productSerialNumber) {
+        ProductEntity productEntity = productRepository.findByProductSerialNumber(productSerialNumber);
+        Map<String, Object> result = new HashMap<>();
+        if (productEntity == null) {
+            result.put("result", "Error: Product not found");
+        } else {
+            result.put("data", productEntity);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<ProductEntity> readAll() {
-        return productRepository.findAll();
-    }
-
-
-
-//================================================================================
-//  update 예외사항
-//    1.존재하지 않는 값에대한 업데이트 요청
-//
-//================================================================================
-    @Override
-    public boolean update(ProductEntity productEntity) {
-        try{
-            if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber()))
-            {
-                ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
-                productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
-                productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
-                productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
-                productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
-                productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
-                productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
-                productRepository.save(productEntity);
-                return true;
-            }
-        }catch (NullPointerException e){ return false; }
-        return false;
+    public Map<String, Object> readAll() {
+        List<ProductEntity> productEntityList = productRepository.findAll();
+        Map<String, Object> result = new HashMap<>();
+        if (productEntityList.isEmpty()) {
+            result.put("result", "Error: No products found");
+        } else {
+            result.put("data", productEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public boolean delete(Long productSerialNumber) {
-        try{
-            ProductEntity productEntity = productRepository.findByProductSerialNumber(productSerialNumber);
-            productRepository.delete(productEntity);
-            return true;
-        }catch (NullPointerException e){ return false; }
+    public String update(ProductEntity productEntity) {
+        if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber())) {
+            ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
+            productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
+            productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
+            productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
+            productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
+            productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
+            productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
+            productRepository.save(productEntity);
+            return "success";
+        } else{
+            return "Error: Product not found";
+        }
+    }
+
+    @Override
+    public String delete(Long productSerialNumber) {
+        if (productRepository.existsByProductSerialNumber(productSerialNumber)) {
+            productRepository.deleteByProductSerialNumber(productSerialNumber);
+            return "success";
+        } else {
+            return "Error: Product not found";
+        }
     }
 }

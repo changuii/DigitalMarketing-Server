@@ -5,12 +5,13 @@ import org.json.simple.JSONObject;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
+import java.util.Map;
 
 public interface InquiryDao {
     String create(InquiryEntity inquiryEntity);
-    InquiryEntity readRecentByWriter(Long postNumber, String inquiryWriter);
-    List<InquiryEntity> readAllByWriter(Long postNumber, String inquiryWriter);
-    List<InquiryEntity> readAll();
+    Map<String, Object> readRecentByWriter(Long postNumber, String inquiryWriter);
+    Map<String, Object> readAllByWriter(Long postNumber, String inquiryWriter);
+    Map<String, Object> readAll();
     String update(InquiryEntity inquiryEntity);
     String delete(Long inquiryNumber);
 }

@@ -24,6 +24,6 @@ public class ProductEntity {
     private String storeLocation;
 
     @ManyToOne
-    @JoinColumn(name = "postNumber")
+    @JoinColumn(name = "salesPostNumber")
     private SalesPostEntity salesPostEntity;
 }

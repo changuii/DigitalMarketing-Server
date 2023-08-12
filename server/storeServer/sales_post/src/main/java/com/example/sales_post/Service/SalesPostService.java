@@ -16,6 +16,6 @@ public interface SalesPostService {
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
     SalesPostEntity jsonToEntity(JSONObject jsonObject);
+    JSONObject entityToJson(SalesPostEntity salesPostEntity);
     JSONObject resultJsonObject(String result);
-    JSONObject resultJsonObject(String result, SalesPostEntity salesPostEntity);
 }

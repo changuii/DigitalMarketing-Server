@@ -1,11 +1,15 @@
 package com.example.sales_post.DAO;
 
+import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.SalesPostRepository;
 import org.apache.kafka.common.quota.ClientQuotaAlteration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -19,35 +23,68 @@ public class SalesPostDaoImpl implements SalesPostDao {
     @Override
     public String create(SalesPostEntity salesPostEntity) {
         salesPostRepository.save(salesPostEntity);
+
         if (salesPostRepository.existsByPostNumber(salesPostEntity.getPostNumber())) {
             return "success";
         } else {
-            return "fail";
+            return "Error: Failed to create salesPost";
         }
     }
 
     @Override
-    public SalesPostEntity read(Long postNumber) {
-        return salesPostRepository.findByPostNumber(postNumber);
+    public Map<String, Object> read(Long postNumber) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntity == null) {
+            result.put("result", "Error: SalesPost not found");
+        } else {
+            result.put("data", salesPostEntity);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public SalesPostEntity readRecentByWriter(String postWriter) {
-        SalesPostEntity salesPostEntity = salesPostRepository
-                .findLatestSalesPostByPostWriter(postWriter);
-        return salesPostEntity;
+    public Map<String, Object> readRecentByWriter(String postWriter) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findLatestSalesPostByPostWriter(postWriter);
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntity == null) {
+            result.put("result", "Error: SalesPost not found");
+        } else {
+            result.put("data", salesPostEntity);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<SalesPostEntity> readAllByWriter(String postWriter) {
+    public Map<String, Object> readAllByWriter(String postWriter) {
         List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAllByPostWriter(postWriter);
-        return salesPostEntityList;
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntityList.isEmpty()) {
+            result.put("result", "Error: No SalesPosts found for writer");
+        } else {
+            result.put("data", salesPostEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<SalesPostEntity> readAll() {
+    public Map<String, Object> readAll() {
         List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAll();
-        return salesPostEntityList;
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntityList.isEmpty()) {
+            result.put("result", "Error: No salesPosts found");
+        } else {
+            result.put("data", salesPostEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
@@ -65,7 +102,7 @@ public class SalesPostDaoImpl implements SalesPostDao {
             salesPostRepository.save(salesPostEntity);
             return "success";
         } else{
-            return "fail";
+            return "Error: SalesPost not found";
         }
     }
 
@@ -75,7 +112,7 @@ public class SalesPostDaoImpl implements SalesPostDao {
         if(salesPostRepository.existsByPostNumber(postNumber)){
             return "success";
         } else{
-            return "fail";
+            return "Error: SalesPost not found";
         }
     }
 }

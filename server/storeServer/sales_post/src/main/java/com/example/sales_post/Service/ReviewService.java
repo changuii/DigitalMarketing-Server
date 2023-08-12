@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface ReviewService {
@@ -14,7 +15,7 @@ public interface ReviewService {
     List<JSONObject> readAll();
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
-    ReviewEntity jsonToEntity(JSONObject jsonObject);
+    Map<String, Object> jsonToEntity(JSONObject jsonObject);
+    JSONObject entityToJson(ReviewEntity reviewEntity);
     JSONObject resultJsonObject(String result);
-    JSONObject resultJsonObject(String result, ReviewEntity reviewEntity);
 }

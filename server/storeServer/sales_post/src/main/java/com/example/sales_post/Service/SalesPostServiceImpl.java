@@ -1,6 +1,7 @@
 package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.SalesPostDaoImpl;
+import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class SalesPostServiceImpl implements SalesPostService{
+public class SalesPostServiceImpl implements SalesPostService {
     private final SalesPostDaoImpl salesPostDaoImpl;
     private final ObjectMapper objectMapper;
 
@@ -30,47 +31,56 @@ public class SalesPostServiceImpl implements SalesPostService{
 
     @Override
     public JSONObject readRecentByWriter(JSONObject jsonObject) {
-        SalesPostEntity salesPostEntity = salesPostDaoImpl
-                .readRecentByWriter((String) jsonObject.get("postWriter"));
+        Map<String, Object> salesPostMap = salesPostDaoImpl.readRecentByWriter((String) jsonObject.get("postWriter"));
+
+        SalesPostEntity salesPostEntity = (SalesPostEntity) salesPostMap.get("data");
+        String result = (String) salesPostMap.get("result");
         JSONObject resultJsonObject;
-        if (salesPostEntity != null) {
-            resultJsonObject = resultJsonObject("success", salesPostEntity);
-        } else{
-            resultJsonObject = resultJsonObject("fail");
+
+        if (result.equals("success")) {
+            resultJsonObject = entityToJson(salesPostEntity);
+        } else {
+            resultJsonObject = resultJsonObject(result);
         }
         return resultJsonObject;
     }
 
     @Override
     public List<JSONObject> readAllByWriter(JSONObject jsonObject) {
-        List<SalesPostEntity> salesPostEntityList = salesPostDaoImpl
-                .readAllByWriter((String) jsonObject.get("postWriter"));
+        Map<String, Object> salesPostMap = salesPostDaoImpl.readAllByWriter((String) jsonObject.get("postWriter"));
+
+        List<SalesPostEntity> salesPostEntityList = (List<SalesPostEntity>) salesPostMap.get("data");
+        String result = (String) salesPostMap.get("result");
         List<JSONObject> jsonObjectList = new ArrayList<>();
 
-        if (salesPostEntityList == null || salesPostEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject("success");
-            jsonObjectList.add(resultJsonObject);
-        } else{
+        if (result.equals("success")) {
             for (SalesPostEntity entity : salesPostEntityList) {
-                JSONObject resultJsonObject = resultJsonObject("fail", entity);
+                JSONObject resultJsonObject = entityToJson(entity);
                 jsonObjectList.add(resultJsonObject);
             }
+            jsonObjectList.add(resultJsonObject(result));
+        } else {
+            jsonObjectList.add(resultJsonObject(result));
         }
         return jsonObjectList;
     }
 
     @Override
     public List<JSONObject> readAll() {
-        List<SalesPostEntity> salesPostEntityList = salesPostDaoImpl.readAll();
+        Map<String, Object> saelsPostMap = salesPostDaoImpl.readAll();
+
+        List<SalesPostEntity> salesPostEntityList = (List<SalesPostEntity>) saelsPostMap.get("data");
+        String result = (String) saelsPostMap.get("result");
         List<JSONObject> jsonObjectList = new ArrayList<>();
-        if (salesPostEntityList == null || salesPostEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject("success");
-            jsonObjectList.add(resultJsonObject);
-        } else {
+
+        if (result.equals("success")) {
             for (SalesPostEntity entity : salesPostEntityList) {
-                JSONObject resultJsonObject = resultJsonObject("fail", entity);
+                JSONObject resultJsonObject = entityToJson(entity);
                 jsonObjectList.add(resultJsonObject);
             }
+            jsonObjectList.add(resultJsonObject(result));
+        } else {
+            jsonObjectList.add(resultJsonObject(result));
         }
         return jsonObjectList;
     }
@@ -89,8 +99,15 @@ public class SalesPostServiceImpl implements SalesPostService{
         return resultJsonObject(result);
     }
 
-    public SalesPostEntity jsonToEntity(JSONObject jsonObject){
+    @Override
+    public SalesPostEntity jsonToEntity(JSONObject jsonObject) {
         return objectMapper.convertValue(jsonObject, SalesPostEntity.class);
+    }
+
+    @Override
+    public JSONObject entityToJson(SalesPostEntity salesPostEntity) {
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, Map.class));
+        return jsonObject;
     }
 
     @Override
@@ -99,19 +116,4 @@ public class SalesPostServiceImpl implements SalesPostService{
         jsonObject.put("result", result);
         return jsonObject;
     }
-
-    @Override
-    public JSONObject resultJsonObject(String result, SalesPostEntity salesPostEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, Map.class));
-        jsonObject.put("result", result);
-        return jsonObject;
-    }
-
-    public JSONObject resultJsonObjectList(String result, List<JSONObject> jsonObjectList){
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("data", jsonObjectList);
-        jsonObject.put("result", result);
-        return jsonObject;
-    }
 }
-

@@ -1,67 +1,82 @@
 package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.ProductDaoImpl;
+import com.example.sales_post.DAO.SalesPostDaoImpl;
+import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.ProductEntity;
-import com.example.sales_post.Repository.ProductRepository;
+import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Service
 public class ProductServiceImpl implements ProductService{
-    private final ProductDaoImpl productDaoimpl;
+    private final ProductDaoImpl productDaoImpl;
+    private final SalesPostDaoImpl salesPostDaoImpl;
     private final ObjectMapper objectMapper;
 
-    public ProductServiceImpl(@Autowired ProductDaoImpl productDaoimpl,
-                              @Autowired ObjectMapper objectMapper) {
-        this.productDaoimpl = productDaoimpl;
+    public ProductServiceImpl(@Autowired ProductDaoImpl productDaoImpl,
+                              @Autowired ObjectMapper objectMapper,
+                              @Autowired SalesPostDaoImpl salesPostDaoImpl) {
+        this.productDaoImpl = productDaoImpl;
+        this.salesPostDaoImpl = salesPostDaoImpl;
         this.objectMapper = objectMapper;
     }
 
-
-
-    //================================================================================
-    // TODO: 실패시 오류 내용 전송
-    //================================================================================
-
-
     @Override
     public JSONObject create(JSONObject jsonObject) {
-        ProductEntity productEntity = jsonToEntity(jsonObject);
-        String result = "fail";
-        if(productDaoimpl.create(productEntity)) {result = "success";}
-
+        Map<String, Object> productMap = jsonToEntity(jsonObject);
+        ProductEntity productEntity = (ProductEntity) productMap.get("data");
+        String JTEresult = (String) productMap.get("result");
+        String result;
+        if(JTEresult.equals("success")){
+            result = productDaoImpl.create(productEntity);
+        } else {
+            result = JTEresult;
+        }
         return resultJsonObject(result);
     }
 
     @Override
     public JSONObject read(JSONObject jsonObject) {
-        Long serialNumber = Long.parseLong(jsonObject.get("productSerialNumber").toString());
-        ProductEntity productEntity = productDaoimpl.read(serialNumber);
+        Long serialNumber = Long.valueOf((String) jsonObject.get("productSerialNumber"));
+        Map<String, Object> productMap = productDaoImpl.read(serialNumber);
 
-        if(productEntity == null) { return resultJsonObject("fail"); } // read 실패: 찾는 값이 없는 경우
-        else { return resultJsonObject("success",productEntity); } // read 성공
+        ProductEntity productEntity = (ProductEntity) productMap.get("data");
+        String result = (String) productMap.get("result");
+        JSONObject resultJsonObject;
+
+        if (result.equals("success")) {
+            resultJsonObject = entityToJson(productEntity);
+        } else{
+            resultJsonObject = resultJsonObject(result);
+        }
+        return resultJsonObject;
     }
 
     @Override
     public List<JSONObject> readAll() {
-        List<ProductEntity> productEntityList = productDaoimpl.readAll();
+        Map<String, Object> productMap = productDaoImpl.readAll();
+
+        List<ProductEntity> productEntityList = (List<ProductEntity>) productMap.get("data");
+        String result = (String) productMap.get("result");
         List<JSONObject> jsonObjectList = new ArrayList<>();
 
-        if (productEntityList == null || productEntityList.isEmpty()) {
-            JSONObject resultJsonObject = resultJsonObject("fail"); // readAll 실패
-            jsonObjectList.add(resultJsonObject);
-        } else{
+        if (result.equals("success")) {
             for (ProductEntity entity : productEntityList) {
-                JSONObject resultJsonObject = resultJsonObject("success", entity);
+                JSONObject resultJsonObject = entityToJson(entity);
                 jsonObjectList.add(resultJsonObject);
             }
+            jsonObjectList.add(resultJsonObject(result));
+        } else{
+            jsonObjectList.add(resultJsonObject(result));
         }
         return jsonObjectList;
     }
@@ -69,36 +84,54 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public JSONObject update(JSONObject jsonObject) {
-        ProductEntity productEntity = jsonToEntity(jsonObject);
-        String result = "fail";
-        if (productDaoimpl.update(productEntity)){ result = "success";}
-
+        Map<String, Object> productMap = jsonToEntity(jsonObject);
+        ProductEntity productEntity = (ProductEntity) productMap.get("data");
+        String JTEresult = (String) productMap.get("result");
+        String result;
+        if(JTEresult.equals("success")){
+            result = productDaoImpl.update(productEntity);
+        } else {
+            result = JTEresult;
+        }
         return resultJsonObject(result);
     }
 
     @Override
     public JSONObject delete(JSONObject jsonObject) {
-        Long serialNumber = Long.parseLong(jsonObject.get("productSerialNumber").toString());
-        String result = "fail";
-        if(productDaoimpl.delete(serialNumber)){result = "success";}
+        Long serialNumber = Long.valueOf((String) jsonObject.get("productSerialNumber"));
+        String result = productDaoImpl.delete(serialNumber);
         return resultJsonObject(result);
     }
 
     @Override
-    public ProductEntity jsonToEntity(JSONObject jsonObject){
-        return objectMapper.convertValue(jsonObject, ProductEntity.class);
+    public Map<String, Object> jsonToEntity(JSONObject jsonObject){
+        ProductEntity productEntity = objectMapper.convertValue(jsonObject, ProductEntity.class);
+        Long salesPostNumber = Long.valueOf((String) jsonObject.get("salesPostNumber"));
+
+        Map<String, Object> salesPostMap = salesPostDaoImpl.read(salesPostNumber);
+        String result = (String) salesPostMap.get("result");
+
+        Map<String, Object> productMap = new HashMap<>();
+        if(result.equals("success")){
+            productEntity.setSalesPostEntity((SalesPostEntity) salesPostMap.get("data"));
+            productMap.put("data", productEntity);
+            productMap.put("result", result);
+        } else{
+            productMap.put("result", result);
+        }
+
+        return productMap;
+    }
+
+    @Override
+    public JSONObject entityToJson(ProductEntity productEntity) {
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(productEntity, Map.class));
+        return jsonObject;
     }
 
     @Override
     public JSONObject resultJsonObject(String result){
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result", result);
-        return jsonObject;
-    }
-
-    @Override
-    public JSONObject resultJsonObject(String result, ProductEntity productEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(productEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;
     }
