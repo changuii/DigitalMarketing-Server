@@ -3,6 +3,7 @@ import redis  # redis 모듈을 임포트합니다.
 from .serializers import PostSerializer  # 현재 패키지의 serializers에서 PostSerializer를 임포트합니다.
 from .models import Post  # 현재 패키지의 models에서 Post 모델을 임포트합니다.
 import logging  # 로깅 모듈을 임포트합니다.
+from celery import shared_task
 
 # 현재 모듈의 로깅 객체를 가져옵니다.
 logger = logging.getLogger(__name__)
@@ -17,6 +18,7 @@ def save_to_redis(key, value):  # save_to_redis 함수를 정의합니다.
     logger.info(f"Saved data to Redis with key {key}")
 
 # handle_message 함수를 정의합니다.
+@shared_task
 def handle_message(data):
     # data에서 "action" 키의 값을 대문자로 변환하여 가져옵니다. 기본값은 빈 문자열입니다.
     action = data.get("action", "").upper()

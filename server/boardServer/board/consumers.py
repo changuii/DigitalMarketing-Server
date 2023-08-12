@@ -36,7 +36,7 @@ class PostKafkaConsumer:  # PostKafkaConsumer 클래스 정의 시작
                 for message in self.consumer:  # 카프카에서 메시지를 가져옵니다.
                     data = message.value  # 메시지의 값을 data 변수에 할당합니다.
                     print(f"수신한 메시지: {data}")
-                    handle_message(data)  # 메시지를 views.py의 handle_message 함수에 넘겨줍니다.
+                    handle_message.delay(data)  # Celery task로 비동기적으로 호출  # 메시지를 views.py의 handle_message 함수에 넘겨줍니다.
             except KeyboardInterrupt:  # 키보드 인터럽트 (예: Ctrl+C)로 종료하려 할 때
                 logging.warning("중단됨")  
                 break  # 무한 루프를 빠져나옵니다.

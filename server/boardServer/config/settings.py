@@ -138,3 +138,6 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0' # Redis를 메시지 브로커로 사용
