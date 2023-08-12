@@ -9,7 +9,7 @@ public interface SalesPostService {
     public ResponseEntity<JSONObject> readAllByWriterSalesPost(JSONObject json);
     public ResponseEntity<JSONObject> readAllSalesPost();
     public ResponseEntity<JSONObject> updateSalesPost(JSONObject json);
-    public ResponseEntity<JSONObject> deleteSalesPost(long salesPostNum);
+    public ResponseEntity<JSONObject> deleteSalesPost(JSONObject json);
 
 
 }

@@ -31,7 +31,7 @@ public class SalesPostController {
         return this.salesPostService.createSalesPost(json);
     }
 
-    @GetMapping("/recent")
+    @GetMapping("/writer/recent")
     public ResponseEntity<JSONObject> readRecentByWriterSalesPost(
             @RequestBody JSONObject json
     ){
@@ -59,11 +59,11 @@ public class SalesPostController {
         return this.salesPostService.updateSalesPost(json);
     }
 
-    @DeleteMapping("{salesPostNum}")
+    @DeleteMapping
     public ResponseEntity<JSONObject> deleteSalesPost(
-            @PathVariable long salesPostNum
+            @RequestBody JSONObject json
     ){
-        return this.salesPostService.deleteSalesPost(salesPostNum);
+        return this.salesPostService.deleteSalesPost(json);
     }
 
 

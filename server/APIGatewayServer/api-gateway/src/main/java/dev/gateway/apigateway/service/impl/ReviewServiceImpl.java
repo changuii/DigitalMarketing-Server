@@ -1,7 +1,6 @@
 package dev.gateway.apigateway.service.impl;
 
-
-import dev.gateway.apigateway.service.InquiryService;
+import dev.gateway.apigateway.service.ReviewService;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,76 +10,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
-public class InquiryServiceImpl implements InquiryService {
-
-    private final String redisKey = "InquiryResponse";
-    private final String TOPIC = "InquiryRequest";
+public class ReviewServiceImpl implements ReviewService {
+    private final String TOPIC = "ReviewRequest";
+    private final String redisKey = "ReviewResponse";
     private long requestId = 0;
     private final KafkaService kafkaService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final static Logger logger = LoggerFactory.getLogger(InquiryServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(ReviewService.class);
 
-    public InquiryServiceImpl(
-            @Autowired RedisTemplate redisTemplate,
-            @Autowired KafkaService kafkaService
+    public ReviewServiceImpl(
+            @Autowired KafkaService kafkaService,
+            @Autowired RedisTemplate redisTemplate
     ){
         this.kafkaService = kafkaService;
         this.redisTemplate = redisTemplate;
     }
 
-    public long generateRequestId(){
+    public String generateRequestID(){
         this.requestId++;
-        this.logger.info("requestID : "+requestId);
-        return this.requestId;
+        return Long.toString(this.requestId);
     }
-
 
     @Async
     @Override
-    public ResponseEntity<JSONObject> createInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+    public ResponseEntity<JSONObject> createReview(JSONObject json) {
+        String request = generateRequestID();
 
         json.put("requestId", request);
-        json.put("action", "inquiryCreate");
+        json.put("action", "reviewCreate");
+
 
         kafkaService.sendMessage(json, TOPIC);
+
         JSONObject response = new JSONObject();
-        logger.info("requestID : "+ requestId + "request"+request);
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
             if( response != null){
-             break;
-            }
-        }
-
-        if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
-        }else{
-            return ResponseEntity.badRequest().body(response);
-        }
-
-
-    }
-
-    @Async
-    @Override
-    public ResponseEntity<JSONObject> readRecentByWriterInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
-
-
-        json.put("requestId", request);
-        json.put("action", "inquiryReadRecentByWriter");
-
-
-        kafkaService.sendMessage(json, TOPIC);
-
-        JSONObject response = new JSONObject();
-        while(true){
-            response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
                 break;
             }
         }
@@ -90,78 +57,50 @@ public class InquiryServiceImpl implements InquiryService {
         }else{
             return ResponseEntity.badRequest().body(response);
         }
+
     }
 
     @Async
     @Override
-    public ResponseEntity<JSONObject> readAllByWriterInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+    public ResponseEntity<JSONObject> readAllByWriterReview(JSONObject json) {
+        String request = generateRequestID();
 
         json.put("requestId", request);
-        json.put("action", "inquiryReadAllByWriter");
+        json.put("action", "reviewReadAllByWriter");
 
         kafkaService.sendMessage(json, TOPIC);
 
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
-
 
         if(response.get("result").equals("success")){
             return ResponseEntity.status(201).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
+
     }
 
     @Async
     @Override
-    public ResponseEntity<JSONObject> readAllInquiry() {
-        String request = Long.toString(this.generateRequestId());
-
+    public ResponseEntity<JSONObject> readAllReview() {
+        String request = generateRequestID();
 
         JSONObject json = new JSONObject();
         json.put("requestId", request);
-        json.put("action", "inquiryReadAll");
-        json.put("inquiryNumber", "null");
-        json.put("inquiryWriter", "all");
+        json.put("action", "reviewReadAll");
 
         kafkaService.sendMessage(json, TOPIC);
 
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
-                break;
-            }
-        }
-
-
-        if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
-        }else{
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    @Async
-    @Override
-    public ResponseEntity<JSONObject> updateInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
-
-        json.put("requestId", request);
-        json.put("action", "inquiryUpdate");
-
-        kafkaService.sendMessage(json, TOPIC);
-
-        JSONObject response = new JSONObject();
-        while(true){
-            response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
@@ -175,11 +114,11 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Async
     @Override
-    public ResponseEntity<JSONObject> deleteInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+    public ResponseEntity<JSONObject> updateReview(JSONObject json) {
+        String request = generateRequestID();
 
         json.put("requestId", request);
-        json.put("action", "inquiryDelete");
+        json.put("action", "reviewUpdate");
 
 
         kafkaService.sendMessage(json, TOPIC);
@@ -187,7 +126,7 @@ public class InquiryServiceImpl implements InquiryService {
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
@@ -199,7 +138,29 @@ public class InquiryServiceImpl implements InquiryService {
         }
     }
 
+    @Async
+    @Override
+    public ResponseEntity<JSONObject> deleteReview(JSONObject json) {
+        String request = generateRequestID();
+
+        json.put("requestId", request);
+        json.put("action", "reviewDelete");
 
 
+        kafkaService.sendMessage(json, TOPIC);
 
+        JSONObject response = new JSONObject();
+        while(true){
+            response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
+            if( response != null){
+                break;
+            }
+        }
+
+        if(response.get("result").equals("success")){
+            return ResponseEntity.status(201).body(response);
+        }else{
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

@@ -23,30 +23,27 @@ public class InquiryController {
         this.inquiryService = inquiryService;
     }
 
-    @PostMapping("/{postNum}")
+    @PostMapping
     public ResponseEntity<JSONObject> createInquiry(
-            @RequestBody JSONObject json,
-            @PathVariable("postNum") long postNum
-    ){
-
-        return this.inquiryService.createInquiry(json, postNum);
-    }
-
-    @GetMapping("/{postNum}/recent")
-    public ResponseEntity<JSONObject> readRecentByWriterInquiry(
-      @PathVariable("postNum") long postNum,
-      @RequestBody JSONObject json
-    ){
-        return this.inquiryService.readRecentByWriterInquiry(json, postNum);
-
-    }
-
-    @GetMapping("/{postNum}")
-    public ResponseEntity<JSONObject> readAllByWriterInquiry(
-            @PathVariable("postNum") long postNum,
             @RequestBody JSONObject json
     ){
-        return this.inquiryService.readAllByWriterInquiry(json, postNum);
+
+        return this.inquiryService.createInquiry(json);
+    }
+
+    @GetMapping("/writer/recent")
+    public ResponseEntity<JSONObject> readRecentByWriterInquiry(
+      @RequestBody JSONObject json
+    ){
+        return this.inquiryService.readRecentByWriterInquiry(json);
+
+    }
+
+    @GetMapping("/writer")
+    public ResponseEntity<JSONObject> readAllByWriterInquiry(
+            @RequestBody JSONObject json
+    ){
+        return this.inquiryService.readAllByWriterInquiry(json);
 
 
     }
@@ -58,18 +55,17 @@ public class InquiryController {
 
     @PutMapping("/{postNum}")
     public ResponseEntity<JSONObject> updateInquiry(
-            @RequestBody JSONObject json,
-            @PathVariable("postNum") long postNum
+            @RequestBody JSONObject json
     ){
-        return this.inquiryService.updateInquiry(json, postNum);
+        return this.inquiryService.updateInquiry(json);
 
     }
 
-    @DeleteMapping("/{inquiryNum}")
+    @DeleteMapping
     public ResponseEntity<JSONObject> deleteInquiry(
-            @PathVariable("inquiryNum") long inquiryNum
+            @RequestBody JSONObject json
     ){
-        return this.inquiryService.deleteInquiry(inquiryNum);
+        return this.inquiryService.deleteInquiry(json);
     }
 
 }

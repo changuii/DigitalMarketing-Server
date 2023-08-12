@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 
@@ -32,6 +33,7 @@ public class SalesPostServiceImpl implements SalesPostService {
         return Long.toString(requestId);
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> createSalesPost(JSONObject json) {
         String request = generateRequestID();
@@ -57,6 +59,7 @@ public class SalesPostServiceImpl implements SalesPostService {
 
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> readRecentByWriterSalesPost(JSONObject json) {
         String request = generateRequestID();
@@ -81,6 +84,7 @@ public class SalesPostServiceImpl implements SalesPostService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> readAllByWriterSalesPost(JSONObject json) {
         String request = generateRequestID();
@@ -105,6 +109,7 @@ public class SalesPostServiceImpl implements SalesPostService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> readAllSalesPost() {
         String request = generateRequestID();
@@ -130,6 +135,7 @@ public class SalesPostServiceImpl implements SalesPostService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> updateSalesPost(JSONObject json) {
         String request = generateRequestID();
@@ -154,11 +160,11 @@ public class SalesPostServiceImpl implements SalesPostService {
         }
     }
 
+    @Async
     @Override
-    public ResponseEntity<JSONObject> deleteSalesPost(long salesPostNum) {
+    public ResponseEntity<JSONObject> deleteSalesPost(JSONObject json) {
         String request = generateRequestID();
 
-        JSONObject json = new JSONObject();
         json.put("requestId", request);
         json.put("action", "salesPostDelete");
 
