@@ -2,19 +2,26 @@ package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.SalesPostDaoImpl;
 import com.example.sales_post.Entity.SalesPostEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SalesPostServiceImpl implements SalesPostService{
+    private static final Logger logger = LoggerFactory.getLogger(SalesPostServiceImpl.class);
     private final SalesPostDaoImpl salesPostDaoImpl;
+    private final ObjectMapper objectMapper;
 
-    public SalesPostServiceImpl(@Autowired SalesPostDaoImpl salesPostDaoImpl) {
+    public SalesPostServiceImpl(@Autowired SalesPostDaoImpl salesPostDaoImpl,
+                                @Autowired ObjectMapper objectMapper) {
         this.salesPostDaoImpl = salesPostDaoImpl;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -87,28 +94,8 @@ public class SalesPostServiceImpl implements SalesPostService{
         return resultJsonObject(result);
     }
 
-    @Override
-    public SalesPostEntity jsonToEntity(JSONObject jsonObject) {
-        String postNumberStr = (String) jsonObject.get("salesPostNumber");
-        Long postNumber = Long.parseLong(postNumberStr);
-        String postHitCountStr = (String) jsonObject.get("postHitCount");
-        Long postHitCount = Long.parseLong(postHitCountStr);
-        String postLikeStr = (String) jsonObject.get("postLike");
-        Long postLike = Long.parseLong(postLikeStr);
-
-        SalesPostEntity salesPostEntity = SalesPostEntity.builder()
-                .postNumber(postNumber)
-                .category((String) jsonObject.get("category"))
-                .postTitle((String) jsonObject.get("postTitle"))
-                .postWriter((String) jsonObject.get("postWriter"))
-                .postDate((String) jsonObject.get("postDate"))
-                .postContents((String) jsonObject.get("postContents"))
-                .postPicture((String) jsonObject.get("postPicture"))
-                .postHitCount(postHitCount)
-                .postLike(postLike)
-                .storeLocation((String) jsonObject.get("storeLocation"))
-                .build();
-        return salesPostEntity;
+    public SalesPostEntity jsonToEntity(JSONObject jsonObject){
+        return objectMapper.convertValue(jsonObject, SalesPostEntity.class);
     }
 
     @Override
@@ -120,18 +107,9 @@ public class SalesPostServiceImpl implements SalesPostService{
 
     @Override
     public JSONObject resultJsonObject(boolean result, SalesPostEntity salesPostEntity) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("salesPostNumber", salesPostEntity.getPostNumber());
-        jsonObject.put("category", salesPostEntity.getCategory());
-        jsonObject.put("postTitle", salesPostEntity.getPostTitle());
-        jsonObject.put("postWriter", salesPostEntity.getPostWriter());
-        jsonObject.put("postDate", salesPostEntity.getPostDate());
-        jsonObject.put("postContents", salesPostEntity.getPostContents());
-        jsonObject.put("postPicture", salesPostEntity.getPostPicture());
-        jsonObject.put("poetHitCount", salesPostEntity.getPostHitCount());
-        jsonObject.put("postLike", salesPostEntity.getPostLike());
-        jsonObject.put("storeLocation", salesPostEntity.getStoreLocation());
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, Map.class));
         jsonObject.put("result", result);
         return jsonObject;
     }
 }
+

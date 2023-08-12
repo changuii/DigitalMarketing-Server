@@ -1,6 +1,5 @@
 package com.example.sales_post.Controller;
 
-import com.example.sales_post.Service.InquiryServiceImpl;
 import com.example.sales_post.Service.SalesPostServiceImpl;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

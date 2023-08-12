@@ -1,7 +1,6 @@
 package com.example.sales_post.Entity;
 
 import lombok.*;
-
 import javax.persistence.*;
 
 @Entity
@@ -9,7 +8,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

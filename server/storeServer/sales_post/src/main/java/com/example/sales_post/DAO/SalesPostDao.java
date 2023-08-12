@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface SalesPostDao {
     boolean create(SalesPostEntity salesPostEntity);
+    SalesPostEntity read(Long postNumber);
     SalesPostEntity readRecentByWriter(String postWriter);
     List<SalesPostEntity> readAllByWriter(String postWriter);
     List<SalesPostEntity> readAll();
