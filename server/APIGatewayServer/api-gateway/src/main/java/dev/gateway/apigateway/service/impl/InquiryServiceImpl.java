@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -16,8 +17,8 @@ import java.util.Optional;
 @Service
 public class InquiryServiceImpl implements InquiryService {
 
-    private final String redisKey = "InquiryResponse";
-    private final String TOPIC = "InquiryRequest";
+    private final String redisKey;
+    private final String TOPIC;
     private long requestId = 0;
     private final KafkaService kafkaService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -25,23 +26,26 @@ public class InquiryServiceImpl implements InquiryService {
 
     public InquiryServiceImpl(
             @Autowired RedisTemplate redisTemplate,
-            @Autowired KafkaService kafkaService
+            @Autowired KafkaService kafkaService,
+            @Value("${redisKey.inquiry}") String redisKey,
+            @Value("${kafkaTOPIC.inquiry}") String TOPIC
     ){
         this.kafkaService = kafkaService;
         this.redisTemplate = redisTemplate;
+        this.redisKey = redisKey;
+        this.TOPIC = TOPIC;
     }
 
-    public long generateRequestId(){
+    public String generateRequestID(){
         this.requestId++;
-        this.logger.info("requestID : "+requestId);
-        return this.requestId;
+        return Long.toString(this.requestId);
     }
 
 
     @Async
     @Override
     public ResponseEntity<JSONObject> createInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+        String request = this.generateRequestID();
 
         json.put("requestId", request);
         json.put("action", "inquiryCreate");
@@ -68,7 +72,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Async
     @Override
     public ResponseEntity<JSONObject> readRecentByWriterInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+        String request = this.generateRequestID();
 
 
         json.put("requestId", request);
@@ -95,7 +99,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Async
     @Override
     public ResponseEntity<JSONObject> readAllByWriterInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+        String request = this.generateRequestID();
 
         json.put("requestId", request);
         json.put("action", "inquiryReadAllByWriter");
@@ -121,7 +125,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Async
     @Override
     public ResponseEntity<JSONObject> readAllInquiry() {
-        String request = Long.toString(this.generateRequestId());
+        String request = this.generateRequestID();
 
 
         JSONObject json = new JSONObject();
@@ -151,7 +155,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Async
     @Override
     public ResponseEntity<JSONObject> updateInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+        String request = this.generateRequestID();
 
         json.put("requestId", request);
         json.put("action", "inquiryUpdate");
@@ -176,7 +180,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Async
     @Override
     public ResponseEntity<JSONObject> deleteInquiry(JSONObject json) {
-        String request = Long.toString(this.generateRequestId());
+        String request = this.generateRequestID();
 
         json.put("requestId", request);
         json.put("action", "inquiryDelete");

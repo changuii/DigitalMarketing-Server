@@ -22,6 +22,11 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @PostMapping("/test")
+    public void print(){
+        this.productService.print();
+    }
+
     @PostMapping()
     public ResponseEntity<JSONObject> createProduct(
             @RequestBody JSONObject json

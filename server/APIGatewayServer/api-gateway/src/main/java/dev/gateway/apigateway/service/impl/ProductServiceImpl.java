@@ -5,14 +5,18 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    private final String TOPIC = "";
-    private final String redisKey = "";
+
+
+    private final String TOPIC;
+    private final String redisKey;
     private long requestId = 0;
     private final static Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final KafkaService kafkaService;
@@ -20,10 +24,14 @@ public class ProductServiceImpl implements ProductService {
 
     public ProductServiceImpl(
             @Autowired KafkaService kafkaService,
-            @Autowired RedisTemplate redisTemplate
+            @Autowired RedisTemplate redisTemplate,
+            @Value("${redisKey.product}") String redisKey,
+            @Value("${kafkaTOPIC.product}") String TOPIC
     ){
         this.kafkaService = kafkaService;
         this.redisTemplate = redisTemplate;
+        this.redisKey = redisKey;
+        this.TOPIC = TOPIC;
     }
 
     public String generateRequestID(){
@@ -31,6 +39,11 @@ public class ProductServiceImpl implements ProductService {
         return Long.toString(this.requestId);
     }
 
+    public void print(){
+        logger.info(this.TOPIC);
+        logger.info(this.redisKey);
+    }
+    @Async
     @Override
     public ResponseEntity<JSONObject> createProduct(JSONObject json) {
         String request = generateRequestID();
@@ -56,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> readProduct(JSONObject json) {
         String request = generateRequestID();
@@ -81,6 +95,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> readAllProduct() {
         String request = generateRequestID();
@@ -107,6 +122,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> updateProduct(JSONObject json) {
         String request = generateRequestID();
@@ -132,6 +148,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Async
     @Override
     public ResponseEntity<JSONObject> deleteProduct(JSONObject json) {
         String request = generateRequestID();

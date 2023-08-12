@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -13,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
-    private final String TOPIC = "ReviewRequest";
-    private final String redisKey = "ReviewResponse";
+    private final String TOPIC;
+    private final String redisKey;
     private long requestId = 0;
     private final KafkaService kafkaService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -22,10 +23,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     public ReviewServiceImpl(
             @Autowired KafkaService kafkaService,
-            @Autowired RedisTemplate redisTemplate
+            @Autowired RedisTemplate redisTemplate,
+            @Value("${redisKey.review}") String redisKey,
+            @Value("${kafkaTOPIC.review}") String TOPIC
     ){
         this.kafkaService = kafkaService;
         this.redisTemplate = redisTemplate;
+        this.redisKey = redisKey;
+        this.TOPIC = TOPIC;
     }
 
     public String generateRequestID(){

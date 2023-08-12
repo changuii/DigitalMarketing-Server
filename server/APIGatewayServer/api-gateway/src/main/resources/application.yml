@@ -1,44 +1,40 @@
 
-
-
-
-
+# Jwt 토큰에 들어가는 secret 값
 spring:
   jwt:
     secret: asd
 
+# database 연결관련
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/springjdbc?createDatabaseIfNotExist=true
     username: root
     password: ?Qweasd7410
-
+# kafka 통신에 필요한 정보 및 직렬화
   kafka:
     producer:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            client-id: <your id>
-            client-secret: <your secret>
-            redirect-uri: <your url>/login/oauth2/code/kakao
-            authorization-grant-type: authorization_code
-            client-authentication-method: POST
-            client-name: Kakao
-            scope:
-              - profile
-              - account_email
-              - image
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
 
+## redis 통신 관련
+redis:
+  host: localhost
+  port: 6379
+
+# kafka TOPIC 및 Redis KEY 값
+redisKey:
+  inquiry: InquiryResponse
+  product: ProductResponse
+  promotionalpost: PromotionalPostResponse
+  review: ReviewResponse
+  salespost: SalesPostResponse
+
+kafkaTOPIC:
+  inquiry: InquiryRequest
+  product: ProductRequest
+  promotionalpost: PromotionalPostRequest
+  review: ReviewRequest
+  salespost: SalesPostRequest
 
 
