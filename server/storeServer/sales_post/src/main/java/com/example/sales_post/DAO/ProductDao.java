@@ -12,4 +12,6 @@ public interface ProductDao {
     List<ProductEntity> readAll();
     boolean update(ProductEntity productEntity);
     boolean delete(Long productSerialNumber);
+
+
 }

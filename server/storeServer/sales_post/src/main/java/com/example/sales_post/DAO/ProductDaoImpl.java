@@ -4,8 +4,6 @@ import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import javax.persistence.Id;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,10 +15,31 @@ import java.util.Optional;
 
 @Repository
 public class ProductDaoImpl implements ProductDao{
+
     private final ProductRepository productRepository;
 
     public ProductDaoImpl(@Autowired ProductRepository productRepository) {
         this.productRepository = productRepository;
+    }
+
+
+//================================================================================
+//  create 예외사항
+//    1.빈 값이 들어오는 경우
+//    2.일부 값만 들어오는 경우
+//    3.이미 존재하는 값
+//================================================================================
+    @Override
+    public boolean create(ProductEntity productEntity) {
+
+        Long serialNumber = productEntity.getProductSerialNumber();
+        if (productRepository.existsByProductSerialNumber(serialNumber)){
+            return false;
+        }
+        else {
+            this.productRepository.save(productEntity);
+            return true;
+        }
     }
 
     @Override
@@ -30,27 +49,41 @@ public class ProductDaoImpl implements ProductDao{
 
     @Override
     public List<ProductEntity> readAll() {
-        return this.productRepository.findAll();
+        return productRepository.findAll();
     }
 
-    @Override
-    public boolean create(ProductEntity productEntity) { // 자동 ID gen 때문에 중복 데이터가 들어가짐
-        this.productRepository.save(productEntity);
-        Long serialNumber = productEntity.getProductSerialNumber();
-        return productRepository.existsByProductSerialNumber(serialNumber);
-    }
 
+
+//================================================================================
+//  update 예외사항
+//    1.존재하지 않는 값에대한 업데이트 요청
+//
+//================================================================================
     @Override
     public boolean update(ProductEntity productEntity) {
-        // 수정하고자 하는 기존 데이터가 없는 경우: 새 데이터가 생성되도록 할 것인지, 아무 행동도 하지 않을 것인지
-        productRepository.save(productEntity);
-        return productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber());
+        try{
+            if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber()))
+            {
+                ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
+                productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
+                productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
+                productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
+                productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
+                productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
+                productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
+                productRepository.save(productEntity);
+                return true;
+            }
+        }catch (NullPointerException e){ return false; }
+        return false;
     }
 
     @Override
-    public boolean delete(Long productSerialNumber) { // NULL Pointer e 수정
-        ProductEntity productEntity = productRepository.findByProductSerialNumber(productSerialNumber);
-        productRepository.delete(productEntity);
-        return productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber());
+    public boolean delete(Long productSerialNumber) {
+        try{
+            ProductEntity productEntity = productRepository.findByProductSerialNumber(productSerialNumber);
+            productRepository.delete(productEntity);
+            return true;
+        }catch (NullPointerException e){ return false; }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.sales_post.Entity;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 
 @Entity
@@ -20,12 +22,14 @@ public class ProductEntity {
     private String storeLocation;
 
     @Builder
-    public ProductEntity(Long productSerialNumber, String productName, int productPrice, int productAmount, int productDeliveryFee, String storeLocation) {
-        this.productSerialNumber = productSerialNumber;
-        this.productName = productName;
-        this.productPrice = productPrice;
-        this.productAmount = productAmount;
-        this.productDeliveryFee = productDeliveryFee;
-        this.storeLocation = storeLocation;
+    public ProductEntity(Long productSerialNumber, String productName, int productPrice,
+                         int productAmount, int productDeliveryFee, String storeLocation)
+    {
+        this.productSerialNumber  =   productSerialNumber ;
+        this.productName          =   productName         ;
+        this.productPrice         =   productPrice        ;
+        this.productAmount        =   productAmount       ;
+        this.productDeliveryFee   =   productDeliveryFee  ;
+        this.storeLocation        =   storeLocation       ;
     }
 }
