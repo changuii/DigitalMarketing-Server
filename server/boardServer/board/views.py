@@ -25,17 +25,31 @@ def handle_message(data):
 
     # action이 'PMPOSTCREATE'일 경우의 로직
     if action == 'PMPOSTCREATE':
+        tags_data = data.pop("pmTags", [])  # 게시물에 연관된 태그를 가져옵니다.
+        category_data = data.pop("pmCategory", None)  # 게시물에 연관된 카테고리를 가져옵니다.
+
+        # 카테고리가 제공된 경우, 해당 이름으로 카테고리를 가져오거나 새로 생성합니다.
+        if category_data:
+            category, created = Category.objects.get_or_create(name=category_data)
+            data["pmCategory_id"] = category.id  # "_id" 접미사를 사용하여 ID를 직접 할당합니다.
+
         # 데이터를 PostSerializer에 전달합니다.
         serializer = PostSerializer(data=data)
         # 데이터가 유효한지 확인합니다.
         if serializer.is_valid():
-            # 유효하면 저장합니다.
-            serializer.save()
+            post_instance = serializer.save()
+
+            # 태그가 제공된 경우 태그를 가져오거나 새로 생성하고 게시물에 연결합니다.
+            for tag_name in tags_data:
+                tag, created = Tag.objects.get_or_create(name=tag_name)
+                post_instance.tags.add(tag)  # 연관된 이름으로 태그를 게시물에 추가합니다.
+
             # Redis에 성공 메시지를 저장합니다.
             save_to_redis(request_id, {"result": "success"})
         else:
             # 유효하지 않으면 Redis에 실패 메시지와 에러 메시지를 저장합니다.
             save_to_redis(request_id, {"result": serializer.errors})
+
 
     # action이 'PMPOSTUPDATE'일 경우의 로직
     elif action == 'PMPOSTUPDATE':
