@@ -33,7 +33,9 @@ public class ProductController {
 
     //POST
     @PostMapping("/create")
-    public JSONObject postProduct(@RequestBody JSONObject jsonObject){ return productServiceImpl.create(jsonObject);}
+    public JSONObject postProduct(@RequestBody JSONObject jsonObject){
+        logger.info(jsonObject.toString());
+        return productServiceImpl.create(jsonObject);}
 
     //PUT
     @PutMapping("/update")

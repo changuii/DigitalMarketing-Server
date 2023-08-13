@@ -40,6 +40,7 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public JSONObject create(JSONObject jsonObject) {
         ProductEntity productEntity = jsonToEntity(jsonObject);
+        logger.info(productEntity.toString());
         return resultJsonObject(productDaoimpl.create(productEntity));
     }
 
