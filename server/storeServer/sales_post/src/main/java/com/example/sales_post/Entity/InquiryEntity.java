@@ -1,16 +1,16 @@
 package com.example.sales_post.Entity;
 
-import lombok.Builder;
-import lombok.Setter;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "Inquiry")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class InquiryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,14 +20,6 @@ public class InquiryEntity {
     private String inquiryContents;
 
     @ManyToOne
-    @JoinColumn(name = "postNumber")
+    @JoinColumn(name = "salesPostNumber")
     private SalesPostEntity salesPostEntity;
-
-    @Builder
-    public InquiryEntity(Long inquiryNumber, String inquiryWriter, String inquiryContents, SalesPostEntity salesPostEntity) {
-        this.inquiryNumber = inquiryNumber;
-        this.inquiryWriter = inquiryWriter;
-        this.inquiryContents = inquiryContents;
-        this.salesPostEntity = salesPostEntity;
-    }
 }

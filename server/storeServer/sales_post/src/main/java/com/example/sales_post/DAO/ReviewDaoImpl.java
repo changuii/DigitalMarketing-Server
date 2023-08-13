@@ -5,7 +5,9 @@ import com.example.sales_post.Repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -15,32 +17,48 @@ public class ReviewDaoImpl implements ReviewDao{
     public ReviewDaoImpl(@Autowired ReviewRepository reviewRepository){
         this.reviewRepository = reviewRepository;
     }
+
     @Override
-    public boolean create(ReviewEntity reviewEntity) {
+    public String create(ReviewEntity reviewEntity) {
         reviewRepository.save(reviewEntity);
+
         if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
-            return true;
+            return "success";
         } else {
-            return false;
+            return "Error: Failed to create review";
         }
     }
 
     @Override
-    public List<ReviewEntity> readAllByWriter(String reviewWriter) { //작성자의 모든 리뷰 조회. 작성날짜에 따른 정렬기능 필요
-        List<ReviewEntity> reviewEntityList = reviewRepository.readAllByReviewWriter(reviewWriter);
-        return reviewEntityList;
-    }
-    @Override
-    public List<ReviewEntity> readAll() { //모든 리뷰 조회
-        List<ReviewEntity> reviewEntityList = reviewRepository.findAll();
-        return reviewEntityList;
+    public Map<String, Object> readAllByWriter(String reviewWriter) {
+        List<ReviewEntity> reviewEntityList = reviewRepository.findAllByReviewWriter(reviewWriter);
+        Map<String, Object> result = new HashMap<>();
+        if(reviewEntityList.isEmpty()){
+            result.put("result", "Error: No reviews found fot writer");
+        } else{
+            result.put("data", reviewEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public boolean update(ReviewEntity reviewEntity) {
+    public Map<String, Object> readAll() {
+        List<ReviewEntity> reviewEntityList = reviewRepository.findAll();
+        Map<String, Object> result = new HashMap<>();
+        if(reviewEntityList.isEmpty()){
+            result.put("result", "Error: No reviews found");
+        } else{
+            result.put("data", reviewEntityList);
+            result.put("result", "success");
+        }
+        return result;
+    }
+
+    @Override
+    public String update(ReviewEntity reviewEntity) {
         if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
             ReviewEntity oldReviewEntity = reviewRepository.findByReviewNumber(reviewEntity.getReviewNumber());
-            reviewEntity.setReviewNumber(Optional.ofNullable(reviewEntity.getReviewNumber()).orElse(oldReviewEntity.getReviewNumber()));
             reviewEntity.setReviewWriter(Optional.ofNullable(reviewEntity.getReviewWriter()).orElse(oldReviewEntity.getReviewWriter()));
             reviewEntity.setReviewContents(Optional.ofNullable(reviewEntity.getReviewContents()).orElse(oldReviewEntity.getReviewContents()));
             reviewEntity.setReviewDate(Optional.ofNullable(reviewEntity.getReviewDate()).orElse(oldReviewEntity.getReviewDate()));
@@ -48,19 +66,19 @@ public class ReviewDaoImpl implements ReviewDao{
             reviewEntity.setReviewStarRating(Optional.ofNullable(reviewEntity.getReviewStarRating()).orElse(oldReviewEntity.getReviewStarRating()));
             reviewEntity.setSalesPostEntity(Optional.ofNullable(reviewEntity.getSalesPostEntity()).orElse(oldReviewEntity.getSalesPostEntity()));
             reviewRepository.save(reviewEntity);
-            return true;
+            return "success";
         } else{
-            return false;
+            return "Error: Review not found";
         }
     }
 
     @Override
-    public boolean delete(Long reviewNumber) { // 작성순번을 통해 삭제
+    public String delete(Long reviewNumber) { // 작성순번을 통해 삭제
         reviewRepository.deleteById(reviewNumber);
         if (reviewRepository.existsByReviewNumber(reviewNumber)) {
-            return false;
+            return "success";
         } else {
-            return true;
+            return "Error: Review not found";
         }
     }
 }

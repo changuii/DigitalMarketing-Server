@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
-    List<ReviewEntity> readAllByReviewWriter(String reviewWRiter);
+    List<ReviewEntity> findAllByReviewWriter(String reviewWRiter);
     ReviewEntity findByReviewNumber(Long reviewNumber);
     boolean existsByReviewWriter(String reviewWriter);
     boolean existsByReviewNumber(Long reviewNumber);

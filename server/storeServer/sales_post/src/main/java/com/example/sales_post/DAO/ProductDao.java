@@ -1,17 +1,12 @@
 package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.ProductEntity;
-import org.json.simple.JSONObject;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 public interface ProductDao {
     String create(ProductEntity productEntity);
-    ProductEntity read(Long productSerialNumber);
-    List<ProductEntity> readAll();
-    boolean update(ProductEntity productEntity);
-    boolean delete(Long productSerialNumber);
-
-
+    Map<String, Object> read(Long productSerialNumber);
+    Map<String, Object> readAll();
+    String update(ProductEntity productEntity);
+    String delete(Long productSerialNumber);
 }

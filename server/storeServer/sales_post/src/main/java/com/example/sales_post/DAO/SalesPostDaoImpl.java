@@ -4,7 +4,10 @@ import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.SalesPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -16,41 +19,74 @@ public class SalesPostDaoImpl implements SalesPostDao {
     }
 
     @Override
-    public boolean create(SalesPostEntity salesPostEntity) {
+    public String create(SalesPostEntity salesPostEntity) {
         salesPostRepository.save(salesPostEntity);
+
         if (salesPostRepository.existsByPostNumber(salesPostEntity.getPostNumber())) {
-            return true;
+            return "success";
         } else {
-            return false;
+            return "Error: Failed to create salesPost";
         }
     }
 
     @Override
-    public SalesPostEntity read(Long postNumber) {
-        return salesPostRepository.findByPostNumber(postNumber);
+    public Map<String, Object> read(Long postNumber) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntity == null) {
+            result.put("result", "Error: SalesPost not found");
+        } else {
+            result.put("data", salesPostEntity);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public SalesPostEntity readRecentByWriter(String postWriter) {
-        SalesPostEntity salesPostEntity = salesPostRepository
-                .findLatestSalesPostByPostWriter(postWriter);
-        return salesPostEntity;
+    public Map<String, Object> readRecentByWriter(String postWriter) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findLatestSalesPostByPostWriter(postWriter);
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntity == null) {
+            result.put("result", "Error: SalesPost not found");
+        } else {
+            result.put("data", salesPostEntity);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<SalesPostEntity> readAllByWriter(String postWriter) {
+    public Map<String, Object> readAllByWriter(String postWriter) {
         List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAllByPostWriter(postWriter);
-        return salesPostEntityList;
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntityList.isEmpty()) {
+            result.put("result", "Error: No SalesPosts found for writer");
+        } else {
+            result.put("data", salesPostEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<SalesPostEntity> readAll() {
+    public Map<String, Object> readAll() {
         List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAll();
-        return salesPostEntityList;
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntityList.isEmpty()) {
+            result.put("result", "Error: No salesPosts found");
+        } else {
+            result.put("data", salesPostEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public boolean update(SalesPostEntity salesPostEntity) {
+    public String update(SalesPostEntity salesPostEntity) {
         if (salesPostRepository.existsByPostNumber(salesPostEntity.getPostNumber())) {
             SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostNumber(salesPostEntity.getPostNumber());
             salesPostEntity.setCategory(Optional.ofNullable(salesPostEntity.getCategory()).orElse(oldSalesPostEntity.getCategory()));
@@ -58,23 +94,23 @@ public class SalesPostDaoImpl implements SalesPostDao {
             salesPostEntity.setPostWriter(Optional.ofNullable(salesPostEntity.getPostWriter()).orElse(oldSalesPostEntity.getPostWriter()));
             salesPostEntity.setPostDate(Optional.ofNullable(salesPostEntity.getPostDate()).orElse(oldSalesPostEntity.getPostDate()));
             salesPostEntity.setPostContents(Optional.ofNullable(salesPostEntity.getPostContents()).orElse(oldSalesPostEntity.getPostContents()));
-            salesPostEntity.setPostHitCount(salesPostEntity.getPostHitCount() == 0 ? oldSalesPostEntity.getPostHitCount() : salesPostEntity.getPostHitCount());
-            salesPostEntity.setPostLike(salesPostEntity.getPostLike() == 0 ? oldSalesPostEntity.getPostLike() : salesPostEntity.getPostLike());
+            salesPostEntity.setPostHitCount(Optional.ofNullable(salesPostEntity.getPostHitCount()).orElse(oldSalesPostEntity.getPostHitCount()));
+            salesPostEntity.setPostLike(Optional.ofNullable(salesPostEntity.getPostLike()).orElse(oldSalesPostEntity.getPostLike()));
             salesPostEntity.setStoreLocation(Optional.ofNullable(salesPostEntity.getStoreLocation()).orElse(oldSalesPostEntity.getStoreLocation()));
             salesPostRepository.save(salesPostEntity);
-            return true;
+            return "success";
         } else{
-            return false;
+            return "Error: SalesPost not found";
         }
     }
 
     @Override
-    public boolean delete(Long postNumber) {
+    public String delete(Long postNumber) {
         salesPostRepository.deleteById(postNumber);
         if(salesPostRepository.existsByPostNumber(postNumber)){
-            return false;
+            return "success";
         } else{
-            return true;
+            return "Error: SalesPost not found";
         }
     }
 }

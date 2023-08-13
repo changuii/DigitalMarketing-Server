@@ -1,6 +1,5 @@
 package com.example.sales_post.Entity;
 
-
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.*;
@@ -8,6 +7,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "Product")
@@ -30,4 +30,7 @@ public class ProductEntity {
     private Long productDeliveryFee;     //  productDeliveryFee  : 제품 배달비
     private String storeLocation;        //  storeLocation       : 가게 위치
 
+    @ManyToOne
+    @JoinColumn(name = "salesPostNumber")
+    private SalesPostEntity salesPostEntity;
 }

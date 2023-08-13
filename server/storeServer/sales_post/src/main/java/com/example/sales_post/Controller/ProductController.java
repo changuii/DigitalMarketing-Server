@@ -25,21 +25,25 @@ public class ProductController {
 
 
     //GET
-    @GetMapping("/get")
-    public JSONObject getProduct(@RequestBody JSONObject jsonObject) {return productServiceImpl.read(jsonObject);}
+    @GetMapping("/read")
+    public JSONObject readProduct(@RequestBody JSONObject jsonObject) {
+        return productServiceImpl.read(jsonObject);
+    }
 
-    @GetMapping("/get-all")
-    public List<JSONObject> getAllProduct(){return productServiceImpl.readAll();}
+    @GetMapping("/read-all")
+    public JSONObject readAllProduct() {
+        return productServiceImpl.readAll();
+    }
 
     //POST
     @PostMapping("/create")
-    public JSONObject postProduct(@RequestBody JSONObject jsonObject){
-        logger.info(jsonObject.toString());
-        return productServiceImpl.create(jsonObject);}
+    public JSONObject createProduct(@RequestBody JSONObject jsonObject) {
+        return productServiceImpl.create(jsonObject);
+    }
 
     //PUT
     @PutMapping("/update")
-    public JSONObject putProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.update(jsonObject);}
+    public JSONObject updateProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.update(jsonObject);}
 
     //DELETE
     @DeleteMapping("/delete")

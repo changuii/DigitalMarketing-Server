@@ -4,13 +4,14 @@ import com.example.sales_post.Entity.SalesPostEntity;
 import org.json.simple.JSONObject;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SalesPostDao {
-    boolean create(SalesPostEntity salesPostEntity);
-    SalesPostEntity read(Long postNumber);
-    SalesPostEntity readRecentByWriter(String postWriter);
-    List<SalesPostEntity> readAllByWriter(String postWriter);
-    List<SalesPostEntity> readAll();
-    boolean update(SalesPostEntity salesPostEntity);
-    boolean delete(Long postNumber);
+    String create(SalesPostEntity salesPostEntity);
+    Map<String, Object> read(Long postNumber);
+    Map<String, Object> readRecentByWriter(String postWriter);
+    Map<String, Object> readAllByWriter(String postWriter);
+    Map<String, Object> readAll();
+    String update(SalesPostEntity salesPostEntity);
+    String delete(Long postNumber);
 }

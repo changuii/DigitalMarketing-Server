@@ -12,7 +12,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Set;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -91,13 +94,29 @@ public class ProductDaoImpl implements ProductDao{
 
 
     @Override
-    public ProductEntity read(Long productSerialNumber) {
-        return this.productRepository.findByProductSerialNumber(productSerialNumber);
+    public Map<String, Object> read(Long productSerialNumber) {
+        ProductEntity productEntity = productRepository.findByProductSerialNumber(productSerialNumber);
+        Map<String, Object> result = new HashMap<>();
+        if (productEntity == null) {
+            result.put("result", "Error: Product not found");
+        } else {
+            result.put("data", productEntity);
+            result.put("result", "success");
+        }
+        return result;
     }
 
     @Override
-    public List<ProductEntity> readAll() {
-        return productRepository.findAll();
+    public Map<String, Object> readAll() {
+        List<ProductEntity> productEntityList = productRepository.findAll();
+        Map<String, Object> result = new HashMap<>();
+        if (productEntityList.isEmpty()) {
+            result.put("result", "Error: No products found");
+        } else {
+            result.put("data", productEntityList);
+            result.put("result", "success");
+        }
+        return result;
     }
 
 
@@ -105,6 +124,7 @@ public class ProductDaoImpl implements ProductDao{
 //================================================================================
 //  update 예외사항
 //    1.존재하지 않는 값에대한 업데이트 요청
+//
 //================================================================================
     @Override
     public boolean update(ProductEntity productEntity) {
@@ -112,10 +132,11 @@ public class ProductDaoImpl implements ProductDao{
             if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber()))
             {
                 ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
+                productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
                 productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
-                productEntity.setProductPrice(Optional.ofNullable(productEntity.getProductPrice()).orElse(oldProductEntity.getProductPrice()));
-                productEntity.setProductAmount(Optional.ofNullable(productEntity.getProductAmount()).orElse(oldProductEntity.getProductAmount()));
-                productEntity.setProductDeliveryFee(Optional.ofNullable(productEntity.getProductDeliveryFee()).orElse(oldProductEntity.getProductDeliveryFee()));
+                productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
+                productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
+                productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
                 productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
                 productRepository.save(productEntity);
                 return true;
@@ -125,11 +146,12 @@ public class ProductDaoImpl implements ProductDao{
     }
 
     @Override
-    public boolean delete(Long productSerialNumber) {
-        try{
-            ProductEntity productEntity = productRepository.findByProductSerialNumber(productSerialNumber);
-            productRepository.delete(productEntity);
-            return true;
-        }catch (NullPointerException e){ return false; }
+    public String delete(Long productSerialNumber) {
+        if (productRepository.existsByProductSerialNumber(productSerialNumber)) {
+            productRepository.deleteByProductSerialNumber(productSerialNumber);
+            return "success";
+        } else {
+            return "Error: Product not found";
+        }
     }
 }

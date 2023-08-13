@@ -21,7 +21,7 @@ public class ReviewController {
 
     //CREATE
     @PostMapping("/create")
-    public JSONObject postReview(@RequestBody JSONObject jsonObject){
+    public JSONObject createReview(@RequestBody JSONObject jsonObject){
         logger.info(jsonObject.toString());
         return reviewService.create(jsonObject);
     }
@@ -29,13 +29,13 @@ public class ReviewController {
     //READ
     //작성자의 모든 리뷰 READ
     @GetMapping("/read-all-writer")
-    public List<JSONObject> readAllReviewByWriter(@RequestBody JSONObject jsonObject){
+    public JSONObject readAllReviewByWriter(@RequestBody JSONObject jsonObject){
         logger.info("read-By-Writer");
         return reviewService.readAllByWriter(jsonObject);
     }
 
     @GetMapping("/read-all")
-    public List<JSONObject> readAllReview(){
+    public JSONObject readAllReview(){
         logger.info("read-All");
         return reviewService.readAll();
     }

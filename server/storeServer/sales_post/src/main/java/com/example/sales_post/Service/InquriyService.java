@@ -6,16 +6,18 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface InquriyService {
     JSONObject create(JSONObject jsonObject);
     JSONObject readRecentByWriter(JSONObject jsonObject);
-    List<JSONObject> readAllByWriter(JSONObject jsonObject);
-    List<JSONObject> readAll();
+    JSONObject readAllByWriter(JSONObject jsonObject);
+    JSONObject readAll();
     JSONObject update(JSONObject jsonObject);
     JSONObject delete(JSONObject jsonObject);
-    InquiryEntity jsonToEntity(JSONObject jsonObject);
-    JSONObject resultJsonObject(boolean result);
-    JSONObject resultJsonObject(boolean result, InquiryEntity inquiryEntity);
+    Map<String, Object> jsonToEntity(JSONObject jsonObject);
+    JSONObject entityToJson(InquiryEntity inquiryEntity);
+    JSONObject resultJsonObject(String result);
+    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
 }
