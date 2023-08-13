@@ -3,7 +3,6 @@ from django.db import models
 # 카테고리 모델
 class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
@@ -16,7 +15,7 @@ class Tag(models.Model):
         return self.name
 
 class Post(models.Model):
-    pmTags = models.ManyToManyField(Tag, blank=True, related_name='tags')  # 태그 필드 추가
+    pmTag = models.ManyToManyField(Tag, blank=True, related_name='tags')  # 태그 필드 추가
     pmCategory = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='categorys')  # 카테고리 필드 추가
     pmPostTitle = models.CharField(max_length=200, blank=True)
     pmPostWriter = models.CharField(max_length=200, blank=True)

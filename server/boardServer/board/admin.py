@@ -4,7 +4,7 @@ from .models import Category, Tag, Post, Comment
 
 class PostAdminForm(forms.ModelForm):
     pmCategory = forms.ModelChoiceField(queryset=Category.objects.all(), required=False, widget=forms.Select)
-    pmTags = forms.ModelMultipleChoiceField(
+    pmTag = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=False
@@ -21,7 +21,7 @@ class CommentInline(admin.TabularInline):  # 또는 admin.StackedInline 사용�
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description']
+    list_display = ['name', ]
     search_fields = ['name']
 
 admin.site.register(Category, CategoryAdmin)
@@ -37,15 +37,15 @@ admin.site.register(Tag, TagAdmin)
 class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
     list_display = ['pmPostTitle', 'pmPostWriter', 'pmPostContents', 'get_category', 'get_tags', 'get_comment_count', 'pmPostHitCount', 'pmPostLike', 'pmPostDate']
-    list_filter = ['pmPostDate', 'pmPostWriter', 'pmTags', 'pmCategory']
+    list_filter = ['pmPostDate', 'pmPostWriter', 'pmTag', 'pmCategory']
     search_fields = ['pmPostTitle', 'pmPostWriter']
     date_hierarchy = 'pmPostDate'
     raw_id_fields = []
     inlines = [CommentInline]
 
     def get_tags(self, obj):
-        return ", ".join([tag.name for tag in obj.pmTags.all()])
-    get_tags.short_description = 'Tags'
+        return ", ".join([tag.name for tag in obj.pmTag.all()])
+    get_tags.short_description = 'Tag'
 
     def get_category(self, obj):
         return obj.pmCategory.name if obj.pmCategory else "None"

@@ -10,5 +10,12 @@
 - Java
 
 `Django server`
-- version : 
+| Package   | Version |
+| --------- | ------- |
+| Python    | 3.11.4  |
+| Django    | 4.2.3   |
+| pip       | 23.1.2  |
+
+
+
 
