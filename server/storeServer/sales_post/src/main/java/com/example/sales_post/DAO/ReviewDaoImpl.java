@@ -1,10 +1,13 @@
 package com.example.sales_post.DAO;
 
+import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.ReviewEntity;
+import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +21,26 @@ public class ReviewDaoImpl implements ReviewDao{
         this.reviewRepository = reviewRepository;
     }
 
+    @Transactional()
     @Override
     public String create(ReviewEntity reviewEntity) {
         reviewRepository.save(reviewEntity);
 
         if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
+            // 연관된 SalesPostEntity와의 연관 관계 설정
+            SalesPostEntity salesPostEntity = reviewEntity.getSalesPostEntity();
+
+            if (salesPostEntity != null) {
+                salesPostEntity.addReview(reviewEntity);
+            }
+
             return "success";
         } else {
             return "Error: Failed to create review";
         }
     }
 
+    @Transactional()
     @Override
     public Map<String, Object> readAllByWriter(String reviewWriter) {
         List<ReviewEntity> reviewEntityList = reviewRepository.findAllByReviewWriter(reviewWriter);
@@ -42,6 +54,7 @@ public class ReviewDaoImpl implements ReviewDao{
         return result;
     }
 
+    @Transactional()
     @Override
     public Map<String, Object> readAll() {
         List<ReviewEntity> reviewEntityList = reviewRepository.findAll();
@@ -55,6 +68,7 @@ public class ReviewDaoImpl implements ReviewDao{
         return result;
     }
 
+    @Transactional()
     @Override
     public String update(ReviewEntity reviewEntity) {
         if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
@@ -65,6 +79,13 @@ public class ReviewDaoImpl implements ReviewDao{
             reviewEntity.setReviewLike(Optional.ofNullable(reviewEntity.getReviewLike()).orElse(oldReviewEntity.getReviewLike()));
             reviewEntity.setReviewStarRating(Optional.ofNullable(reviewEntity.getReviewStarRating()).orElse(oldReviewEntity.getReviewStarRating()));
             reviewEntity.setSalesPostEntity(Optional.ofNullable(reviewEntity.getSalesPostEntity()).orElse(oldReviewEntity.getSalesPostEntity()));
+
+            // 연관된 SalesPostEntity와의 연관 관계 설정
+            SalesPostEntity salesPostEntity = reviewEntity.getSalesPostEntity();
+            if (salesPostEntity != null) {
+                salesPostEntity.addReview(reviewEntity);
+            }
+
             reviewRepository.save(reviewEntity);
             return "success";
         } else{
@@ -72,13 +93,22 @@ public class ReviewDaoImpl implements ReviewDao{
         }
     }
 
+    @Transactional()
     @Override
-    public String delete(Long reviewNumber) { // 작성순번을 통해 삭제
-        reviewRepository.deleteById(reviewNumber);
+    public String delete(Long reviewNumber) {
         if (reviewRepository.existsByReviewNumber(reviewNumber)) {
+            ReviewEntity reviewEntity = reviewRepository.findByReviewNumber(reviewNumber);
+
+            // 연관된 SalesPostEntity의 inquiries 컬렉션에서 삭제
+            SalesPostEntity salesPostEntity = reviewEntity.getSalesPostEntity();
+            if (salesPostEntity != null) {
+                salesPostEntity.removeReview(reviewEntity);
+            }
+
+            reviewRepository.deleteById(reviewNumber);
             return "success";
         } else {
-            return "Error: Review not found";
+            return "Error: Inquiry not found";
         }
     }
 }

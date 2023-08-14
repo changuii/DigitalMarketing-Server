@@ -18,5 +18,5 @@ public interface ReviewService {
     Map<String, Object> jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(ReviewEntity reviewEntity);
     JSONObject resultJsonObject(String result);
-    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
+    JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList);
 }

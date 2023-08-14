@@ -5,54 +5,68 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/review")
 public class ReviewController {
-    private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
     private final ReviewService reviewService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final static Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
-    public ReviewController(@Autowired ReviewService reviewService) {
+    public ReviewController(@Autowired ReviewService reviewService,
+                            @Autowired RedisTemplate redisTemplate) {
         this.reviewService = reviewService;
+        this.redisTemplate = redisTemplate;
     }
 
-    //CREATE
-    @PostMapping("/create")
-    public JSONObject createReview(@RequestBody JSONObject jsonObject){
-        logger.info(jsonObject.toString());
-        return reviewService.create(jsonObject);
+    public JSONObject createReview(JSONObject jsonObject){return reviewService.create(jsonObject);}
+    public JSONObject readAllReviewByWriter(JSONObject jsonObject){return reviewService.readAllByWriter(jsonObject);}
+
+    public JSONObject readAllReview(){return reviewService.readAll();}
+
+    public JSONObject updateReview(JSONObject jsonObject){return reviewService.update(jsonObject);}
+
+    public JSONObject deleteReview(JSONObject jsonObject){return reviewService.delete(jsonObject);}
+
+    @KafkaListener(topics = "ReviewRequest", groupId = "foo")
+    public void getMessage(JSONObject jsonObject){
+        logger.info("KafkaMessage: " + jsonObject.toString());
+        actionControl(jsonObject);
     }
 
-    //READ
-    //작성자의 모든 리뷰 READ
-    @GetMapping("/read-all-writer")
-    public JSONObject readAllReviewByWriter(@RequestBody JSONObject jsonObject){
-        logger.info("read-By-Writer");
-        return reviewService.readAllByWriter(jsonObject);
+    public void sendMessage(String requestId, JSONObject jsonObject){
+        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
+        hashOperations.put("ReviewResponse", requestId, jsonObject);
     }
 
-    @GetMapping("/read-all")
-    public JSONObject readAllReview(){
-        logger.info("read-All");
-        return reviewService.readAll();
-    }
+    public void actionControl(JSONObject jsonObject){
+        String action = (String) jsonObject.get("action");
+        String requestId = (String) jsonObject.get("requestId");
 
-    //UPDATE
-    @PutMapping("/update")
-    public JSONObject updateReview(@RequestBody JSONObject jsonObject){
-        logger.info("update content" + jsonObject);
-        return reviewService.update(jsonObject);
+        if ("reviewCreate".equals(action)) {
+            JSONObject resultJsonObject = createReview(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("reviewReadAllByWriter".equals(action)) {
+            JSONObject resultJsonObject = readAllReviewByWriter(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("reviewReadAll".equals(action)) {
+            JSONObject resultJsonObject = readAllReview();
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("reviewUpdate".equals(action)) {
+            JSONObject resultJsonObject = updateReview(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("reviewDelete".equals(action)) {
+            JSONObject resultJsonObject = deleteReview(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
     }
-
-    //DELETE
-    @DeleteMapping("/delete")
-    public JSONObject deleteReview(@RequestBody JSONObject jsonObject){
-        logger.info("delete");
-        return reviewService.delete(jsonObject);
-    }
-
-    //별점 내림차순, 오름차순 정렬기능 구현과 각 별점별로 리뷰 볼 수 있는 기능 추가하면 좋을 듯?
 }

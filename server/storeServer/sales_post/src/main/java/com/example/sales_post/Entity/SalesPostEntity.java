@@ -28,7 +28,42 @@ public class SalesPostEntity {
     private Long postLike;
     private String storeLocation;
 
-//    @OneToMany
-//    @JoinColumn(name = "productSerialNumber")
-//    private List<ProductEntity> productEntityList;
+    @OneToMany(mappedBy = "salesPostEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<InquiryEntity> inquiries;
+
+    @OneToMany(mappedBy = "salesPostEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProductEntity> products;
+
+    @OneToMany(mappedBy = "salesPostEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ReviewEntity> reviews;
+
+    public void addInquiry(InquiryEntity inquiryEntity) {
+        inquiries.add(inquiryEntity);
+        inquiryEntity.setSalesPostEntity(this);
+    }
+
+    public void addReview(ReviewEntity reviewEntity) {
+        reviews.add(reviewEntity);
+        reviewEntity.setSalesPostEntity(this);
+    }
+
+    public void addProduct(ProductEntity productEntity) {
+        products.add(productEntity);
+        productEntity.setSalesPostEntity(this);
+    }
+
+    public void removeInquiry(InquiryEntity inquiryEntity) {
+        inquiries.remove(inquiryEntity);
+        inquiryEntity.setSalesPostEntity(null);
+    }
+
+    public void removeReview(ReviewEntity reviewEntity) {
+        reviews.remove(reviewEntity);
+        reviewEntity.setSalesPostEntity(null);
+    }
+
+    public void removeProduct(ProductEntity productEntity) {
+        products.remove(productEntity);
+        productEntity.setSalesPostEntity(null);
+    }
 }

@@ -21,7 +21,7 @@ public class ReviewEntity {
     private Integer reviewLike; //좋아요
     private String reviewDate; //작성날짜
 
-    @ManyToOne
-    @JoinColumn(name = "salesPostNumber") //외래키 생성, SalePostRepository 의 id와 매핑
+    @ManyToOne() // FetchType.LAZY 설정을 권장
+    @JoinColumn(name = "salesPostNumber", referencedColumnName = "postNumber")
     private SalesPostEntity salesPostEntity; //리뷰의 제품 게시글
 }

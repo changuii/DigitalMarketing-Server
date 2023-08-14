@@ -11,10 +11,5 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     List<ReviewEntity> findAllByReviewWriter(String reviewWRiter);
     ReviewEntity findByReviewNumber(Long reviewNumber);
-    boolean existsByReviewWriter(String reviewWriter);
     boolean existsByReviewNumber(Long reviewNumber);
-
-
 }
-
-//제목만 수정하거나 내용만 수정하거나 위치수정하는 경우 많음. 수정된것만 받는걸로

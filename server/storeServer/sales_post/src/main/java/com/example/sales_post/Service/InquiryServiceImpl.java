@@ -3,6 +3,7 @@ package com.example.sales_post.Service;
 import com.example.sales_post.DAO.InquiryDaoImpl;
 import com.example.sales_post.DAO.SalesPostDaoImpl;
 import com.example.sales_post.Entity.InquiryEntity;
+import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
@@ -11,12 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 @Service
 public class InquiryServiceImpl implements InquriyService {
     private final InquiryDaoImpl inquiryDaoImpl;
@@ -37,6 +39,7 @@ public class InquiryServiceImpl implements InquriyService {
         InquiryEntity inquiryEntity = (InquiryEntity) inquiryMap.get("data");
         String JTEresult = (String) inquiryMap.get("result");
         String result;
+
         if(JTEresult.equals("success")){
             result = inquiryDaoImpl.create(inquiryEntity);
         } else {
@@ -46,8 +49,7 @@ public class InquiryServiceImpl implements InquriyService {
     }
 
     public JSONObject readRecentByWriter(JSONObject jsonObject){
-        Long postNumber = Long.valueOf((String) jsonObject.get("salesPostNumber"));
-        Map<String, Object> inquiryMap = inquiryDaoImpl.readRecentByWriter(postNumber, (String) jsonObject.get("inquiryWriter"));
+        Map<String, Object> inquiryMap = inquiryDaoImpl.readRecentByWriter((String) jsonObject.get("inquiryWriter"));
 
         InquiryEntity inquiryEntity = (InquiryEntity) inquiryMap.get("data");
         String result = (String) inquiryMap.get("result");
@@ -55,16 +57,15 @@ public class InquiryServiceImpl implements InquriyService {
 
         if (result.equals("success")) {
             resultJsonObject = entityToJson(inquiryEntity);
-        } else{
+            resultJsonObject.put("result", result);
+        } else {
             resultJsonObject = resultJsonObject(result);
         }
         return resultJsonObject;
     }
 
     public JSONObject readAllByWriter(JSONObject jsonObject) {
-        String postNumberStr = (String) jsonObject.get("salesPostNumber");
-        Long postNumber = Long.valueOf(postNumberStr);
-        Map<String, Object> inquiryMap = inquiryDaoImpl.readAllByWriter(postNumber, (String) jsonObject.get("inquiryWriter"));
+        Map<String, Object> inquiryMap = inquiryDaoImpl.readAllByWriter((String) jsonObject.get("inquiryWriter"));
 
         List<InquiryEntity> inquiryEntityList = (List<InquiryEntity>) inquiryMap.get("data");
         String result = (String) inquiryMap.get("result");
@@ -72,14 +73,13 @@ public class InquiryServiceImpl implements InquriyService {
 
         if (result.equals("success")) {
             for (InquiryEntity entity : inquiryEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
-        } else{
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
+        } else {
+            return resultJsonObject(result);
         }
-        return resultJsonObject(result);
     }
 
     @Override
@@ -92,26 +92,18 @@ public class InquiryServiceImpl implements InquriyService {
 
         if (result.equals("success")) {
             for (InquiryEntity entity : inquiryEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
-        } else{
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
+        } else {
+            return resultJsonObject(result);
         }
-        return resultJsonObject(result);
     }
 
     public JSONObject update(JSONObject jsonObject){
-        Map<String, Object> inquiryMap = jsonToEntity(jsonObject);
-        InquiryEntity inquiryEntity = (InquiryEntity) inquiryMap.get("data");
-        String JTEresult = (String) inquiryMap.get("result");
-        String result;
-        if(JTEresult.equals("success")){
-            result = inquiryDaoImpl.update(inquiryEntity);
-        } else {
-            result = JTEresult;
-        }
+        InquiryEntity inquiryEntity = updateJsonToEntity(jsonObject);
+        String result = inquiryDaoImpl.update(inquiryEntity);
         return resultJsonObject(result);
     }
 
@@ -140,22 +132,31 @@ public class InquiryServiceImpl implements InquriyService {
         return inquiryMap;
     }
 
+    public InquiryEntity updateJsonToEntity(JSONObject jsonObject){
+        return objectMapper.convertValue(jsonObject, InquiryEntity.class);
+    }
+
     @Override
     public JSONObject entityToJson(InquiryEntity inquiryEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(inquiryEntity, Map.class));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("inquiryNumber", inquiryEntity.getInquiryNumber());
+        jsonObject.put("inquiryWriter", inquiryEntity.getInquiryWriter());
+        jsonObject.put("inquiryContents", inquiryEntity.getInquiryContents());
         return jsonObject;
     }
 
-    public JSONObject resultJsonObject(String result){
+    @Override
+    public JSONObject resultJsonObject(String result) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
         return jsonObject;
     }
 
     @Override
-    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+    public JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("data", jsonObjectList);
+        jsonObject.put("result", result);
         return jsonObject;
     }
 }

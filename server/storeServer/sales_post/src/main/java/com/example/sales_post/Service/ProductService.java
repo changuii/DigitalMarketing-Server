@@ -17,5 +17,5 @@ public interface ProductService {
     Map<String, Object> jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(ProductEntity productEntity);
     JSONObject resultJsonObject(String result);
-    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
+    JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList);
 }

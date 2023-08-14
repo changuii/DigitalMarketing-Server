@@ -1,10 +1,15 @@
 package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.InquiryEntity;
+import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.InquiryRepository;
+import com.example.sales_post.Service.InquiryServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,25 +18,35 @@ import java.util.Optional;
 @Repository
 public class InquiryDaoImpl implements InquiryDao {
     private final InquiryRepository inquiryRepository;
+    private final Logger logger = LoggerFactory.getLogger(InquiryServiceImpl.class);
 
     public InquiryDaoImpl(@Autowired InquiryRepository inquiryRepository) {
         this.inquiryRepository = inquiryRepository;
     }
 
+    @Transactional()
     @Override
     public String create(InquiryEntity inquiryEntity) {
         inquiryRepository.save(inquiryEntity);
 
         if (inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())) {
+            // 연관된 SalesPostEntity와의 연관 관계 설정
+            SalesPostEntity salesPostEntity = inquiryEntity.getSalesPostEntity();
+
+            if (salesPostEntity != null) {
+                salesPostEntity.addInquiry(inquiryEntity);
+            }
+
             return "success";
         } else {
             return "Error: Failed to create inquiry";
         }
     }
 
+    @Transactional()
     @Override
-    public Map<String, Object> readRecentByWriter(Long postNumber, String inquiryWriter) {
-        InquiryEntity inquiryEntity = inquiryRepository.findLatestInquiryByWriterAndPostNumber(postNumber, inquiryWriter);
+    public Map<String, Object> readRecentByWriter(String inquiryWriter) {
+        InquiryEntity inquiryEntity = inquiryRepository.findLatestInquiryByWriterAndPostNumber(inquiryWriter);
         Map<String, Object> result = new HashMap<>();
 
         if (inquiryEntity == null) {
@@ -43,11 +58,13 @@ public class InquiryDaoImpl implements InquiryDao {
         return result;
     }
 
+    @Transactional()
     @Override
-    public Map<String, Object> readAllByWriter(Long postNumber, String inquiryWriter) {
+    public Map<String, Object> readAllByWriter(String inquiryWriter) {
         List<InquiryEntity> inquiryEntityList = inquiryRepository.findAllByInquiryWriter(inquiryWriter);
         Map<String, Object> result = new HashMap<>();
 
+        logger.info("dao: "+inquiryEntityList.toString());
         if (inquiryEntityList.isEmpty()) {
             result.put("result", "Error: No inquiries found for writer");
         } else {
@@ -57,6 +74,7 @@ public class InquiryDaoImpl implements InquiryDao {
         return result;
     }
 
+    @Transactional()
     @Override
     public Map<String, Object> readAll() {
         List<InquiryEntity> inquiryEntityList = inquiryRepository.findAll();
@@ -71,6 +89,7 @@ public class InquiryDaoImpl implements InquiryDao {
         return result;
     }
 
+    @Transactional()
     @Override
     public String update(InquiryEntity inquiryEntity) {
         if (inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())) {
@@ -78,6 +97,13 @@ public class InquiryDaoImpl implements InquiryDao {
             inquiryEntity.setInquiryWriter(Optional.ofNullable(inquiryEntity.getInquiryWriter()).orElse(oldInquiryEntity.getInquiryWriter()));
             inquiryEntity.setInquiryContents(Optional.ofNullable(inquiryEntity.getInquiryContents()).orElse(oldInquiryEntity.getInquiryContents()));
             inquiryEntity.setSalesPostEntity(Optional.ofNullable(inquiryEntity.getSalesPostEntity()).orElse(oldInquiryEntity.getSalesPostEntity()));
+
+            // 연관된 SalesPostEntity와의 연관 관계 설정
+            SalesPostEntity salesPostEntity = inquiryEntity.getSalesPostEntity();
+            if (salesPostEntity != null) {
+                salesPostEntity.addInquiry(inquiryEntity);
+            }
+
             inquiryRepository.save(inquiryEntity);
             return "success";
         } else {
@@ -85,9 +111,18 @@ public class InquiryDaoImpl implements InquiryDao {
         }
     }
 
+    @Transactional()
     @Override
     public String delete(Long inquiryNumber) {
         if (inquiryRepository.existsByInquiryNumber(inquiryNumber)) {
+            InquiryEntity inquiryEntity = inquiryRepository.findByInquiryNumber(inquiryNumber);
+
+            // 연관된 SalesPostEntity의 inquiries 컬렉션에서 삭제
+            SalesPostEntity salesPostEntity = inquiryEntity.getSalesPostEntity();
+            if (salesPostEntity != null) {
+                salesPostEntity.removeInquiry(inquiryEntity);
+            }
+
             inquiryRepository.deleteById(inquiryNumber);
             return "success";
         } else {

@@ -10,11 +10,13 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 @Service
 public class ReviewServiceImpl implements ReviewService{
     private final ReviewDaoImpl reviewDaoImpl;
@@ -35,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService{
         ReviewEntity reviewEntity = (ReviewEntity) reviewMap.get("data");
         String JTEresult = (String) reviewMap.get("result");
         String result;
+
         if(JTEresult.equals("success")){
             result = reviewDaoImpl.create(reviewEntity);
         } else {
@@ -53,14 +56,13 @@ public class ReviewServiceImpl implements ReviewService{
 
         if (result.equals("success")) {
             for (ReviewEntity entity : reviewEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
-        } else{
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
+        } else {
+            return resultJsonObject(result);
         }
-        return resultJsonObject(jsonObjectList);
     }
 
     @Override
@@ -73,27 +75,19 @@ public class ReviewServiceImpl implements ReviewService{
 
         if (result.equals("success")) {
             for (ReviewEntity entity : reviewEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
-        } else{
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
+        } else {
+            return resultJsonObject(result);
         }
-        return resultJsonObject(jsonObjectList);
     }
 
     @Override
     public JSONObject update(JSONObject jsonObject) {
-        Map<String, Object> reviewMap = jsonToEntity(jsonObject);
-        ReviewEntity reviewEntity = (ReviewEntity) reviewMap.get("data");
-        String JTEresult = (String) reviewMap.get("result");
-        String result;
-        if(JTEresult.equals("success")){
-            result = reviewDaoImpl.update(reviewEntity);
-        } else {
-            result = JTEresult;
-        }
+        ReviewEntity reviewEntity = updateJsonToEntity(jsonObject);
+        String result = reviewDaoImpl.update(reviewEntity);
         return resultJsonObject(result);
     }
 
@@ -123,9 +117,22 @@ public class ReviewServiceImpl implements ReviewService{
         return reviewMap;
     }
 
+    public ReviewEntity updateJsonToEntity(JSONObject jsonObject){
+        return objectMapper.convertValue(jsonObject, ReviewEntity.class);
+    }
+
     @Override
     public JSONObject entityToJson(ReviewEntity reviewEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(reviewEntity, Map.class));
+//        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(reviewEntity, Map.class));
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("reviewNumber", reviewEntity.getReviewNumber());
+        jsonObject.put("reviewWriter", reviewEntity.getReviewWriter());
+        jsonObject.put("reviewContents", reviewEntity.getReviewContents());
+        jsonObject.put("reviewStarRating", reviewEntity.getReviewStarRating());
+        jsonObject.put("reviewLike", reviewEntity.getReviewLike());
+        jsonObject.put("reviewdate", reviewEntity.getReviewDate());
+
         return jsonObject;
     }
 
@@ -137,9 +144,10 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+    public JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("data", jsonObjectList);
+        jsonObject.put("result", result);
         return jsonObject;
     }
 }

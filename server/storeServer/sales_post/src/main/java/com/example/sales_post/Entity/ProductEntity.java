@@ -24,7 +24,7 @@ public class ProductEntity {
     private Long productDeliveryFee;
     private String storeLocation;
 
-    @ManyToOne
-    @JoinColumn(name = "salesPostNumber")
+    @ManyToOne() // FetchType.LAZY 설정을 권장
+    @JoinColumn(name = "salesPostNumber", referencedColumnName = "postNumber")
     private SalesPostEntity salesPostEntity;
 }

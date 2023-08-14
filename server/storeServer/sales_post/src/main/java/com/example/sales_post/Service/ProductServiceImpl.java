@@ -2,7 +2,6 @@ package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.ProductDaoImpl;
 import com.example.sales_post.DAO.SalesPostDaoImpl;
-import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +9,14 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
+@Transactional
 @Service
 public class ProductServiceImpl implements ProductService{
     private final ProductDaoImpl productDaoImpl;
@@ -36,6 +37,7 @@ public class ProductServiceImpl implements ProductService{
         ProductEntity productEntity = (ProductEntity) productMap.get("data");
         String JTEresult = (String) productMap.get("result");
         String result;
+
         if(JTEresult.equals("success")){
             result = productDaoImpl.create(productEntity);
         } else {
@@ -55,7 +57,8 @@ public class ProductServiceImpl implements ProductService{
 
         if (result.equals("success")) {
             resultJsonObject = entityToJson(productEntity);
-        } else{
+            resultJsonObject.put("result", result);
+        } else {
             resultJsonObject = resultJsonObject(result);
         }
         return resultJsonObject;
@@ -71,28 +74,20 @@ public class ProductServiceImpl implements ProductService{
 
         if (result.equals("success")) {
             for (ProductEntity entity : productEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
-        } else{
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
+        } else {
+            return resultJsonObject(result);
         }
-        return resultJsonObject(result);
     }
 
 
     @Override
     public JSONObject update(JSONObject jsonObject) {
-        Map<String, Object> productMap = jsonToEntity(jsonObject);
-        ProductEntity productEntity = (ProductEntity) productMap.get("data");
-        String JTEresult = (String) productMap.get("result");
-        String result;
-        if(JTEresult.equals("success")){
-            result = productDaoImpl.update(productEntity);
-        } else {
-            result = JTEresult;
-        }
+        ProductEntity productEntity = updateJsonToEntity(jsonObject);
+        String result = productDaoImpl.update(productEntity);
         return resultJsonObject(result);
     }
 
@@ -107,6 +102,7 @@ public class ProductServiceImpl implements ProductService{
     public Map<String, Object> jsonToEntity(JSONObject jsonObject){
         ProductEntity productEntity = objectMapper.convertValue(jsonObject, ProductEntity.class);
         Long salesPostNumber = Long.valueOf((String) jsonObject.get("salesPostNumber"));
+
 
         Map<String, Object> salesPostMap = salesPostDaoImpl.read(salesPostNumber);
         String result = (String) salesPostMap.get("result");
@@ -125,21 +121,34 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public JSONObject entityToJson(ProductEntity productEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(productEntity, Map.class));
+//        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(productEntity, Map.class));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("productSerialNumber", productEntity.getProductSerialNumber());
+        jsonObject.put("productName", productEntity.getProductName());
+        jsonObject.put("productPrice", productEntity.getProductPrice());
+        jsonObject.put("productAmount", productEntity.getProductAmount());
+        jsonObject.put("productDeliveryFee", productEntity.getProductDeliveryFee());
+        jsonObject.put("storeLocation", productEntity.getStoreLocation());
+
         return jsonObject;
     }
 
+    public ProductEntity updateJsonToEntity(JSONObject jsonObject){
+        return objectMapper.convertValue(jsonObject, ProductEntity.class);
+    }
+
     @Override
-    public JSONObject resultJsonObject(String result){
+    public JSONObject resultJsonObject(String result) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", result);
         return jsonObject;
     }
 
     @Override
-    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+    public JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("data", jsonObjectList);
+        jsonObject.put("result", result);
         return jsonObject;
     }
 }

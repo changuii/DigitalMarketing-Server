@@ -1,16 +1,18 @@
 package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.SalesPostDaoImpl;
-import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 @Service
 public class SalesPostServiceImpl implements SalesPostService {
     private final SalesPostDaoImpl salesPostDaoImpl;
@@ -39,6 +41,7 @@ public class SalesPostServiceImpl implements SalesPostService {
 
         if (result.equals("success")) {
             resultJsonObject = entityToJson(salesPostEntity);
+            resultJsonObject.put("result", result);
         } else {
             resultJsonObject = resultJsonObject(result);
         }
@@ -55,14 +58,13 @@ public class SalesPostServiceImpl implements SalesPostService {
 
         if (result.equals("success")) {
             for (SalesPostEntity entity : salesPostEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
         } else {
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result);
         }
-        return resultJsonObject(jsonObjectList);
     }
 
     @Override
@@ -75,14 +77,13 @@ public class SalesPostServiceImpl implements SalesPostService {
 
         if (result.equals("success")) {
             for (SalesPostEntity entity : salesPostEntityList) {
-                JSONObject resultJsonObject = entityToJson(entity);
-                jsonObjectList.add(resultJsonObject);
+                JSONObject temporaryJsonObject = entityToJson(entity);
+                jsonObjectList.add(temporaryJsonObject);
             }
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result, jsonObjectList);
         } else {
-            jsonObjectList.add(resultJsonObject(result));
+            return resultJsonObject(result);
         }
-        return resultJsonObject(jsonObjectList);
     }
 
     @Override
@@ -106,7 +107,20 @@ public class SalesPostServiceImpl implements SalesPostService {
 
     @Override
     public JSONObject entityToJson(SalesPostEntity salesPostEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, Map.class));
+//        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, Map.class));
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("salesPostNumber", salesPostEntity.getPostNumber());
+        jsonObject.put("category", salesPostEntity.getCategory());
+        jsonObject.put("postTitle", salesPostEntity.getPostTitle());
+        jsonObject.put("postWriter", salesPostEntity.getPostWriter());
+        jsonObject.put("postContents", salesPostEntity.getPostContents());
+        jsonObject.put("postDate", salesPostEntity.getPostDate());
+        jsonObject.put("postPicture", salesPostEntity.getPostPicture());
+        jsonObject.put("postHitCount", salesPostEntity.getPostHitCount());
+        jsonObject.put("postLike", salesPostEntity.getPostLike());
+        jsonObject.put("storeLocation", salesPostEntity.getStoreLocation());
+
         return jsonObject;
     }
 
@@ -118,9 +132,10 @@ public class SalesPostServiceImpl implements SalesPostService {
     }
 
     @Override
-    public JSONObject resultJsonObject(List<JSONObject> jsonObjectList){
+    public JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("data", jsonObjectList);
+        jsonObject.put("result", result);
         return jsonObject;
     }
 }

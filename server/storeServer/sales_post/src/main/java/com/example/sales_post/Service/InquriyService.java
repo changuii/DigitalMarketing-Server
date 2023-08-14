@@ -19,5 +19,5 @@ public interface InquriyService {
     Map<String, Object> jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(InquiryEntity inquiryEntity);
     JSONObject resultJsonObject(String result);
-    JSONObject resultJsonObject(List<JSONObject> jsonObjectList);
+    JSONObject resultJsonObject(String result, List<JSONObject> jsonObjectList);
 }

@@ -1,52 +1,74 @@
 package com.example.sales_post.Controller;
-
-
-import com.example.sales_post.Service.ProductServiceImpl;
+import com.example.sales_post.Service.ProductService;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/product")
 public class ProductController {
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
-    //DI
-    private final ProductServiceImpl productServiceImpl;
+    private final ProductService productService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final static Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    public ProductController(@Autowired ProductServiceImpl productServiceImpl) {
-        this.productServiceImpl = productServiceImpl;
+    public ProductController(@Autowired ProductService productService,
+                             @Autowired RedisTemplate redisTemplate) {
+        this.productService = productService;
+        this.redisTemplate = redisTemplate;
     }
 
-
-    //GET
-    @GetMapping("/read")
-    public JSONObject readProduct(@RequestBody JSONObject jsonObject) {
-        return productServiceImpl.read(jsonObject);
+    public JSONObject readProduct(JSONObject jsonObject) {
+        return productService.read(jsonObject);
     }
 
-    @GetMapping("/read-all")
     public JSONObject readAllProduct() {
-        return productServiceImpl.readAll();
+        return productService.readAll();
     }
 
-    //POST
-    @PostMapping("/create")
-    public JSONObject createProduct(@RequestBody JSONObject jsonObject) {
-        return productServiceImpl.create(jsonObject);
+    public JSONObject createProduct(JSONObject jsonObject) {return productService.create(jsonObject);}
+
+    public JSONObject updateProduct(JSONObject jsonObject){return productService.update(jsonObject);}
+
+    public JSONObject deleteProduct(JSONObject jsonObject){return productService.delete(jsonObject);}
+
+    @KafkaListener(topics = "ProductRequest", groupId = "foo")
+    public void getMessage(JSONObject jsonObject){
+        logger.info("KafkaMessage: " + jsonObject.toString());
+        actionControl(jsonObject);
     }
 
-    //PUT
-    @PutMapping("/update")
-    public JSONObject updateProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.update(jsonObject);}
+    public void sendMessage(String requestId, JSONObject jsonObject){
+        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
+        hashOperations.put("ProductResponse", requestId, jsonObject);
+    }
 
-    //DELETE
-    @DeleteMapping("/delete")
-    public JSONObject deleteProduct(@RequestBody JSONObject jsonObject){return productServiceImpl.delete(jsonObject);}
+    public void actionControl(JSONObject jsonObject){
+        String action = (String) jsonObject.get("action");
+        String requestId = (String) jsonObject.get("requestId");
+
+        if ("productCreate".equals(action)) {
+            JSONObject resultJsonObject = createProduct(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("productReadOne".equals(action)) {
+            JSONObject resultJsonObject = readProduct(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("productReadAll".equals(action)) {
+            JSONObject resultJsonObject = readAllProduct();
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("productUpdate".equals(action)) {
+            JSONObject resultJsonObject = updateProduct(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("productDelete".equals(action)) {
+            JSONObject resultJsonObject = deleteProduct(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+    }
 }
