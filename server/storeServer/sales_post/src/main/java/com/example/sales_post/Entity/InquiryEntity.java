@@ -18,6 +18,7 @@ public class InquiryEntity {
 
     private String inquiryWriter;
     private String inquiryContents;
+    private String inquiryDate;
 
     @ManyToOne() // FetchType.LAZY 설정을 권장
     @JoinColumn(name = "salesPostNumber", referencedColumnName = "postNumber")

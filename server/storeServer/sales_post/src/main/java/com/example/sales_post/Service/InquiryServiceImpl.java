@@ -142,6 +142,7 @@ public class InquiryServiceImpl implements InquriyService {
         jsonObject.put("inquiryNumber", inquiryEntity.getInquiryNumber());
         jsonObject.put("inquiryWriter", inquiryEntity.getInquiryWriter());
         jsonObject.put("inquiryContents", inquiryEntity.getInquiryContents());
+        jsonObject.put("inquiryDate", inquiryEntity.getInquiryDate());
         return jsonObject;
     }
 
