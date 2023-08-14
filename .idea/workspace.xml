@@ -4,29 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dd3a2fed-ece0-44f3-9340-8bf449e0da07" name="Changes" comment="review 완성">
+    <list default="true" id="bb849530-c536-42e4-a222-3114e9ffd7bf" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/Controller/ReviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/Controller/ReviewController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/DAO/ReviewDaoImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/DAO/ReviewDaoImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/Repository/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/Repository/ReviewRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/Service/ReviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/storeServer/sales_post/src/main/java/com/example/sales_post/Service/ReviewServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="ExternalProjectsData">
-    <projectState path="$PROJECT_DIR$/server/storeServer/sales_post">
-      <ProjectState />
-    </projectState>
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,111 +19,38 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2TluGnUSMId3lsOaDONzV7dV7Hb" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectId" id="2TxqoB3Boa6tkjKC5zqniZS7rBj" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/한동근/Desktop/DigitalMarketing-Server",
+    "last_opened_file_path": "C:/Users/ehdrm/Desktop/DigitalMarketing-Server/server/imageserver",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "inlay.hints",
-    "spring.configuration.checksum": "04a35f7fcbbf9f307e239cea6beb6290",
     "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
-    ]
   }
 }]]></component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <option name="filePath" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SalesPostApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="sales_post.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.sales_post.SalesPostApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="dd3a2fed-ece0-44f3-9340-8bf449e0da07" name="Changes" comment="" />
-      <created>1691629896501</created>
+      <changelist id="bb849530-c536-42e4-a222-3114e9ffd7bf" name="Changes" comment="" />
+      <created>1691995255374</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1691629896501</updated>
-      <workItem from="1691629897595" duration="3287000" />
-      <workItem from="1691636007147" duration="29000" />
-      <workItem from="1691636043848" duration="17289000" />
-      <workItem from="1691726475827" duration="16400000" />
+      <updated>1691995255374</updated>
+      <workItem from="1691995263681" duration="2520000" />
     </task>
-    <task id="LOCAL-00001" summary="review 완성">
-      <option name="closed" value="true" />
-      <created>1691738813560</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1691738813560</updated>
-    </task>
-    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="review 완성" />
-    <MESSAGE value="Review 수정완료" />
-    <option name="LAST_COMMIT_MESSAGE" value="Review 수정완료" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <breakpoint enabled="true" type="java-exception">
-          <properties class="org.springframework.beans.factory.BeanCreationException" package="org.springframework.beans.factory" />
-          <option name="timeStamp" value="1" />
-        </breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
