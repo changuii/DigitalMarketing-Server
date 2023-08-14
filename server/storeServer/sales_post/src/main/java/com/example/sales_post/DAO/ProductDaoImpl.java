@@ -7,11 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.util.Set;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,61 +25,39 @@ import java.util.Optional;
 public class ProductDaoImpl implements ProductDao{
 
     private final ProductRepository productRepository;
-
-    private final Validator validator;
+    private final GlobalValidCheck globalValidCheck;
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     public ProductDaoImpl(@Autowired ProductRepository productRepository,
-                          @Autowired Validator validator) {
+                          @Autowired GlobalValidCheck globalValidCheck) {
         this.productRepository = productRepository;
-        this.validator = validator;
+        this.globalValidCheck = globalValidCheck;
     }
-    //================================================================================
-//  create 예외사항
-//    1.빈 값이 들어오는 경우
-//    2.일부 값만 들어오는 경우
-//    3.이미 존재하는 값
-//================================================================================
 
-
-//    public String validCheck(ProductEntity productEntity) {
+//    public String validCheck(@Validated ProductEntity productEntity)
+//    {
 //        Set<ConstraintViolation<ProductEntity>> violations = validator.validate(productEntity);
-//        if (!violations.isEmpty()) {
+//        logger.info(violations.toString());
+//        logger.info(productEntity.toString());
+//        if (violations.isEmpty()) {
+//            return "success";
+//        } else {
 //            StringBuilder errorMessage = new StringBuilder();
 //            for (ConstraintViolation<ProductEntity> violation : violations) {
-//                errorMessage.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("\n");
+//                errorMessage.append(violation.getPropertyPath()).append(": ").append(violation.getMessage());
 //            }
-//            throw new ValidationFailedException(errorMessage.toString());
+////            return new ValidationException(String.valueOf(errorMessage)).toString();
+////            return new ValidationFailedException(String.valueOf(errorMessage)).toString();
+//
+//            return errorMessage.toString();
 //        }
-//        return "success";
 //    }
-
-
-    public String validCheck(@Validated ProductEntity productEntity)
-    {
-        Set<ConstraintViolation<ProductEntity>> violations = validator.validate(productEntity);
-        logger.info(violations.toString());
-        logger.info(productEntity.toString());
-        if (violations.isEmpty()) {
-            return "success";
-        } else {
-            StringBuilder errorMessage = new StringBuilder();
-            for (ConstraintViolation<ProductEntity> violation : violations) {
-                errorMessage.append(violation.getPropertyPath()).append(": ").append(violation.getMessage());
-            }
-//            return new ValidationException(String.valueOf(errorMessage)).toString();
-//            return new ValidationFailedException(String.valueOf(errorMessage)).toString();
-
-            return errorMessage.toString();
-        }
-
-    }
 
 
     @Override
     public String create(ProductEntity productEntity) {
         Long serialNumber = productEntity.getProductSerialNumber();
-        String valid = validCheck(productEntity);
+        String valid = globalValidCheck.validCheck(productEntity);
 
         logger.info(productEntity.toString());
         if (!productRepository.existsByProductSerialNumber(serialNumber) && valid.equals("success")) {
@@ -120,29 +95,20 @@ public class ProductDaoImpl implements ProductDao{
     }
 
 
-
-//================================================================================
-//  update 예외사항
-//    1.존재하지 않는 값에대한 업데이트 요청
-//
-//================================================================================
     @Override
-    public boolean update(ProductEntity productEntity) {
-        try{
-            if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber()))
-            {
-                ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
-                productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
-                productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
-                productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
-                productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
-                productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
-                productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
-                productRepository.save(productEntity);
-                return true;
-            }
-        }catch (NullPointerException e){ return false; }
-        return false;
+    public String update(ProductEntity productEntity) {
+        if(productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber())) {
+            ProductEntity oldProductEntity = productRepository.findByProductSerialNumber(productEntity.getProductSerialNumber());
+            productEntity.setProductSerialNumber(Optional.ofNullable(productEntity.getProductSerialNumber()).orElse(oldProductEntity.getProductSerialNumber()));
+            productEntity.setProductName(Optional.ofNullable(productEntity.getProductName()).orElse(oldProductEntity.getProductName()));
+            productEntity.setProductPrice(productEntity.getProductPrice() == 0 ? oldProductEntity.getProductPrice() : productEntity.getProductPrice());
+            productEntity.setProductAmount(productEntity.getProductAmount() == 0 ? oldProductEntity.getProductAmount() : productEntity.getProductAmount());
+            productEntity.setProductDeliveryFee(productEntity.getProductDeliveryFee() == 0 ? oldProductEntity.getProductDeliveryFee() : productEntity.getProductDeliveryFee());
+            productEntity.setStoreLocation(Optional.ofNullable(productEntity.getStoreLocation()).orElse(oldProductEntity.getStoreLocation()));
+            productRepository.save(productEntity);
+            return "success";
+        }
+        return "ERROR: Product not found";
     }
 
     @Override

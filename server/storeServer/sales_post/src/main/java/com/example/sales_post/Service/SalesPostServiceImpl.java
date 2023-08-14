@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 @Service
 public class SalesPostServiceImpl implements SalesPostService {
@@ -21,10 +25,11 @@ public class SalesPostServiceImpl implements SalesPostService {
         this.salesPostDaoImpl = salesPostDaoImpl;
         this.objectMapper = objectMapper;
     }
-
+    private static final Logger logger = LoggerFactory.getLogger(SalesPostServiceImpl.class);
     @Override
     public JSONObject create(JSONObject jsonObject) {
         SalesPostEntity salesPostEntity = jsonToEntity(jsonObject);
+        logger.info(jsonObject.toString());
         String result = salesPostDaoImpl.create(salesPostEntity);
         return resultJsonObject(result);
     }

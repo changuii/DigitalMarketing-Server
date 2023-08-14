@@ -19,11 +19,11 @@ import java.util.List;
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productSerialNumber;    //  productSerialNumbe  : 제품 번호
+    private Long productSerialNumber;    //  productSerialNumber  : 제품 번호
 
-    @Size(min = 1, max = 3, message = "상품 명은 최소 1글자 이상이어야 합니다.")
+    @Size(min = 1, max = 20, message = "상품 명은 최소 1글자 이상이어야 합니다.")
     private String productName;          //  productName         : 제품 이름
-    @Max(10)
+    @Max(10000000)
     private Long productPrice;           //  productPrice        : 제품 가격
     @NotNull(message = "널값 넣지마라 십새야")
     private Long productAmount;          //  productAmount       : 제품 수량

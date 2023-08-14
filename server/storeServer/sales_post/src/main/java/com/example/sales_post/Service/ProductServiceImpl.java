@@ -2,22 +2,16 @@ package com.example.sales_post.Service;
 
 import com.example.sales_post.DAO.ProductDaoImpl;
 import com.example.sales_post.DAO.SalesPostDaoImpl;
-import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Service
@@ -34,13 +28,6 @@ public class ProductServiceImpl implements ProductService{
         this.objectMapper = objectMapper;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
-
-
-
-    //================================================================================
-    // TODO: 실패시 오류 내용 전송
-    //================================================================================
 
 
     @Override
@@ -54,6 +41,7 @@ public class ProductServiceImpl implements ProductService{
         } else {
             result = JTEresult;
         }
+
         return resultJsonObject(result);
     }
 

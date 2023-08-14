@@ -5,6 +5,8 @@ import com.example.sales_post.Repository.InquiryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,20 +15,22 @@ import java.util.Optional;
 @Repository
 public class InquiryDaoImpl implements InquiryDao {
     private final InquiryRepository inquiryRepository;
+    private final GlobalValidCheck globalValidCheck;
 
-    public InquiryDaoImpl(@Autowired InquiryRepository inquiryRepository) {
+    public InquiryDaoImpl(@Autowired InquiryRepository inquiryRepository
+            , @Autowired GlobalValidCheck globalValidCheck) {
         this.inquiryRepository = inquiryRepository;
+        this.globalValidCheck = globalValidCheck;
     }
 
     @Override
     public String create(InquiryEntity inquiryEntity) {
-        inquiryRepository.save(inquiryEntity);
-
-        if (inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())) {
-            return "success";
-        } else {
-            return "Error: Failed to create inquiry";
+        String valid = globalValidCheck.validCheck(inquiryEntity);
+        if (valid.equals("success")) {
+            inquiryEntity.setInquiryDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            inquiryRepository.save(inquiryEntity);
         }
+        return valid;
     }
 
     @Override

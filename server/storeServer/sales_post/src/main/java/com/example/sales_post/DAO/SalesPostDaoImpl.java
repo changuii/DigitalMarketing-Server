@@ -2,31 +2,39 @@ package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.SalesPostRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Repository
 public class SalesPostDaoImpl implements SalesPostDao {
     private final SalesPostRepository salesPostRepository;
+    private  final GlobalValidCheck globalValidCheck;
 
-    public SalesPostDaoImpl(@Autowired SalesPostRepository salesPostRepository) {
+    private static final Logger logger = LoggerFactory.getLogger(SalesPostDaoImpl.class);
+
+    public SalesPostDaoImpl(@Autowired SalesPostRepository salesPostRepository,
+                            @Autowired GlobalValidCheck globalValidCheck) {
         this.salesPostRepository = salesPostRepository;
+        this.globalValidCheck = globalValidCheck;
     }
 
     @Override
-    public String create(SalesPostEntity salesPostEntity) {
-        salesPostRepository.save(salesPostEntity);
+    public String create(@Validated SalesPostEntity salesPostEntity) {
+        String valid = globalValidCheck.validCheck(salesPostEntity);
 
-        if (salesPostRepository.existsByPostNumber(salesPostEntity.getPostNumber())) {
-            return "success";
-        } else {
-            return "Error: Failed to create salesPost";
+        if (valid.equals("success")) {
+            salesPostEntity.setPostDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            this.salesPostRepository.save(salesPostEntity);
         }
+        return valid;
     }
 
     @Override

@@ -5,6 +5,9 @@ import com.example.sales_post.Repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.text.DateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,20 +16,23 @@ import java.util.Optional;
 @Repository
 public class ReviewDaoImpl implements ReviewDao{
     private final ReviewRepository reviewRepository;
-
-    public ReviewDaoImpl(@Autowired ReviewRepository reviewRepository){
+    private final GlobalValidCheck globalValidCheck;
+    public ReviewDaoImpl(@Autowired ReviewRepository reviewRepository,
+                         @Autowired GlobalValidCheck globalValidCheck){
         this.reviewRepository = reviewRepository;
+        this.globalValidCheck = globalValidCheck;
     }
 
     @Override
     public String create(ReviewEntity reviewEntity) {
-        reviewRepository.save(reviewEntity);
+        String valid = globalValidCheck.validCheck(reviewEntity);
 
-        if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
-            return "success";
-        } else {
-            return "Error: Failed to create review";
+        if (valid.equals("success")) {
+            reviewEntity.setReviewDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            reviewRepository.save(reviewEntity);
         }
+        return valid;
+
     }
 
     @Override
