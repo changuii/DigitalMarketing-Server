@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,9 +24,8 @@ public class SalesPostEntity {
     private String postWriter;
     private String postContents;
     private String mainImage;
-    @JsonIgnore
     @ElementCollection
-    private List<String> descImages;
+    private List<ImageData> descImages;
     private String storeLocation;
     private String postDate;
     @ColumnDefault("0")
@@ -38,6 +38,9 @@ public class SalesPostEntity {
     private List<ProductEntity> products;
 
     public void addProduct(ProductEntity productEntity) {
+        if(this.products == null){
+            this.products = new ArrayList<>();
+        }
         products.add(productEntity);
         productEntity.setSalesPostEntity(this);
     }

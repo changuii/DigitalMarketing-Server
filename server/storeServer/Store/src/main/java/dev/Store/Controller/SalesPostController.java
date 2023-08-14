@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("store")
+@RequestMapping("/store")
 public class SalesPostController {
     private SalesPostService salesPostService;
 
@@ -23,6 +23,8 @@ public class SalesPostController {
     public JSONObject readAll(){
         return salesPostService.readAll();
     }
+    @PutMapping
     public JSONObject update(@RequestBody JSONObject jsonObject){return salesPostService.update(jsonObject);}
+    @DeleteMapping
     public JSONObject delete(@RequestBody JSONObject jsonObject){return salesPostService.delete(jsonObject);}
 }

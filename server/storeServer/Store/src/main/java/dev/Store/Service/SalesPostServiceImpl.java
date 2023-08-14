@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +39,7 @@ public class SalesPostServiceImpl implements SalesPostService{
         SalesPostEntity resultSalesPostEntity = (SalesPostEntity) resultMap.get("data");
 
         if(postCreateResult.equals("success")) {
-            List<JSONObject> products = (List<JSONObject>) jsonObject.get("products");
-            logger.info(products.toString());
+            List<HashMap<String, Object>> products = (List<HashMap<String, Object>>) jsonObject.get("products");
             String productCreateResult = productService.jsonListToEntityList(products, resultSalesPostEntity);
             if(!postCreateResult.equals("succes"))
                 return resultJsonObject(productCreateResult);
@@ -51,7 +51,7 @@ public class SalesPostServiceImpl implements SalesPostService{
     public JSONObject read(JSONObject jsonObject) {
         String postWriter = (String) jsonObject.get("postWriter");
         String postTitle = (String) jsonObject.get("postTitle");
-        Map<String, Object> salesPostMap = salesPostDAO.readBypostNumber(postWriter, postTitle);
+        Map<String, Object> salesPostMap = salesPostDAO.readByWriterAndTitle(postWriter, postTitle);
 
         SalesPostEntity salesPostEntity = (SalesPostEntity) salesPostMap.get("data");
         String result = (String) salesPostMap.get("result");
@@ -128,6 +128,7 @@ public class SalesPostServiceImpl implements SalesPostService{
 
         for (ProductEntity product : products) {
             JSONObject productJsonObject = new JSONObject(objectMapper.convertValue(product, Map.class));
+            productJsonObject.put("number",product.getNumberById());
             jsonObjectList.add(productJsonObject);
         }
         jsonObject.put("products", jsonObjectList);

@@ -10,8 +10,8 @@ import java.util.Objects;
 @Repository
 public interface ProductDAO {
     public String create(ProductEntity product);
-    public Map<String, Object> readAll();
-    public Map<String, Object> readByNumber(Long number);
-    public String update(ProductEntity product);
-    public String delete(Long number);
+//    public Map<String, Object> readAllByPostNumber();
+//    public Map<String, Object> readByNumber(Long number);
+//    public String update(ProductEntity product);
+//    public String delete(Long number);
 }

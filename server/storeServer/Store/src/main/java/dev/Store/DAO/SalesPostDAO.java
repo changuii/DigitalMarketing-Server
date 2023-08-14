@@ -8,7 +8,7 @@ import java.util.Map;
 public interface SalesPostDAO {
     public Map<String, Object> create(SalesPostEntity salesPostEntity);
     public Map<String, Object> readAll();
-    public Map<String, Object> readBypostNumber(String postWriter, String postTitle);
+    public Map<String, Object> readByWriterAndTitle(String postWriter, String postTitle);
     public String update(SalesPostEntity salesPostEntity);
     public String delete(String postWriter, String postTitle);
 }

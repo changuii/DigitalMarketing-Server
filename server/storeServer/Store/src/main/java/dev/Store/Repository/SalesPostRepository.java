@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesPostRepository extends JpaRepository<SalesPostEntity, Long> {
-    SalesPostEntity findByPostWriterAndPostTitle(String postWriter, String postTitle);
-    SalesPostEntity findByPostNumber(Long postNumber);
+    SalesPostEntity findFirstByPostWriterAndPostTitleOrderByPostDateDesc(String postWriter, String postTitle);
+
 }

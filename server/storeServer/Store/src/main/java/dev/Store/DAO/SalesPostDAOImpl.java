@@ -1,5 +1,7 @@
 package dev.Store.DAO;
 
+import dev.Store.Entity.ImageData;
+import dev.Store.Entity.ProductEntity;
 import dev.Store.Entity.SalesPostEntity;
 import dev.Store.Repository.SalesPostRepository;
 import org.hibernate.cache.spi.SecondLevelCacheLogger;
@@ -8,10 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class SalesPostDAOImpl implements SalesPostDAO{
@@ -48,8 +47,8 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> readBypostNumber(String postWriter, String postTitle) {
-        SalesPostEntity salesPostEntity = salesPostRepository.findByPostWriterAndPostTitle(postWriter, postTitle);
+    public Map<String, Object> readByWriterAndTitle(String postWriter, String postTitle) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(postWriter, postTitle);
         Map<String, Object> result = new HashMap<>();
 
         if (salesPostEntity == null) {
@@ -63,8 +62,10 @@ public class SalesPostDAOImpl implements SalesPostDAO{
 
     @Override
     public String update(SalesPostEntity salesPostEntity) {
-        SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostWriterAndPostTitle(salesPostEntity.getPostWriter(), salesPostEntity.getPostTitle());
+        SalesPostEntity oldSalesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(salesPostEntity.getPostWriter(), salesPostEntity.getPostTitle());
+
         if (oldSalesPostEntity != null) {
+            salesPostEntity.setPostNumber(Optional.ofNullable(salesPostEntity.getPostNumber()).orElse(oldSalesPostEntity.getPostNumber()));
             salesPostEntity.setCategory(Optional.ofNullable(salesPostEntity.getCategory()).orElse(oldSalesPostEntity.getCategory()));
             salesPostEntity.setPostTitle(Optional.ofNullable(salesPostEntity.getPostTitle()).orElse(oldSalesPostEntity.getPostTitle()));
             salesPostEntity.setPostWriter(Optional.ofNullable(salesPostEntity.getPostWriter()).orElse(oldSalesPostEntity.getPostWriter()));
@@ -75,8 +76,23 @@ public class SalesPostDAOImpl implements SalesPostDAO{
             salesPostEntity.setStoreLocation(Optional.ofNullable(salesPostEntity.getStoreLocation()).orElse(oldSalesPostEntity.getStoreLocation()));
             salesPostEntity.setMainImage(Optional.ofNullable(salesPostEntity.getMainImage()).orElse(oldSalesPostEntity.getMainImage()));
             salesPostEntity.setDescImages(Optional.ofNullable(salesPostEntity.getDescImages()).orElse(oldSalesPostEntity.getDescImages()));
-            salesPostEntity.setProducts(oldSalesPostEntity.getProducts());
-            salesPostRepository.save(salesPostEntity);
+            salesPostEntity.setProducts(Optional.ofNullable(salesPostEntity.getProducts()).orElse(oldSalesPostEntity.getProducts()));
+
+//            List<ImageData> images = new ArrayList<>();
+//            for(ImageData image : oldSalesPostEntity.getDescImages()){
+//                images.add(image);
+//            }
+//            salesPostEntity.setDescImages(images);
+
+//            List<ProductEntity> newProducts = new ArrayList<>();
+//            for (ProductEntity product : oldSalesPostEntity.getProducts()) {
+//                product.setSalesPostEntity(salesPostEntity);
+//                newProducts.add(product);
+//            }
+//
+//            salesPostEntity.setProducts(newProducts);
+
+            salesPostRepository.save(oldSalesPostEntity);
             return "success";
         } else {
             return "Error: 수정하려고 하는 SalesPost가 존재하지 않습니다.";
@@ -85,9 +101,10 @@ public class SalesPostDAOImpl implements SalesPostDAO{
 
     @Override
     public String delete(String postWriter, String postTitle) {
-        SalesPostEntity salesPostEntity = salesPostRepository.findByPostWriterAndPostTitle(postWriter, postTitle);
+        SalesPostEntity salesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(postWriter, postTitle);
+
         if(salesPostEntity != null){
-            salesPostRepository.existsById(salesPostEntity.getPostNumber());
+            salesPostRepository.delete(salesPostEntity);
             return "success";
         } else{
             return "Error: 삭제하려고 하는 SalesPost가 존재하지 않습니다.";
