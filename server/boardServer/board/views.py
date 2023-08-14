@@ -8,12 +8,16 @@ from django.db import DatabaseError
 logger = logging.getLogger(__name__)
 redis_conn = redis.StrictRedis(host='172.20.10.14', port=6379, db=0, decode_responses=True)
 
-def save_to_redis(request_id, value):
+def save_to_redis(request_id, value, data=None):
     try:
         response_id = "PromotionalPostResponse"
-        # 문자열이 아닌 경우 JSON 형식으로 변환
-        if not isinstance(value, str):
-            value = json.dumps(value)
+        # 필요한 경우 JSON 문자열로 변환
+        if not isinstance(value, str) or data:
+            value = json.dumps({
+                "@class": "org.json.simple.JSONObject",
+                "result": value,
+                "data": data if data else None
+            })
         redis_conn.hset(response_id, request_id, value)
         logger.info(f"Saved data to Redis with key {request_id} {value}")
     except Exception as e:
@@ -41,11 +45,9 @@ def handle_message(data):
                 for tag_name in tags_data:
                     tag, created = Tag.objects.get_or_create(name=tag_name)
                     post_instance.pmTag.add(tag)
-                # 모든 속성 로깅
                 logger.info(f"Post created: {vars(post_instance)}")
-                success = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"success\"}"
-                failure = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"No posts found\"}"
-            
+                success = "success"
+                failure = "No posts found"
                 save_to_redis(request_id,  success)
             else:
                 save_to_redis(request_id, failure)
@@ -64,33 +66,31 @@ def handle_message(data):
             if serializer.is_valid():
                 post_instance = serializer.save()
 
-                # Remove all tags from the post before adding new ones
                 post_instance.pmTag.clear()
                 for tag_name in tags_data:
                     tag, created = Tag.objects.get_or_create(name=tag_name)
                     post_instance.pmTag.add(tag)
-                success = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"success\"}"            
-                failure = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"No posts found\"}"
+                success = "success"           
+                failure = "No posts found"
                 save_to_redis(request_id, success)
             else:
                 save_to_redis(request_id, failure)
 
-
         elif action == 'PMPOSTDELETE':
             post = Post.objects.get(id=data['pmPostNumber'])
             post.delete()
-            success = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"success\"}"
+            success = "success"
             save_to_redis(request_id, success)
 
         elif action == 'PMPOSTREADALL':
             posts = Post.objects.all()
             serializer = PostSerializer(posts, many=True)
             posts_data = serializer.data
-            success = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"success\"}"
-            failure = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"No posts found\"}"
             if posts_data:
-                save_to_redis(request_id, success)
+                success = "success"
+                save_to_redis(request_id, success, posts_data)
             else:
+                failure = "No posts found"
                 save_to_redis(request_id, failure)
 
         elif action == 'PMPOSTREADTAG':
@@ -136,13 +136,14 @@ def handle_message(data):
             })
 
     except Post.DoesNotExist:
-        failure = "{\"@class\": \"org.json.simple.JSONObject\",\"result\": \"No posts found\"}"
+        failure = "No posts found"
         save_to_redis(request_id, failure)
 
     except DatabaseError as db_err:
         logger.error(f"Database Error: {db_err}")
-        save_to_redis(request_id, {"result": "Database Error", "message": str(db_err)})
+        save_to_redis(request_id, "Database Error")
 
     except Exception as e:
-        logger.error(f"Unexpected Error: {e}")
-        save_to_redis(request_id, {"result": "Error", "message": str(e)})
+        logger.error(f"Unhandled Exception: {e}")
+        save_to_redis(request_id, "Unhandled Exception")
+
