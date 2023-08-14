@@ -2,11 +2,16 @@ package com.example.sales_post.DAO;
 
 import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Repository.ProductRepository;
+import com.example.sales_post.Service.ProductServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import com.example.sales_post.Entity.SalesPostEntity;
 
 import javax.transaction.Transactional;
+import javax.validation.Validator;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +21,13 @@ import java.util.Optional;
 public class ProductDaoImpl implements ProductDao{
 
     private final ProductRepository productRepository;
+    private final GlobalValidCheck globalValidCheck;
+    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    public ProductDaoImpl(@Autowired ProductRepository productRepository) {
+    public ProductDaoImpl(@Autowired ProductRepository productRepository,
+                          @Autowired GlobalValidCheck globalValidCheck) {
         this.productRepository = productRepository;
+        this.globalValidCheck = globalValidCheck;
     }
 
     @Transactional()
@@ -40,11 +49,13 @@ public class ProductDaoImpl implements ProductDao{
         }
     }
 
+
 //    @Override
 //    public String create(ProductEntity productEntity) {
 //        Long serialNumber = productEntity.getProductSerialNumber();
-//        String valid = validCheck(productEntity);
+//        String valid = globalValidCheck.validCheck(productEntity);
 //
+//        logger.info(productEntity.toString());
 //        if (!productRepository.existsByProductSerialNumber(serialNumber) && valid.equals("success")) {
 //            this.productRepository.save(productEntity);
 //        }

@@ -4,8 +4,11 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.List;
 import javax.validation.*;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "Product")
@@ -28,4 +31,5 @@ public class ProductEntity {
     @ManyToOne() // FetchType.LAZY 설정을 권장
     @JoinColumn(name = "salesPostNumber", referencedColumnName = "postNumber")
     private SalesPostEntity salesPostEntity;
+
 }

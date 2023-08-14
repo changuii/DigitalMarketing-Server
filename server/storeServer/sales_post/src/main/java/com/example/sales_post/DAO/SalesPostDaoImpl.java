@@ -5,9 +5,17 @@ import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.ReviewEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.SalesPostRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
 
+
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.persistence.GeneratedValue;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 import java.util.HashMap;
@@ -21,15 +29,18 @@ public class SalesPostDaoImpl implements SalesPostDao {
     private final InquiryDao inquiryDao;
     private final ProductDao productDao;
     private final ReviewDao reviewDao;
+    private  final GlobalValidCheck globalValidCheck;
 
     public SalesPostDaoImpl(@Autowired SalesPostRepository salesPostRepository,
                             @Autowired InquiryDao inquiryDao,
                             @Autowired ProductDao productDao,
-                            @Autowired ReviewDao reviewDao) {
+                            @Autowired ReviewDao reviewDao,
+                            @Autowired GlobalValidCheck globalValidCheck) {
         this.salesPostRepository = salesPostRepository;
         this.inquiryDao = inquiryDao;
         this.productDao = productDao;
         this.reviewDao = reviewDao;
+        this.globalValidCheck = globalValidCheck;
     }
 
     @Transactional()
@@ -43,6 +54,17 @@ public class SalesPostDaoImpl implements SalesPostDao {
             return "Error: Failed to create salesPost";
         }
     }
+
+//    @Override
+//    public String create(@Validated SalesPostEntity salesPostEntity) {
+//        String valid = globalValidCheck.validCheck(salesPostEntity);
+//
+//        if (valid.equals("success")) {
+//            salesPostEntity.setPostDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+//            this.salesPostRepository.save(salesPostEntity);
+//        }
+//        return valid;
+//    }
 
     @Transactional()
     @Override
@@ -127,7 +149,6 @@ public class SalesPostDaoImpl implements SalesPostDao {
         }
     }
 
-    // 지울 때 외래키에 연결된 모든 것들을 지워야 됨.
     @Transactional()
     @Override
     public String delete(Long postNumber) {
