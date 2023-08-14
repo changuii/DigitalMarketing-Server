@@ -6,7 +6,7 @@ import logging
 from django.db import DatabaseError
 
 logger = logging.getLogger(__name__)
-redis_conn = redis.StrictRedis(host='192.168.0.11', port=6379, db=0, decode_responses=True)
+redis_conn = redis.StrictRedis(host='rhljh201.codns.com', port=6379, db=0, decode_responses=True)
 
 
 def convert_to_java_format(data):
@@ -217,10 +217,6 @@ def handle_message(data):
         elif action == 'pmCommentCreate':
             result = create_comment(data)
             save_to_redis(request_id, result)
-        
-        elif action == 'PMPOSTREAD':
-            result= read_post_with_comments(data)
-            save_to_redis(request_id, "success", result)
 
         elif action == 'pmPostReadAll':
             posts_data = read_all_posts()
@@ -252,8 +248,11 @@ def handle_message(data):
             save_to_redis(request_id, "success", posts_data)
         
         elif action == 'pmPostRead':
-            result= read_post_with_comments(data)
-            save_to_redis(request_id, "success", result)
+            posts_data= read_post_with_comments(data)
+            if posts_data:
+                save_to_redis(request_id, "success", posts_data)
+            else:
+                save_to_redis(request_id, "Post not found")
 
     except DatabaseError as db_err:
         logger.error(f"Database Error: {db_err}")
