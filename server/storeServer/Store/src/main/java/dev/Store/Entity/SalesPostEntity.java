@@ -1,5 +1,6 @@
 package dev.Store.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -22,6 +23,7 @@ public class SalesPostEntity {
     private String postWriter;
     private String postContents;
     private String mainImage;
+    @JsonIgnore
     @ElementCollection
     private List<String> descImages;
     private String storeLocation;
@@ -31,7 +33,8 @@ public class SalesPostEntity {
     @ColumnDefault("0")
     private Long postLike;
 
-    @OneToMany(mappedBy = "salesPost", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(mappedBy = "salesPostEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductEntity> products;
 
     public void addProduct(ProductEntity productEntity) {

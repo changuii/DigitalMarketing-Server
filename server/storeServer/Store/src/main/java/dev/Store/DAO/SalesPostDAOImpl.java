@@ -2,6 +2,7 @@ package dev.Store.DAO;
 
 import dev.Store.Entity.SalesPostEntity;
 import dev.Store.Repository.SalesPostRepository;
+import org.hibernate.cache.spi.SecondLevelCacheLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,14 +19,18 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     private SalesPostRepository salesPostRepository;
 
     @Override
-    public String create(SalesPostEntity salesPostEntity) {
+    public Map<String, Object> create(SalesPostEntity salesPostEntity) {
         salesPostEntity.setPostDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         this.salesPostRepository.save(salesPostEntity);
+        Map<String, Object> result = new HashMap<>();
 
         if (salesPostRepository.existsById(salesPostEntity.getPostNumber())) {
-            return "success";
+            result.put("result", "success");
+            result.put("data", salesPostEntity);
+        } else{
+            result.put("result", "Error: SalesPost가 올바르게 저장되지 않았습니다.");
         }
-        return "Error: SalesPost가 올바르게 저장되지 않았습니다.";
+        return result;
     }
 
     @Override
@@ -43,8 +48,8 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> readById(Long postNumber) {
-        SalesPostEntity salesPostEntity = salesPostRepository.findByPostNumber(postNumber);
+    public Map<String, Object> readBypostNumber(String postWriter, String postTitle) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findByPostWriterAndPostTitle(postWriter, postTitle);
         Map<String, Object> result = new HashMap<>();
 
         if (salesPostEntity == null) {
@@ -58,8 +63,8 @@ public class SalesPostDAOImpl implements SalesPostDAO{
 
     @Override
     public String update(SalesPostEntity salesPostEntity) {
-        if (salesPostRepository.existsById(salesPostEntity.getPostNumber())) {
-            SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostNumber(salesPostEntity.getPostNumber());
+        SalesPostEntity oldSalesPostEntity = salesPostRepository.findByPostWriterAndPostTitle(salesPostEntity.getPostWriter(), salesPostEntity.getPostTitle());
+        if (oldSalesPostEntity != null) {
             salesPostEntity.setCategory(Optional.ofNullable(salesPostEntity.getCategory()).orElse(oldSalesPostEntity.getCategory()));
             salesPostEntity.setPostTitle(Optional.ofNullable(salesPostEntity.getPostTitle()).orElse(oldSalesPostEntity.getPostTitle()));
             salesPostEntity.setPostWriter(Optional.ofNullable(salesPostEntity.getPostWriter()).orElse(oldSalesPostEntity.getPostWriter()));
@@ -79,9 +84,10 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public String delete(Long postNumber) {
-        if(salesPostRepository.existsById(postNumber)){
-            salesPostRepository.existsById(postNumber);
+    public String delete(String postWriter, String postTitle) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findByPostWriterAndPostTitle(postWriter, postTitle);
+        if(salesPostEntity != null){
+            salesPostRepository.existsById(salesPostEntity.getPostNumber());
             return "success";
         } else{
             return "Error: 삭제하려고 하는 SalesPost가 존재하지 않습니다.";

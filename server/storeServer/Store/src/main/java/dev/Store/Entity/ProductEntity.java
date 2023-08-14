@@ -1,5 +1,6 @@
 package dev.Store.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,9 +18,10 @@ public class ProductEntity {
     private Long number;
 
     private String detail;
-    private Integer quantity;
-    private Double price;
+    private Long quantity;
+    private Long price;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "salesPostNumber", referencedColumnName = "postNumber")
     private SalesPostEntity salesPostEntity;
