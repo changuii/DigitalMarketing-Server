@@ -27,8 +27,9 @@ public class ProductEntity {
     private Long productAmount;
     private Long productDeliveryFee;
     private String storeLocation;
-    @NotNull(message = "사진을 꼭 넣으세요.")
     private String productPicture;
+    private String productColor;
+    private Long productSize;
 
     @ManyToOne() // FetchType.LAZY 설정을 권장
     @JoinColumn(name = "salesPostNumber", referencedColumnName = "postNumber")

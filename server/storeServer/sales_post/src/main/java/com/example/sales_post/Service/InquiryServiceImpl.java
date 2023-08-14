@@ -3,7 +3,6 @@ package com.example.sales_post.Service;
 import com.example.sales_post.DAO.InquiryDaoImpl;
 import com.example.sales_post.DAO.SalesPostDaoImpl;
 import com.example.sales_post.Entity.InquiryEntity;
-import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
