@@ -1,12 +1,10 @@
 package com.example.sales_post.DAO;
 
-import com.example.sales_post.Entity.InquiryEntity;
 import com.example.sales_post.Entity.ProductEntity;
-import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.ProductRepository;
-import org.apache.kafka.common.quota.ClientQuotaAlteration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import com.example.sales_post.Entity.SalesPostEntity;
 
 import javax.transaction.Transactional;
 import java.util.HashMap;
@@ -41,6 +39,19 @@ public class ProductDaoImpl implements ProductDao{
             return "Error: Failed to create product";
         }
     }
+
+//    @Override
+//    public String create(ProductEntity productEntity) {
+//        Long serialNumber = productEntity.getProductSerialNumber();
+//        String valid = validCheck(productEntity);
+//
+//        if (!productRepository.existsByProductSerialNumber(serialNumber) && valid.equals("success")) {
+//            this.productRepository.save(productEntity);
+//        }
+//        return valid;
+//    }
+
+
 
     @Transactional()
     @Override
