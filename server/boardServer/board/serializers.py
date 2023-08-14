@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from .models import Post, Comment, Tag, Category
 
+
 class CommentSerializer(serializers.ModelSerializer):
+    # `post`는 댓글 생성 시 전달되지 않지만, 내부적으로 관리되어야 합니다.
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all(), write_only=True)
+
     class Meta:
         model = Comment
         fields = '__all__'
@@ -32,9 +36,10 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
-    pmTag = TagSerializer(many=True, read_only=True)
-    pmCategory = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+    pmTag = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all()) # 변경
+    pmCategory = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all()) # 변경
 
     class Meta:
         model = Post
         fields = '__all__'
+

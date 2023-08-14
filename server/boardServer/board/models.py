@@ -19,12 +19,12 @@ class Post(models.Model):
     pmCategory = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='categorys')  # 카테고리 필드 추가
     pmPostTitle = models.CharField(max_length=200, blank=True)
     pmPostWriter = models.CharField(max_length=200, blank=True)
-    pmPostDate = models.DateTimeField(auto_now_add=True)
-    pmPostContents = models.TextField(blank=True)
-    pmPostPicture = models.ImageField(upload_to='images/', blank=True)
+    pmPostDate = models.DateTimeField(auto_now_add=True,null=True)
+    pmPostContents = models.TextField(blank=True,null=True)
+    pmPostPicture =  models.CharField(max_length=200, blank=True)
     pmPostHitCount = models.IntegerField(default=0)
     pmPostLike = models.IntegerField(default=0)
-    storeLocation = models.CharField(max_length=300, blank=True)
+    storeLocation = models.CharField(max_length=300, blank=True,null=True)
 
     def __str__(self):
         return self.pmPostTitle
