@@ -1,14 +1,11 @@
 package com.example.sales_post.DAO;
 
-import com.example.sales_post.Entity.ProductEntity;
 import com.example.sales_post.Entity.ReviewEntity;
 import com.example.sales_post.Entity.SalesPostEntity;
 import com.example.sales_post.Repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import javax.transaction.Transactional;
-import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -17,11 +14,12 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class ReviewDaoImpl implements ReviewDao{
+public class ReviewDaoImpl implements ReviewDao {
     private final ReviewRepository reviewRepository;
     private final GlobalValidCheck globalValidCheck;
+
     public ReviewDaoImpl(@Autowired ReviewRepository reviewRepository,
-                         @Autowired GlobalValidCheck globalValidCheck){
+                         @Autowired GlobalValidCheck globalValidCheck) {
         this.reviewRepository = reviewRepository;
         this.globalValidCheck = globalValidCheck;
     }
@@ -29,33 +27,21 @@ public class ReviewDaoImpl implements ReviewDao{
     @Transactional()
     @Override
     public String create(ReviewEntity reviewEntity) {
-        reviewRepository.save(reviewEntity);
+        Long reviewNumber = reviewEntity.getReviewNumber();
+        String valid = globalValidCheck.validCheck(reviewEntity);
 
-        if (reviewRepository.existsByReviewNumber(reviewEntity.getReviewNumber())) {
-            // 연관된 SalesPostEntity와의 연관 관계 설정
+        if (valid.equals("success")) {
+            reviewEntity.setReviewDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            reviewRepository.save(reviewEntity);
+
             SalesPostEntity salesPostEntity = reviewEntity.getSalesPostEntity();
 
             if (salesPostEntity != null) {
                 salesPostEntity.addReview(reviewEntity);
             }
-
-            return "success";
-        } else {
-            return "Error: Failed to create review";
         }
+        return valid;
     }
-
-//    @Override
-//    public String create(ReviewEntity reviewEntity) {
-//        String valid = globalValidCheck.validCheck(reviewEntity);
-//
-//        if (valid.equals("success")) {
-//            reviewEntity.setReviewDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-//            reviewRepository.save(reviewEntity);
-//        }
-//        return valid;
-//
-//    }
 
     @Transactional()
     @Override

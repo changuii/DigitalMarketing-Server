@@ -131,7 +131,7 @@ public class ReviewServiceImpl implements ReviewService{
         jsonObject.put("reviewContents", reviewEntity.getReviewContents());
         jsonObject.put("reviewStarRating", reviewEntity.getReviewStarRating());
         jsonObject.put("reviewLike", reviewEntity.getReviewLike());
-        jsonObject.put("reviewdate", reviewEntity.getReviewDate());
+        jsonObject.put("reviewDate", reviewEntity.getReviewDate());
 
         return jsonObject;
     }

@@ -46,44 +46,44 @@ public class InquiryController {
         return inquiryService.delete(jsonObject);
     }
 
-    @KafkaListener(topics = "InquiryRequest", groupId = "foo")
-    public void getMessage(JSONObject jsonObject) {
-        logger.info("KafkaMessage: " + jsonObject.toString());
-        actionControl(jsonObject);
-    }
-
-    public void sendMessage(String requestId, JSONObject jsonObject){
-        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
-        hashOperations.put("InquiryResponse", requestId, jsonObject);
-    }
-
-    public void actionControl(JSONObject jsonObject){
-        String action = (String) jsonObject.get("action");
-        String requestId = (String) jsonObject.get("requestId");
-
-        if ("inquiryCreate".equals(action)) {
-            JSONObject resultJsonObject = createInquiry(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("inquiryReadRecentByWriter".equals(action)) {
-            JSONObject resultJsonObject = readRecentInquiryByWriter(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("inquiryReadAllByWriter".equals(action)) {
-            JSONObject resultJsonObject = readAllInquiryByWriter(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("inquiryReadAll".equals(action)) {
-            JSONObject resultJsonObject = readAllInquiry();
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("inquiryUpdate".equals(action)) {
-            JSONObject resultJsonObject = updateInquiry(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("inquiryDelete".equals(action)) {
-            JSONObject resultJsonObject = deleteInquiry(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-    }
+//    @KafkaListener(topics = "InquiryRequest", groupId = "foo")
+//    public void getMessage(JSONObject jsonObject) {
+//        logger.info("KafkaMessage: " + jsonObject.toString());
+//        actionControl(jsonObject);
+//    }
+//
+//    public void sendMessage(String requestId, JSONObject jsonObject){
+//        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
+//        hashOperations.put("InquiryResponse", requestId, jsonObject);
+//    }
+//
+//    public void actionControl(JSONObject jsonObject){
+//        String action = (String) jsonObject.get("action");
+//        String requestId = (String) jsonObject.get("requestId");
+//
+//        if ("inquiryCreate".equals(action)) {
+//            JSONObject resultJsonObject = createInquiry(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("inquiryReadRecentByWriter".equals(action)) {
+//            JSONObject resultJsonObject = readRecentInquiryByWriter(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("inquiryReadAllByWriter".equals(action)) {
+//            JSONObject resultJsonObject = readAllInquiryByWriter(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("inquiryReadAll".equals(action)) {
+//            JSONObject resultJsonObject = readAllInquiry();
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("inquiryUpdate".equals(action)) {
+//            JSONObject resultJsonObject = updateInquiry(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("inquiryDelete".equals(action)) {
+//            JSONObject resultJsonObject = deleteInquiry(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//    }
 }

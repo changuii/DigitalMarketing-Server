@@ -33,40 +33,40 @@ public class ReviewController {
 
     public JSONObject deleteReview(JSONObject jsonObject){return reviewService.delete(jsonObject);}
 
-    @KafkaListener(topics = "ReviewRequest", groupId = "foo")
-    public void getMessage(JSONObject jsonObject){
-        logger.info("KafkaMessage: " + jsonObject.toString());
-        actionControl(jsonObject);
-    }
-
-    public void sendMessage(String requestId, JSONObject jsonObject){
-        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
-        hashOperations.put("ReviewResponse", requestId, jsonObject);
-    }
-
-    public void actionControl(JSONObject jsonObject){
-        String action = (String) jsonObject.get("action");
-        String requestId = (String) jsonObject.get("requestId");
-
-        if ("reviewCreate".equals(action)) {
-            JSONObject resultJsonObject = createReview(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("reviewReadAllByWriter".equals(action)) {
-            JSONObject resultJsonObject = readAllReviewByWriter(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("reviewReadAll".equals(action)) {
-            JSONObject resultJsonObject = readAllReview();
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("reviewUpdate".equals(action)) {
-            JSONObject resultJsonObject = updateReview(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("reviewDelete".equals(action)) {
-            JSONObject resultJsonObject = deleteReview(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-    }
+//    @KafkaListener(topics = "ReviewRequest", groupId = "foo")
+//    public void getMessage(JSONObject jsonObject){
+//        logger.info("KafkaMessage: " + jsonObject.toString());
+//        actionControl(jsonObject);
+//    }
+//
+//    public void sendMessage(String requestId, JSONObject jsonObject){
+//        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
+//        hashOperations.put("ReviewResponse", requestId, jsonObject);
+//    }
+//
+//    public void actionControl(JSONObject jsonObject){
+//        String action = (String) jsonObject.get("action");
+//        String requestId = (String) jsonObject.get("requestId");
+//
+//        if ("reviewCreate".equals(action)) {
+//            JSONObject resultJsonObject = createReview(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("reviewReadAllByWriter".equals(action)) {
+//            JSONObject resultJsonObject = readAllReviewByWriter(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("reviewReadAll".equals(action)) {
+//            JSONObject resultJsonObject = readAllReview();
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("reviewUpdate".equals(action)) {
+//            JSONObject resultJsonObject = updateReview(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("reviewDelete".equals(action)) {
+//            JSONObject resultJsonObject = deleteReview(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//    }
 }

@@ -8,8 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,29 +19,32 @@ import java.util.Optional;
 @Repository
 public class InquiryDaoImpl implements InquiryDao {
     private final InquiryRepository inquiryRepository;
+    private final GlobalValidCheck globalValidCheck;
     private final Logger logger = LoggerFactory.getLogger(InquiryServiceImpl.class);
 
-    public InquiryDaoImpl(@Autowired InquiryRepository inquiryRepository) {
+    public InquiryDaoImpl(@Autowired InquiryRepository inquiryRepository,
+                          @Autowired GlobalValidCheck globalValidCheck) {
         this.inquiryRepository = inquiryRepository;
+        this.globalValidCheck = globalValidCheck;
     }
 
     @Transactional()
     @Override
     public String create(InquiryEntity inquiryEntity) {
-        inquiryRepository.save(inquiryEntity);
+        Long inquiryNumber = inquiryEntity.getInquiryNumber();
+        String valid = globalValidCheck.validCheck(inquiryEntity);
 
-        if (inquiryRepository.existsByInquiryNumber(inquiryEntity.getInquiryNumber())) {
-            // 연관된 SalesPostEntity와의 연관 관계 설정
+        if (valid.equals("success")) {
+            inquiryEntity.setInquiryDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            inquiryRepository.save(inquiryEntity);
+
             SalesPostEntity salesPostEntity = inquiryEntity.getSalesPostEntity();
 
             if (salesPostEntity != null) {
                 salesPostEntity.addInquiry(inquiryEntity);
             }
-
-            return "success";
-        } else {
-            return "Error: Failed to create inquiry";
         }
+        return valid;
     }
 
     @Transactional()
@@ -96,6 +100,7 @@ public class InquiryDaoImpl implements InquiryDao {
             InquiryEntity oldInquiryEntity = inquiryRepository.findByInquiryNumber(inquiryEntity.getInquiryNumber());
             inquiryEntity.setInquiryWriter(Optional.ofNullable(inquiryEntity.getInquiryWriter()).orElse(oldInquiryEntity.getInquiryWriter()));
             inquiryEntity.setInquiryContents(Optional.ofNullable(inquiryEntity.getInquiryContents()).orElse(oldInquiryEntity.getInquiryContents()));
+            inquiryEntity.setInquiryDate(Optional.ofNullable(inquiryEntity.getInquiryDate()).orElse(oldInquiryEntity.getInquiryDate()));
             inquiryEntity.setSalesPostEntity(Optional.ofNullable(inquiryEntity.getSalesPostEntity()).orElse(oldInquiryEntity.getSalesPostEntity()));
 
             // 연관된 SalesPostEntity와의 연관 관계 설정

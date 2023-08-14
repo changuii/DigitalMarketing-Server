@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import com.example.sales_post.Entity.SalesPostEntity;
-
 import javax.transaction.Transactional;
-import javax.validation.Validator;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,36 +30,20 @@ public class ProductDaoImpl implements ProductDao{
     @Transactional()
     @Override
     public String create(ProductEntity productEntity) {
-        productRepository.save(productEntity);
+        Long serialNumber = productEntity.getProductSerialNumber();
+        String valid = globalValidCheck.validCheck(productEntity);
 
-        if (productRepository.existsByProductSerialNumber(productEntity.getProductSerialNumber())) {
-            // 연관된 SalesPostEntity와의 연관 관계 설정
+        if (valid.equals("success")) {
+            this.productRepository.save(productEntity);
+
             SalesPostEntity salesPostEntity = productEntity.getSalesPostEntity();
 
             if (salesPostEntity != null) {
                 salesPostEntity.addProduct(productEntity);
             }
-
-            return "success";
-        } else {
-            return "Error: Failed to create product";
         }
+        return valid;
     }
-
-
-//    @Override
-//    public String create(ProductEntity productEntity) {
-//        Long serialNumber = productEntity.getProductSerialNumber();
-//        String valid = globalValidCheck.validCheck(productEntity);
-//
-//        logger.info(productEntity.toString());
-//        if (!productRepository.existsByProductSerialNumber(serialNumber) && valid.equals("success")) {
-//            this.productRepository.save(productEntity);
-//        }
-//        return valid;
-//    }
-
-
 
     @Transactional()
     @Override

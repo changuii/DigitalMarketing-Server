@@ -129,6 +129,7 @@ public class ProductServiceImpl implements ProductService{
         jsonObject.put("productAmount", productEntity.getProductAmount());
         jsonObject.put("productDeliveryFee", productEntity.getProductDeliveryFee());
         jsonObject.put("storeLocation", productEntity.getStoreLocation());
+        jsonObject.put("productPicture", productEntity.getProductPicture());
 
         return jsonObject;
     }

@@ -35,40 +35,40 @@ public class ProductController {
 
     public JSONObject deleteProduct(JSONObject jsonObject){return productService.delete(jsonObject);}
 
-    @KafkaListener(topics = "ProductRequest", groupId = "foo")
-    public void getMessage(JSONObject jsonObject){
-        logger.info("KafkaMessage: " + jsonObject.toString());
-        actionControl(jsonObject);
-    }
-
-    public void sendMessage(String requestId, JSONObject jsonObject){
-        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
-        hashOperations.put("ProductResponse", requestId, jsonObject);
-    }
-
-    public void actionControl(JSONObject jsonObject){
-        String action = (String) jsonObject.get("action");
-        String requestId = (String) jsonObject.get("requestId");
-
-        if ("productCreate".equals(action)) {
-            JSONObject resultJsonObject = createProduct(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("productReadOne".equals(action)) {
-            JSONObject resultJsonObject = readProduct(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("productReadAll".equals(action)) {
-            JSONObject resultJsonObject = readAllProduct();
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("productUpdate".equals(action)) {
-            JSONObject resultJsonObject = updateProduct(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("productDelete".equals(action)) {
-            JSONObject resultJsonObject = deleteProduct(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-    }
+//    @KafkaListener(topics = "ProductRequest", groupId = "foo")
+//    public void getMessage(JSONObject jsonObject){
+//        logger.info("KafkaMessage: " + jsonObject.toString());
+//        actionControl(jsonObject);
+//    }
+//
+//    public void sendMessage(String requestId, JSONObject jsonObject){
+//        HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
+//        hashOperations.put("ProductResponse", requestId, jsonObject);
+//    }
+//
+//    public void actionControl(JSONObject jsonObject){
+//        String action = (String) jsonObject.get("action");
+//        String requestId = (String) jsonObject.get("requestId");
+//
+//        if ("productCreate".equals(action)) {
+//            JSONObject resultJsonObject = createProduct(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("productReadOne".equals(action)) {
+//            JSONObject resultJsonObject = readProduct(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("productReadAll".equals(action)) {
+//            JSONObject resultJsonObject = readAllProduct();
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("productUpdate".equals(action)) {
+//            JSONObject resultJsonObject = updateProduct(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("productDelete".equals(action)) {
+//            JSONObject resultJsonObject = deleteProduct(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//    }
 }
