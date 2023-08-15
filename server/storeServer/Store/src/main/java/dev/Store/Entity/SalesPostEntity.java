@@ -32,21 +32,6 @@ public class SalesPostEntity {
     private Long postHitCount;
     @ColumnDefault("0")
     private Long postLike;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "salesPostEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ProductEntity> products;
-
-    public void addProduct(ProductEntity productEntity) {
-        if(this.products == null){
-            this.products = new ArrayList<>();
-        }
-        products.add(productEntity);
-        productEntity.setSalesPostEntity(this);
-    }
-
-    public void removeProduct(ProductEntity productEntity) {
-        products.remove(productEntity);
-        productEntity.setSalesPostEntity(null);
-    }
+    @ElementCollection
+    private List<Product> products;
 }

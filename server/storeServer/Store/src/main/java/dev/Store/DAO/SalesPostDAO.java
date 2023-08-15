@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Repository
 public interface SalesPostDAO {
-    public Map<String, Object> create(SalesPostEntity salesPostEntity);
+    public String create(SalesPostEntity salesPostEntity);
     public Map<String, Object> readAll();
     public Map<String, Object> readByWriterAndTitle(String postWriter, String postTitle);
     public String update(SalesPostEntity salesPostEntity);

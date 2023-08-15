@@ -1,10 +1,7 @@
 package dev.Store.DAO;
 
-import dev.Store.Entity.ImageData;
-import dev.Store.Entity.ProductEntity;
 import dev.Store.Entity.SalesPostEntity;
 import dev.Store.Repository.SalesPostRepository;
-import org.hibernate.cache.spi.SecondLevelCacheLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,18 +15,14 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     private SalesPostRepository salesPostRepository;
 
     @Override
-    public Map<String, Object> create(SalesPostEntity salesPostEntity) {
+    public String create(SalesPostEntity salesPostEntity) {
         salesPostEntity.setPostDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         this.salesPostRepository.save(salesPostEntity);
-        Map<String, Object> result = new HashMap<>();
 
         if (salesPostRepository.existsById(salesPostEntity.getPostNumber())) {
-            result.put("result", "success");
-            result.put("data", salesPostEntity);
-        } else{
-            result.put("result", "Error: SalesPost가 올바르게 저장되지 않았습니다.");
+            return "scuccess";
         }
-        return result;
+        return "Error: SalesPost가 올바르게 저장되지 않았습니다.";
     }
 
     @Override
@@ -92,7 +85,7 @@ public class SalesPostDAOImpl implements SalesPostDAO{
 //
 //            salesPostEntity.setProducts(newProducts);
 
-            salesPostRepository.save(oldSalesPostEntity);
+            salesPostRepository.save(salesPostEntity);
             return "success";
         } else {
             return "Error: 수정하려고 하는 SalesPost가 존재하지 않습니다.";
