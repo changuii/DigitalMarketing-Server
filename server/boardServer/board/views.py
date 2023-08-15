@@ -8,7 +8,6 @@ from django.db import DatabaseError
 logger = logging.getLogger(__name__)
 redis_conn = redis.StrictRedis(host='rhljh201.codns.com', port=6379, db=0, decode_responses=True)
 
-
 def convert_to_java_format(data):
     """Django 모델 또는 직렬화된 데이터를 Jackson 라이브러리와 호환되는 형식으로 변환합니다."""
     # 기본 구조
@@ -19,14 +18,25 @@ def convert_to_java_format(data):
     # 데이터가 딕셔너리(직렬화된 데이터와 같은)인 경우, 우리의 구조에 그것을 통합합니다.
     if isinstance(data, dict):
         for key, value in data.items():
+            if key == "pmTag":  # pmTag에 대한 특별한 처리
+                if not value or value == [{}]:  # pmTag의 값이 비어있거나 빈 딕셔너리의 리스트인 경우
+                    java_format[key] = ["java.util.ArrayList", value]
+                else:  # 그 외의 경우, 일반적인 리스트 변환을 합니다.
+                    java_format[key] = ["java.util.ArrayList", [convert_to_java_format(item) if isinstance(item, dict) else item for item in value]]
+                continue
+
             if isinstance(value, list):  # 값이 리스트인 경우
-                java_format[key] = ["java.util.ArrayList", [convert_to_java_format(item) for item in value]]
+                java_format[key] = ["java.util.ArrayList", [convert_to_java_format(item) if isinstance(item, dict) else item for item in value]]
             elif isinstance(value, dict):  # 값이 또 다른 딕셔너리인 경우, 재귀적으로 변환
                 java_format[key] = convert_to_java_format(value)
             else:
                 java_format[key] = value
 
     return java_format
+
+
+# save_to_redis 함수는 변경되지 않아 그대로 사용됩니다.
+
 
 def save_to_redis(request_id, result, data=None):
     try:
@@ -38,7 +48,7 @@ def save_to_redis(request_id, result, data=None):
                 data = ["java.util.ArrayList", [convert_to_java_format(item) for item in data]]
             else:
                 data = convert_to_java_format(data)
-                
+            
             response_data = {
                 "@class": "org.json.simple.JSONObject",
                 "result": result,
@@ -149,7 +159,7 @@ def create_comment(data):
     # `post` 정보를 data에 추가합니다.
     data['post'] = post_instance.id
     data["commentLike"] = int(data["commentLike"])
-    serializer = CommentSerializer(data=data)
+    serializer = CommentSerializer(data=data, partial=True)
     if serializer.is_valid():
         comment_instance = serializer.save()
         logger.info(f"Comment created: {vars(comment_instance)}")
@@ -179,13 +189,11 @@ def read_all_posts():
     return serializer.data
 
 
-def read_posts_by_tag(tag_name):
-    tag = Tag.objects.filter(name=tag_name).first()
-    if not tag:
-        return []
-    posts = tag.tags.all()
+def read_posts_by_tags(tag_names):
+    posts = Post.objects.filter(pmTag__name__in=tag_names)
     serializer = PostSerializer(posts, many=True)
     return serializer.data
+
 
 
 def read_posts_by_category(category_name):
@@ -226,15 +234,19 @@ def handle_message(data):
                 save_to_redis(request_id, "No posts found")
 
         elif action == 'pmPostReadTag':
-            tag_name = data.get('pmTag')
-            if not tag_name:
-                save_to_redis(request_id, "Tag name not provided")
+            tag_names = data.get('pmTag', [])
+            if not tag_names:
+                save_to_redis(request_id, "Tag names not provided")
                 return
-            posts_data = read_posts_by_tag(tag_name)
+            if isinstance(tag_names, str):
+                tag_names = [tag_names]
+            posts_data = read_posts_by_tags(tag_names)
             if not posts_data:
-                save_to_redis(request_id, "Tag not found")
+                save_to_redis(request_id, "No posts with provided tags found")
                 return
+            print(posts_data)
             save_to_redis(request_id, "success", posts_data)
+
 
         elif action == 'pmPostReadCategory':
             category_name = data.get('pmCategory')

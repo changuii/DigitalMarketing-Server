@@ -35,6 +35,7 @@ class CategorySerializer(serializers.ModelSerializer):
         return PostSerializer(posts, many=True).data
 
 class PostSerializer(serializers.ModelSerializer):
+    pmPostNumber = serializers.IntegerField(source='id', read_only=True)  # 추가
     comments = CommentSerializer(many=True, read_only=True)
     pmTag = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all()) # 변경
     pmCategory = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all()) # 변경
