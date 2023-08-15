@@ -39,29 +39,60 @@ public class SalesPostController {
         hashOperations.put("SalesPostResponse", requestId, jsonObject);
     }
 
-    public void actionControl(JSONObject jsonObject){
+//    public void actionControl(JSONObject jsonObject){
+//        String action = (String) jsonObject.get("action");
+//        String requestId = (String) jsonObject.get("requestId");
+//        logger.info("[Action: " + action + ", RequestId: " + requestId + "]");
+//        if ("salesPostCreate".equals(action)) {
+//            JSONObject resultJsonObject = create(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("salesPostRead".equals(action)) {
+//            JSONObject resultJsonObject = read(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("salesPostReadAll".equals(action)) {
+//            JSONObject resultJsonObject = readAll();
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("salesPostUpdate".equals(action)) {
+//            JSONObject resultJsonObject = update(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//        if ("salesPostDelete".equals(action)) {
+//            JSONObject resultJsonObject = delete(jsonObject);
+//            sendMessage(requestId, resultJsonObject);
+//        }
+//    }
+
+
+
+    public void actionControl(JSONObject jsonObject) {
         String action = (String) jsonObject.get("action");
         String requestId = (String) jsonObject.get("requestId");
         logger.info("[Action: " + action + ", RequestId: " + requestId + "]");
-        if ("salesPostCreate".equals(action)) {
-            JSONObject resultJsonObject = create(jsonObject);
+
+        try {
+            SalesPostAction salesPostAction = SalesPostAction.valueOf(action.toUpperCase());
+            JSONObject resultJsonObject = salesPostAction.execute(this, jsonObject);
             sendMessage(requestId, resultJsonObject);
-        }
-        if ("salesPostRead".equals(action)) {
-            JSONObject resultJsonObject = read(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("salesPostReadAll".equals(action)) {
-            JSONObject resultJsonObject = readAll();
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("salesPostUpdate".equals(action)) {
-            JSONObject resultJsonObject = update(jsonObject);
-            sendMessage(requestId, resultJsonObject);
-        }
-        if ("salesPostDelete".equals(action)) {
-            JSONObject resultJsonObject = delete(jsonObject);
-            sendMessage(requestId, resultJsonObject);
+        } catch (IllegalArgumentException e) {
+            logger.error("Unknown action: " + action);
         }
     }
+
+
+
+    private enum SalesPostAction {
+        SALES_POST_CREATE {@Override public JSONObject execute(SalesPostController controller, JSONObject jsonObject) { return controller.create(jsonObject);}  },
+        SALES_POST_READ { @Override public JSONObject execute(SalesPostController controller, JSONObject jsonObject) { return controller.read(jsonObject);}  },
+        SALES_POST_READ_ALL { @Override public JSONObject execute(SalesPostController controller, JSONObject jsonObject) { return controller.readAll();}  },
+        SALES_POST_UPDATE { @Override public JSONObject execute(SalesPostController controller, JSONObject jsonObject) { return controller.update(jsonObject);}  },
+        SALES_POST_DELETE { @Override public JSONObject execute(SalesPostController controller, JSONObject jsonObject) { return controller.delete(jsonObject);}  };
+
+        public abstract JSONObject execute(SalesPostController controller, JSONObject jsonObject);
+    }
+
+
+
 }
