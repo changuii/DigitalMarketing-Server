@@ -10,8 +10,11 @@ import java.util.List;
 public interface SalesPostService {
     public JSONObject create(JSONObject jsonObject);
     public JSONObject read(JSONObject jsonObject);
+    public JSONObject readAllByCategory(JSONObject jsonObject);
     public JSONObject readAll();
     public JSONObject update(JSONObject jsonObject);
+    public JSONObject postHitCountUpdate(JSONObject jsonObject);
+    public JSONObject postLikeUpdate(JSONObject jsonObject);
     public JSONObject delete(JSONObject jsonObject);
     SalesPostEntity jsonToEntity(JSONObject jsonObject);
     JSONObject entityToJson(SalesPostEntity salesPostEntity);

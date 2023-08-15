@@ -28,12 +28,26 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> readAll() {
-        List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAll();
+    public Map<String, Object> readByWriterAndTitle(String postWriter, String postTitle) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(postWriter, postTitle);
+        Map<String, Object> result = new HashMap<>();
+
+        if (salesPostEntity == null) {
+            result.put("result", "Error: 해당하는 SalesPost가 존재하지 않습니다.");
+        } else {
+            result.put("data", salesPostEntity);
+            result.put("result", "success");
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> readAllByCategory(String category) {
+        List<SalesPostEntity> salesPostEntityList = salesPostRepository.findByCategory(category);
         Map<String, Object> result = new HashMap<>();
 
         if (salesPostEntityList.isEmpty()) {
-            result.put("result", "Error: 저장된 SalesPost가 없습니다.");
+            result.put("result", "Error: 선택한 카테고리에 SalesPost가 존재하지 않습니다.");
         } else {
             result.put("data", salesPostEntityList);
             result.put("result", "success");
@@ -42,14 +56,14 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> readByWriterAndTitle(String postWriter, String postTitle) {
-        SalesPostEntity salesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(postWriter, postTitle);
+    public Map<String, Object> readAll() {
+        List<SalesPostEntity> salesPostEntityList = salesPostRepository.findAll();
         Map<String, Object> result = new HashMap<>();
 
-        if (salesPostEntity == null) {
-            result.put("result", "Error: 해당 하는 SalesPost가 존재하지 않습니다.");
+        if (salesPostEntityList.isEmpty()) {
+            result.put("result", "Error: 저장된 SalesPost가 없습니다.");
         } else {
-            result.put("data", salesPostEntity);
+            result.put("data", salesPostEntityList);
             result.put("result", "success");
         }
         return result;
@@ -90,14 +104,45 @@ public class SalesPostDAOImpl implements SalesPostDAO{
             List<Product> newProducts = new ArrayList<>(oldSalesPostEntity.getProducts());
             salesPostEntity.setProducts(newProducts);
 
-
-            salesPostEntity.setProducts(newProducts);
-
             salesPostRepository.save(salesPostEntity);
             return "success";
         } else {
             return "Error: 수정하려고 하는 SalesPost가 존재하지 않습니다.";
         }
+    }
+
+    @Override
+    public Map<String, Object> postLikeUpdate(String postTitle, Long postLike, String action){
+        SalesPostEntity salesPostEntity = salesPostRepository.findSingleByPostTitleAndPostLike(postTitle, postLike);
+        Map<String, Object> result = new HashMap<>();
+
+        if(salesPostEntity != null){
+            if(action.equals("disLike")){
+                salesPostEntity.setPostLike(postLike - 1);
+            }else {
+                salesPostEntity.setPostLike(postLike + 1);
+            }
+            result.put("data", salesPostEntity.getPostLike());
+            result.put("result", "success");
+        } else{
+            result.put("result", "해당하는 SalesPost가 존재하지 않습니다.");
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> postHitCountUpdate(String postTitle, Long postHitCount){
+        SalesPostEntity salesPostEntity = salesPostRepository.findByPostTitleAndPostHitCount(postTitle, postHitCount);
+        Map<String, Object> result = new HashMap<>();
+
+        if(salesPostEntity != null){
+            salesPostEntity.setPostHitCount(postHitCount + 1);
+            result.put("data", salesPostEntity.getPostHitCount());
+            result.put("result", "success");
+        } else{
+            result.put("result", "해당하는 SalesPost가 존재하지 않습니다.");
+        }
+        return result;
     }
 
     @Override
