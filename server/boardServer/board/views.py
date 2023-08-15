@@ -1,12 +1,12 @@
 import json
 import redis
 from .serializers import CommentSerializer, PostReadSerializer, PostWriteSerializer
-from .models import Category, Post, Tag
+from .models import Category, Comment, Post, Tag
 import logging
 from django.db import DatabaseError
+from redis_manager import redis_conn
 
 logger = logging.getLogger(__name__)
-redis_conn = redis.StrictRedis(host='rhljh201.codns.com', port=6379, db=0, decode_responses=True)
 
 def convert_to_java_format(data):
     """Django 모델 또는 직렬화된 데이터를 Jackson 라이브러리와 호환되는 형식으로 변환합니다."""
@@ -74,6 +74,8 @@ def save_to_redis(request_id, result, data=None):
 
 
 def create_post(data):
+    data["pmPostHitCount"] = 0
+    data["pmPostLike"] = 0
     tags_data = data.get("pmTag", [])
     category_data = data.get("pmCategory", None)
 
@@ -92,9 +94,6 @@ def create_post(data):
         category, _ = Category.objects.get_or_create(name=category_data)
         data["pmCategory"] = category.id
 
-    # Convert hit count and like count to integers.
-    data["pmPostHitCount"] = int(data["pmPostHitCount"])
-    data["pmPostLike"] = int(data["pmPostLike"])
 
     serializer = PostWriteSerializer(data=data)
     if serializer.is_valid():
@@ -105,66 +104,77 @@ def create_post(data):
         logger.info(f"Post Failed: {serializer.errors}")
         return "Failed to create post"
 
-
+def read_post(data):
+    pmPostWriter = data.get("pmPostWriter")
+    pmPostTitle = data.get("pmPostTitle")
+    
+    try:
+        post = Post.objects.get(pmPostWriter=pmPostWriter, pmPostTitle=pmPostTitle)
+    except Post.DoesNotExist:
+        return "Post not found"
+    
+    # 포스트와 해당 포스트의 댓글들을 직렬화
+    serializer = PostReadSerializer(post)
+    return serializer.data
 
 def update_post(data):
-    pmPostNumber = data.pop("pmPostNumber", None)
-    if not pmPostNumber:
-        return "pmPostNumber not provided"
+    pmPostWriter = data.pop("pmPostWriter")
+    pmPostTitle = data.pop("pmPostTitle")
 
-    post_id = int(pmPostNumber)  # pmPostNumber를 정수로 변환
-
+    # Try to fetch the post using writer and title
     try:
-        post = Post.objects.get(id=post_id)
+        post = Post.objects.get(pmPostWriter=pmPostWriter, pmPostTitle=pmPostTitle)
     except Post.DoesNotExist:
         return "Post does not exist"
 
-    tags_data = data.get("pmTag", [])
-    category_data = data.get("pmCategory", None)
+    # Handle Tags: Convert tag names to tag ids
+    tags_data = data.pop("pmTag", [])
+    tag_ids = []
+    for tag_name in tags_data:
+        tag, _ = Tag.objects.get_or_create(name=tag_name)
+        tag_ids.append(tag.id)
+    data["pmTag"] = tag_ids
 
-    # If category_data is present, update it
+    # Handle Category: Convert category name to category id
+    category_data = data.pop("pmCategory", None)
     if category_data:
         category, _ = Category.objects.get_or_create(name=category_data)
         data["pmCategory"] = category.id
 
-    # Use `partial=True` to allow partial updates
+    # Serialize the data
     serializer = PostWriteSerializer(post, data=data, partial=True)
-    if serializer.is_valid():
-        post_instance = serializer.save()
 
-        # If tags_data is present, update it
-        if tags_data:
-            post_instance.pmTag.clear()
-            for tag_name in tags_data:
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                post_instance.pmTag.add(tag.id)
+    # Check serialization validity
+    if serializer.is_valid():
+        serializer.save()
         return "success"
     else:
-        return "Failed to update post"
-
-
+        return f"Failed to update post due to: {serializer.errors}"
 
 def delete_post(data):
-    pmPostNumber = data.pop("pmPostNumber")
+    pmPostWriter = data.get("pmPostWriter")
+    pmPostTitle = data.get("pmPostTitle")
+    
     try:
-        post = Post.objects.get(id=pmPostNumber)
+        post = Post.objects.get(pmPostWriter=pmPostWriter, pmPostTitle=pmPostTitle)
         post.delete()
         return "success"
     except Post.DoesNotExist:
-        logger.error(f"Post with id {pmPostNumber} does not exist.")
-        return "Failed to delete post"
+        return f"Failed to delete post with writer {pmPostWriter} and title {pmPostTitle}."
+
 
 
 def create_comment(data):
-    post_id = data.get('pmPostNumber')
+    data["commentLike"] = 0
+    pmPostWriter = data.pop("pmPostWriter")
+    pmPostTitle = data.pop("pmPostTitle")
     try:
-        post_instance = Post.objects.get(id=post_id)
+        post_instance = Post.objects.get(pmPostWriter=pmPostWriter, pmPostTitle=pmPostTitle)
     except Post.DoesNotExist:
         return "Post not found"
 
     # `post` 정보를 data에 추가합니다.
     data['post'] = post_instance.id
-    data["commentLike"] = int(data["commentLike"])
     serializer = CommentSerializer(data=data, partial=True)
     if serializer.is_valid():
         comment_instance = serializer.save()
@@ -174,16 +184,45 @@ def create_comment(data):
         logger.error(f"Comment creation failed: {serializer.errors}")
         return "Failed to create comment"
 
-def read_post_with_comments(data):
-    pmPostNumber = data.pop("pmPostNumber")
-    post_id = int(pmPostNumber)  # pmPostNumber를 정수로 변환
+
+def update_comment(data):
+    pmPostWriter = data.pop("pmPostWriter")
+    pmPostTitle = data.pop("pmPostTitle")
+    username = data.get("username")
+
+    if not pmPostWriter or not pmPostTitle or not username:
+        return "Comment info not provided"
+
     try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return "Post not found"
-    # 포스트와 해당 포스트의 댓글들을 직렬화
-    serializer = PostReadSerializer(post)
-    return serializer.data
+        comment = Comment.objects.get(post__pmPostWriter=pmPostWriter, post__pmPostTitle=pmPostTitle, username=username)
+    except Comment.DoesNotExist:
+        return "Comment does not exist"
+
+    # Use `partial=True` to allow partial updates
+    serializer = CommentSerializer(comment, data=data, partial=True)
+    if serializer.is_valid():
+        comment_instance = serializer.save()
+        logger.info(f"Comment updated: {vars(comment_instance)}")
+        return "success"
+    else:
+        return "Failed to update comment"
+
+
+def delete_comment(data):
+    pmPostWriter = data.pop("pmPostWriter")
+    pmPostTitle = data.pop("pmPostTitle")
+    username = data.get("username")
+
+    try:
+        comment = Comment.objects.get(post__pmPostWriter=pmPostWriter, post__pmPostTitle=pmPostTitle, username=username)
+        comment.delete()
+        logger.info("Comment deleted.")
+        return "success"
+    except Comment.DoesNotExist:
+        logger.error("Comment does not exist.")
+        return "Failed to delete comment"
+
+
 
 
 def read_all_posts():
@@ -232,6 +271,14 @@ def handle_message(data):
             result = create_comment(data)
             save_to_redis(request_id, result)
 
+        elif action == 'pmCommentUpdate':
+            result = update_comment(data)
+            save_to_redis(request_id, result)
+
+        elif action == 'pmCommentDelete':
+            result = delete_comment(data)
+            save_to_redis(request_id, result)
+
         elif action == 'pmPostReadAll':
             posts_data = read_all_posts()
             if posts_data:
@@ -266,7 +313,7 @@ def handle_message(data):
             save_to_redis(request_id, "success", posts_data)
         
         elif action == 'pmPostRead':
-            posts_data= read_post_with_comments(data)
+            posts_data= read_post(data)
             if posts_data:
                 save_to_redis(request_id, "success", posts_data)
             else:

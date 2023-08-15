@@ -36,7 +36,11 @@ admin.site.register(Tag, TagAdmin)
 
 class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
-    list_display = ['pmPostTitle', 'pmPostWriter', 'pmPostContents', 'get_category', 'get_tags', 'get_comment_count', 'pmPostHitCount', 'pmPostLike', 'pmPostDate']
+    list_display = [
+        'pmPostTitle', 'get_category', 'get_tags', 'pmPostWriter', 'pmPostContents', 'pmMainImage',
+        'pmPostPictures', 'pmPostHitCount', 'pmPostLike', 
+        'get_comment_count','pmPostDate'
+    ]
     list_filter = ['pmPostDate', 'pmPostWriter', 'pmTag', 'pmCategory']
     search_fields = ['pmPostTitle', 'pmPostWriter']
     date_hierarchy = 'pmPostDate'
@@ -54,6 +58,7 @@ class PostAdmin(admin.ModelAdmin):
     def get_comment_count(self, obj):
         return obj.comments.count()  # 'comments'는 Comment 모델에서 Post에 설정된 related_name 입니다.
     get_comment_count.short_description = 'Comment Count'
+
 
 
 admin.site.register(Post, PostAdmin)
