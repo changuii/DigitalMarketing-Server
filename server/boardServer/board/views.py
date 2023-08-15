@@ -25,6 +25,13 @@ def convert_to_java_format(data):
                     java_format[key] = ["java.util.ArrayList", [convert_to_java_format(item) if isinstance(item, dict) else item for item in value]]
                 continue
 
+            if key == "pmPostPictures":  # pmTag에 대한 특별한 처리
+                if not value or value == [{}]:  # pmTag의 값이 비어있거나 빈 딕셔너리의 리스트인 경우
+                    java_format[key] = ["java.util.ArrayList", value]
+                else:  # 그 외의 경우, 일반적인 리스트 변환을 합니다.
+                    java_format[key] = ["java.util.ArrayList", [convert_to_java_format(item) if isinstance(item, dict) else item for item in value]]
+                continue
+
             if isinstance(value, list):  # 값이 리스트인 경우
                 java_format[key] = ["java.util.ArrayList", [convert_to_java_format(item) if isinstance(item, dict) else item for item in value]]
             elif isinstance(value, dict):  # 값이 또 다른 딕셔너리인 경우, 재귀적으로 변환

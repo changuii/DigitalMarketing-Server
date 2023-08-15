@@ -1,5 +1,4 @@
 from django.db import models
-
 # 카테고리 모델
 class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -21,7 +20,7 @@ class Post(models.Model):
     pmPostWriter = models.CharField(max_length=200, blank=True)
     pmPostDate = models.DateTimeField(auto_now_add=True,null=True)
     pmPostContents = models.TextField(blank=True,null=True)
-    pmPostPicture =  models.CharField(max_length=200, blank=True)
+    pmPostPictures = models.JSONField(blank=True, null=True) #pmPostPicture =  models.CharField(max_length=200, blank=True)
     pmPostHitCount = models.IntegerField(default=0)
     pmPostLike = models.IntegerField(default=0)
     storeLocation = models.CharField(max_length=300, blank=True,null=True)
