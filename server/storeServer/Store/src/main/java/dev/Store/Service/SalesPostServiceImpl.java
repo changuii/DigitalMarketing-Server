@@ -6,10 +6,13 @@ import dev.Store.Entity.SalesPostEntity;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 @Service
 public class SalesPostServiceImpl implements SalesPostService{
     private final SalesPostDAO salesPostDAO;
@@ -86,12 +89,18 @@ public class SalesPostServiceImpl implements SalesPostService{
         return objectMapper.convertValue(jsonObject, SalesPostEntity.class);
     }
 
+//    @Override
+//    public JSONObject entityToJson(SalesPostEntity salesPostEntity) {
+//        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, JSONObject.class));
+//        return jsonObject;
+//    }
+
     @Override
     public JSONObject entityToJson(SalesPostEntity salesPostEntity) {
         JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, JSONObject.class));
-
         return jsonObject;
     }
+
 
     @Override
     public JSONObject resultJsonObject(String result) {

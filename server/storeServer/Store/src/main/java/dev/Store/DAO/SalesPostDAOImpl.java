@@ -73,16 +73,23 @@ public class SalesPostDAOImpl implements SalesPostDAO{
 //            salesPostEntity.setDescImages(Optional.ofNullable(salesPostEntity.getDescImages()).orElse(oldSalesPostEntity.getDescImages()));
 //            salesPostEntity.setProducts(Optional.ofNullable(salesPostEntity.getProducts()).orElse(oldSalesPostEntity.getProducts()));
 
-            List<ImageData> images = new ArrayList<>();
-            for(ImageData image : oldSalesPostEntity.getDescImages()){
-                images.add(image);
-            }
+//            List<ImageData> images = new ArrayList<>();
+//            for(ImageData image : oldSalesPostEntity.getDescImages()){
+//                images.add(image);
+//            }
+//            salesPostEntity.setDescImages(images);
+//
+//            List<Product> newProducts = new ArrayList<>();
+//            for (Product product : oldSalesPostEntity.getProducts()) {
+//                newProducts.add(product);
+//            }
+
+            List<ImageData> images = new ArrayList<>(oldSalesPostEntity.getDescImages());
             salesPostEntity.setDescImages(images);
 
-            List<Product> newProducts = new ArrayList<>();
-            for (Product product : oldSalesPostEntity.getProducts()) {
-                newProducts.add(product);
-            }
+            List<Product> newProducts = new ArrayList<>(oldSalesPostEntity.getProducts());
+            salesPostEntity.setProducts(newProducts);
+
 
             salesPostEntity.setProducts(newProducts);
 

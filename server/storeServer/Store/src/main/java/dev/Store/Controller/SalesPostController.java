@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 public class SalesPostController {
     private final SalesPostService salesPostService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -33,13 +35,14 @@ public class SalesPostController {
 
     public void sendMessage(String requestId, JSONObject jsonObject){
         HashOperations<String, String, JSONObject> hashOperations = redisTemplate.opsForHash();
+        logger.info("[SendMessage: " + jsonObject.toString() + "]");
         hashOperations.put("SalesPostResponse", requestId, jsonObject);
     }
 
     public void actionControl(JSONObject jsonObject){
         String action = (String) jsonObject.get("action");
         String requestId = (String) jsonObject.get("requestId");
-
+        logger.info("[Action: " + action + ", RequestId: " + requestId + "]");
         if ("salesPostCreate".equals(action)) {
             JSONObject resultJsonObject = create(jsonObject);
             sendMessage(requestId, resultJsonObject);
