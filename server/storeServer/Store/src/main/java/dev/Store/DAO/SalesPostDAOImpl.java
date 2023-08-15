@@ -1,5 +1,7 @@
 package dev.Store.DAO;
 
+import dev.Store.Entity.ImageData;
+import dev.Store.Entity.Product;
 import dev.Store.Entity.SalesPostEntity;
 import dev.Store.Repository.SalesPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,8 @@ public class SalesPostDAOImpl implements SalesPostDAO{
         salesPostEntity.setPostDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         this.salesPostRepository.save(salesPostEntity);
 
-        if (salesPostRepository.existsById(salesPostEntity.getPostNumber())) {
-            return "scuccess";
+        if (salesPostRepository.existsBySalesPostNumber(salesPostEntity.getSalesPostNumber())) {
+            return "success";
         }
         return "Error: SalesPost가 올바르게 저장되지 않았습니다.";
     }
@@ -58,7 +60,7 @@ public class SalesPostDAOImpl implements SalesPostDAO{
         SalesPostEntity oldSalesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(salesPostEntity.getPostWriter(), salesPostEntity.getPostTitle());
 
         if (oldSalesPostEntity != null) {
-            salesPostEntity.setPostNumber(Optional.ofNullable(salesPostEntity.getPostNumber()).orElse(oldSalesPostEntity.getPostNumber()));
+            salesPostEntity.setSalesPostNumber(Optional.ofNullable(salesPostEntity.getSalesPostNumber()).orElse(oldSalesPostEntity.getSalesPostNumber()));
             salesPostEntity.setCategory(Optional.ofNullable(salesPostEntity.getCategory()).orElse(oldSalesPostEntity.getCategory()));
             salesPostEntity.setPostTitle(Optional.ofNullable(salesPostEntity.getPostTitle()).orElse(oldSalesPostEntity.getPostTitle()));
             salesPostEntity.setPostWriter(Optional.ofNullable(salesPostEntity.getPostWriter()).orElse(oldSalesPostEntity.getPostWriter()));
@@ -68,22 +70,21 @@ public class SalesPostDAOImpl implements SalesPostDAO{
             salesPostEntity.setPostLike(Optional.ofNullable(salesPostEntity.getPostLike()).orElse(oldSalesPostEntity.getPostLike()));
             salesPostEntity.setStoreLocation(Optional.ofNullable(salesPostEntity.getStoreLocation()).orElse(oldSalesPostEntity.getStoreLocation()));
             salesPostEntity.setMainImage(Optional.ofNullable(salesPostEntity.getMainImage()).orElse(oldSalesPostEntity.getMainImage()));
-            salesPostEntity.setDescImages(Optional.ofNullable(salesPostEntity.getDescImages()).orElse(oldSalesPostEntity.getDescImages()));
-            salesPostEntity.setProducts(Optional.ofNullable(salesPostEntity.getProducts()).orElse(oldSalesPostEntity.getProducts()));
+//            salesPostEntity.setDescImages(Optional.ofNullable(salesPostEntity.getDescImages()).orElse(oldSalesPostEntity.getDescImages()));
+//            salesPostEntity.setProducts(Optional.ofNullable(salesPostEntity.getProducts()).orElse(oldSalesPostEntity.getProducts()));
 
-//            List<ImageData> images = new ArrayList<>();
-//            for(ImageData image : oldSalesPostEntity.getDescImages()){
-//                images.add(image);
-//            }
-//            salesPostEntity.setDescImages(images);
+            List<ImageData> images = new ArrayList<>();
+            for(ImageData image : oldSalesPostEntity.getDescImages()){
+                images.add(image);
+            }
+            salesPostEntity.setDescImages(images);
 
-//            List<ProductEntity> newProducts = new ArrayList<>();
-//            for (ProductEntity product : oldSalesPostEntity.getProducts()) {
-//                product.setSalesPostEntity(salesPostEntity);
-//                newProducts.add(product);
-//            }
-//
-//            salesPostEntity.setProducts(newProducts);
+            List<Product> newProducts = new ArrayList<>();
+            for (Product product : oldSalesPostEntity.getProducts()) {
+                newProducts.add(product);
+            }
+
+            salesPostEntity.setProducts(newProducts);
 
             salesPostRepository.save(salesPostEntity);
             return "success";

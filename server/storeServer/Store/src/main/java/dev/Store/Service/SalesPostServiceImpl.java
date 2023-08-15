@@ -88,7 +88,8 @@ public class SalesPostServiceImpl implements SalesPostService{
 
     @Override
     public JSONObject entityToJson(SalesPostEntity salesPostEntity) {
-        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, Map.class));
+        JSONObject jsonObject = new JSONObject(objectMapper.convertValue(salesPostEntity, JSONObject.class));
+
         return jsonObject;
     }
 
