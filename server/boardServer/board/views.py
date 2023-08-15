@@ -1,6 +1,6 @@
 import json
 import redis
-from .serializers import CommentSerializer, PostSerializer
+from .serializers import CommentSerializer, PostReadSerializer, PostWriteSerializer
 from .models import Category, Post, Tag
 import logging
 from django.db import DatabaseError
@@ -47,8 +47,7 @@ def save_to_redis(request_id, result, data=None):
             if isinstance(data, list):
                 data = ["java.util.ArrayList", [convert_to_java_format(item) for item in data]]
             else:
-                data = convert_to_java_format(data)
-            
+                data = convert_to_java_format(data)          
             response_data = {
                 "@class": "org.json.simple.JSONObject",
                 "result": result,
@@ -90,7 +89,7 @@ def create_post(data):
     data["pmPostHitCount"] = int(data["pmPostHitCount"])
     data["pmPostLike"] = int(data["pmPostLike"])
 
-    serializer = PostSerializer(data=data)
+    serializer = PostWriteSerializer(data=data)
     if serializer.is_valid():
         post_instance = serializer.save()
         logger.info(f"Post created: {vars(post_instance)}")
@@ -122,7 +121,7 @@ def update_post(data):
         data["pmCategory"] = category.id
 
     # Use `partial=True` to allow partial updates
-    serializer = PostSerializer(post, data=data, partial=True)
+    serializer = PostWriteSerializer(post, data=data, partial=True)
     if serializer.is_valid():
         post_instance = serializer.save()
 
@@ -176,14 +175,14 @@ def read_post_with_comments(data):
     except Post.DoesNotExist:
         return "Post not found"
     # 포스트와 해당 포스트의 댓글들을 직렬화
-    serializer = PostSerializer(post)
+    serializer = PostReadSerializer(post)
     return serializer.data
 
 
 def read_all_posts():
     posts = Post.objects.all()
     print(posts)
-    serializer = PostSerializer(posts, many=True)
+    serializer = PostReadSerializer(posts, many=True)
     serialized_data = serializer.data
     logger.info(f"Read all posts: {serialized_data}")
     return serializer.data
@@ -191,7 +190,7 @@ def read_all_posts():
 
 def read_posts_by_tags(tag_names):
     posts = Post.objects.filter(pmTag__name__in=tag_names)
-    serializer = PostSerializer(posts, many=True)
+    serializer = PostReadSerializer(posts, many=True)
     return serializer.data
 
 
@@ -201,7 +200,7 @@ def read_posts_by_category(category_name):
     if not category:
         return []
     posts = category.categorys.all()
-    serializer = PostSerializer(posts, many=True)
+    serializer = PostReadSerializer(posts, many=True)
     return serializer.data
 
 
