@@ -76,6 +76,8 @@ def save_to_redis(request_id, result, data=None):
 def create_post(data):
     data["pmPostHitCount"] = 0
     data["pmPostLike"] = 0
+    data["salesPostNumber"] = int(data.get("salesPostNumber"))
+
     tags_data = data.get("pmTag", [])
     category_data = data.get("pmCategory", None)
 
@@ -249,6 +251,61 @@ def read_posts_by_category(category_name):
     serializer = PostReadSerializer(posts, many=True)
     return serializer.data
 
+def toggle_post_like(data):
+    pmPostWriter = data.get("pmPostWriter")
+    pmPostTitle = data.get("pmPostTitle")
+    
+    try:
+        post = Post.objects.get(pmPostWriter=pmPostWriter, pmPostTitle=pmPostTitle)
+        
+        # 좋아요 처리
+        if data.get("like", True):
+            post.pmPostLike += 1
+        # 좋아요 취소 처리 & 현재 좋아요가 0보다 클 때만 감소
+        else:
+            if post.pmPostLike > 0:
+                post.pmPostLike -= 1
+            else:
+                return "already count 0"
+        
+        post.save()
+        return "success"
+    except Post.DoesNotExist:
+        return "Post not found"
+
+def toggle_comment_like(data):
+    pmPostWriter = data.get("pmPostWriter")
+    pmPostTitle = data.get("pmPostTitle")
+    username = data.get("username")
+    
+    try:
+        comment = Comment.objects.get(post__pmPostWriter=pmPostWriter, post__pmPostTitle=pmPostTitle, username=username)
+        
+        # 좋아요 처리
+        if data.get("like", True):
+            comment.commentLike += 1
+        # 좋아요 취소 처리 & 현재 좋아요가 0보다 클 때만 감소
+        else:
+            if comment.commentLike > 0:
+                comment.commentLike -= 1
+            else:
+                return "already count 0"
+            
+        
+        comment.save()
+        return "success"
+    except Comment.DoesNotExist:
+        return "Comment not found"
+
+def pmPostsFromSalesPost(data):
+    salesPostNumber = int(data.get("salesPostNumber"))
+    try:
+        post = Post.objects.get(salesPostNumber=salesPostNumber)
+        serializer = PostReadSerializer(post)
+        return serializer.data
+    except Post.DoesNotExist:
+        return None
+
 
 def handle_message(data):
     action = data.pop("action", "")
@@ -319,6 +376,21 @@ def handle_message(data):
             else:
                 save_to_redis(request_id, "Post not found")
 
+        elif action == 'pmPostLike':
+            result = toggle_post_like(data)
+            save_to_redis(request_id, result)
+
+        elif action == 'pmCommentLike':
+            result = toggle_comment_like(data)
+            save_to_redis(request_id, result)
+
+        elif action == 'pmPostsFromSalesPost':
+            posts_data = pmPostsFromSalesPost(data)
+            if posts_data:
+                save_to_redis(request_id, "success", posts_data)
+            else:
+                save_to_redis(request_id, "Post not found")
+    
     except DatabaseError as db_err:
         logger.error(f"Database Error: {db_err}")
         save_to_redis(request_id, "Database Error")

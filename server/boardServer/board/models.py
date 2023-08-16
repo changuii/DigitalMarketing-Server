@@ -14,6 +14,7 @@ class Tag(models.Model):
         return self.name
 
 class Post(models.Model):
+    salesPostNumber = models.IntegerField() # 게시글 번호
     pmTag = models.ManyToManyField(Tag, blank=True, related_name='tags')  # 태그 필드 추가
     pmCategory = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='categorys')  # 카테고리 필드 추가
     pmPostTitle = models.CharField(max_length=200, blank=True)
@@ -39,3 +40,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content
+
