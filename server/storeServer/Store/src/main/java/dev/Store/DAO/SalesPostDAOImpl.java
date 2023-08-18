@@ -17,19 +17,23 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     private SalesPostRepository salesPostRepository;
 
     @Override
-    public String create(SalesPostEntity salesPostEntity) {
+    public Map<String, Object> create(SalesPostEntity salesPostEntity) {
         salesPostEntity.setPostDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         this.salesPostRepository.save(salesPostEntity);
+        Map<String, Object> result = new HashMap<>();
 
         if (salesPostRepository.existsBySalesPostNumber(salesPostEntity.getSalesPostNumber())) {
-            return "success";
+            result.put("result", "success");
+            result.put("salesPostNumber", salesPostEntity.getSalesPostNumber());
+        } else{
+            result.put("result", "Error: SalesPost가 올바르게 저장되지 않았습니다.");
         }
-        return "Error: SalesPost가 올바르게 저장되지 않았습니다.";
+        return result;
     }
 
     @Override
-    public Map<String, Object> readByWriterAndTitle(String postWriter, String postTitle) {
-        SalesPostEntity salesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(postWriter, postTitle);
+    public Map<String, Object> readByWriterAndTitle(Long salesPostNUmber) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNUmber);
         Map<String, Object> result = new HashMap<>();
 
         if (salesPostEntity == null) {
@@ -71,7 +75,7 @@ public class SalesPostDAOImpl implements SalesPostDAO{
 
     @Override
     public String update(SalesPostEntity salesPostEntity) {
-        SalesPostEntity oldSalesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(salesPostEntity.getPostWriter(), salesPostEntity.getPostTitle());
+        SalesPostEntity oldSalesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostEntity.getSalesPostNumber());
 
         if (oldSalesPostEntity != null) {
             salesPostEntity.setSalesPostNumber(Optional.ofNullable(salesPostEntity.getSalesPostNumber()).orElse(oldSalesPostEntity.getSalesPostNumber()));
@@ -112,15 +116,15 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> postLikeUpdate(String postTitle, Long postLike, String action){
-        SalesPostEntity salesPostEntity = salesPostRepository.findSingleByPostTitleAndPostLike(postTitle, postLike);
+    public Map<String, Object> postLikeUpdate(Long salesPostNumber, String action){
+        SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNumber);
         Map<String, Object> result = new HashMap<>();
 
         if(salesPostEntity != null){
             if(action.equals("disLike")){
-                salesPostEntity.setPostLike(postLike - 1);
+                salesPostEntity.setPostLike(salesPostEntity.getPostLike()-1);
             }else {
-                salesPostEntity.setPostLike(postLike + 1);
+                salesPostEntity.setPostLike(salesPostEntity.getPostLike()+1);
             }
             result.put("data", salesPostEntity.getPostLike());
             result.put("result", "success");
@@ -131,12 +135,12 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> postHitCountUpdate(String postTitle, Long postHitCount){
-        SalesPostEntity salesPostEntity = salesPostRepository.findByPostTitleAndPostHitCount(postTitle, postHitCount);
+    public Map<String, Object> postHitCountUpdate(Long salesPostNumber){
+        SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNumber);
         Map<String, Object> result = new HashMap<>();
 
         if(salesPostEntity != null){
-            salesPostEntity.setPostHitCount(postHitCount + 1);
+            salesPostEntity.setPostHitCount(salesPostEntity.getPostHitCount()+1);
             result.put("data", salesPostEntity.getPostHitCount());
             result.put("result", "success");
         } else{
@@ -146,8 +150,8 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public String delete(String postWriter, String postTitle) {
-        SalesPostEntity salesPostEntity = salesPostRepository.findFirstByPostWriterAndPostTitleOrderByPostDateDesc(postWriter, postTitle);
+    public String delete(Long salesPostNumber) {
+        SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNumber);
 
         if(salesPostEntity != null){
             salesPostRepository.delete(salesPostEntity);

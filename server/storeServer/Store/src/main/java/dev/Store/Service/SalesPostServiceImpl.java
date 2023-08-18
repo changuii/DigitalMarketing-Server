@@ -27,15 +27,26 @@ public class SalesPostServiceImpl implements SalesPostService{
     @Override
     public JSONObject create(JSONObject jsonObject) {
         SalesPostEntity salesPostEntity = jsonToEntity(jsonObject);
-        String result = salesPostDAO.create(salesPostEntity);
-        return resultJsonObject(result);
+        Map<String, Object> resultMap = salesPostDAO.create(salesPostEntity);
+        String result = (String) resultMap.get("result");
+        JSONObject resultJsonObject;
+
+        if (result.equals("success")) {
+            resultJsonObject = resultJsonObject(result);
+            Long salesPostNumber = (Long) resultMap.get("salesPostNumber");
+            resultJsonObject.put("salesPostNumber", salesPostNumber);
+        } else {
+            resultJsonObject = resultJsonObject(result);
+        }
+
+        return resultJsonObject;
     }
+
 
     @Override
     public JSONObject read(JSONObject jsonObject) {
-        String postWriter = (String) jsonObject.get("postWriter");
-        String postTitle = (String) jsonObject.get("postTitle");
-        Map<String, Object> salesPostMap = salesPostDAO.readByWriterAndTitle(postWriter, postTitle);
+        Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
+        Map<String, Object> salesPostMap = salesPostDAO.readByWriterAndTitle(salesPostNumber);
 
         String result = (String) salesPostMap.get("result");
         JSONObject resultJsonObject;
@@ -100,11 +111,10 @@ public class SalesPostServiceImpl implements SalesPostService{
 
     @Override
     public JSONObject postLikeUpdate(JSONObject jsonObject){
-        String postTitle = (String) jsonObject.get("postTitle");
-        Long postLike = Long.parseLong((String) jsonObject.get("postLike"));
+        Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
         String action = (String) jsonObject.get("disLike");
 
-        Map<String, Object> resultMap = salesPostDAO.postLikeUpdate(postTitle, postLike, action);
+        Map<String, Object> resultMap = salesPostDAO.postLikeUpdate(salesPostNumber, action);
         String result = (String) resultMap.get("result");
 
         JSONObject resultJsonObject = resultJsonObject(result);
@@ -118,10 +128,9 @@ public class SalesPostServiceImpl implements SalesPostService{
 
     @Override
     public JSONObject postHitCountUpdate(JSONObject jsonObject){
-        String postTitle = (String) jsonObject.get("postTitle");
-        Long postLike = Long.parseLong((String) jsonObject.get("postHitCount"));
+        Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
 
-        Map<String, Object> resultMap = salesPostDAO.postHitCountUpdate(postTitle, postLike);
+        Map<String, Object> resultMap = salesPostDAO.postHitCountUpdate(salesPostNumber);
         String result = (String) resultMap.get("result");
 
         JSONObject resultJsonObject = resultJsonObject(result);
@@ -135,9 +144,8 @@ public class SalesPostServiceImpl implements SalesPostService{
 
     @Override
     public JSONObject delete(JSONObject jsonObject) {
-        String postWriter = (String) jsonObject.get("postWriter");
-        String postTitle = (String) jsonObject.get("postTitle");
-        String result = salesPostDAO.delete(postWriter, postTitle);
+        Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
+        String result = salesPostDAO.delete(salesPostNumber);
         return resultJsonObject(result);
     }
 
