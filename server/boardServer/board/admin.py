@@ -38,7 +38,7 @@ class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
     list_display = [
         'pmPostTitle', 'get_category', 'get_tags', 'pmPostWriter', 'pmPostContents', 'pmMainImage',
-        'pmPostPictures', 'pmPostHitCount', 'pmPostLike', 
+        'pmPostPictures', 'pmPostLike', 
         'get_comment_count','pmPostDate'
     ]
     list_filter = ['pmPostDate', 'pmPostWriter', 'pmTag', 'pmCategory']

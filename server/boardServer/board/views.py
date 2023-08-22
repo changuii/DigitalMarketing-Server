@@ -74,7 +74,6 @@ def save_to_redis(request_id, result, data=None):
 
 
 def create_post(data):
-    data["pmPostHitCount"] = 0
     data["pmPostLike"] = 0
     data["salesPostNumber"] = int(data.get("salesPostNumber"))
 

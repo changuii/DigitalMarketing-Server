@@ -23,7 +23,6 @@ class Post(models.Model):
     pmPostContents = models.TextField(blank=True,null=True)
     pmMainImage = models.CharField(max_length=200, blank=True,null=True)
     pmPostPictures = models.JSONField(blank=True, null=True) #pmPostPicture =  models.CharField(max_length=200, blank=True)
-    pmPostHitCount = models.IntegerField(default=0)
     pmPostLike = models.IntegerField(default=0)
 
     def __str__(self):

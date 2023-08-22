@@ -15,7 +15,7 @@ class PostKafkaConsumer:  # PostKafkaConsumer 클래스 정의 시작
         # 카프카 소비자 인스턴스를 생성합니다.
         self.consumer = KafkaConsumer(
             'PromotionalPostRequest',  # topic 이름
-            bootstrap_servers=['121.55.117.123:9092'],  # Kafka broker 주소
+            bootstrap_servers=['49.50.161.125:9092'],  # Kafka broker 주소
             group_id='pmPost',  # 소비자 그룹 ID
             auto_offset_reset='latest',  # 가장 최신의 메시지부터 시작
             value_deserializer=lambda v: json.loads(v.decode('utf-8')),  # 메시지를 JSON 형식으로 디코딩
