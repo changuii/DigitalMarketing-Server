@@ -1,7 +1,6 @@
 package dev.Store.Entity;
 
 import lombok.*;
-
 import javax.persistence.Embeddable;
 
 @Embeddable

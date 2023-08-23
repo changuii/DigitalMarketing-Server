@@ -32,9 +32,29 @@ public class SalesPostEntity {
     private List<ImageData> descImages;
     @ElementCollection
     private List<Product> products;
+    @ElementCollection
+    private List<Comment> comments;
+
 
     public SalesPostEntity() {
         this.postHitCount = 0L;
         this.postLike = 0L;
+    }
+
+    public void add(Comment comment){
+        comments.add(comment);
+    }
+
+    public void remove(Comment comment){
+        comments.remove(comment);
+    }
+
+    public Comment findCommentByCommentWriter(String commentWriter) {
+        for (Comment comment : comments) {
+            if (comment.getCommentWriter().equals(commentWriter)) {
+                return comment;
+            }
+        }
+        return null;
     }
 }
