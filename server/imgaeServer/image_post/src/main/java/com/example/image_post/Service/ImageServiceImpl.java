@@ -10,7 +10,7 @@ import java.io.IOException;
 @Service
 public class ImageServiceImpl implements ImageService{
     private final ImageRepository imageRepository;
-    private final String hostname = "http://172.20.10.4:8080/image/download/";
+    private final String hostname = "http://49.50.161.125:8080/img/";
 
     public ImageServiceImpl (@Autowired ImageRepository imageRepository){
         this.imageRepository = imageRepository;
