@@ -13,4 +13,6 @@ public interface UserRepository {
     UserEntity getByUid(String uid);
     Boolean isEmailDuplicateCheck(String uid);
     void updateRoleByUid(String uid, String role);
+    void updateLikesByUid(String uid, String likes);
+
 }

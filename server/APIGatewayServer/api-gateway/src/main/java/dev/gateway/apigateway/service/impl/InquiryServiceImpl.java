@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+
 
 @Service
 public class InquiryServiceImpl implements InquiryService {
@@ -84,13 +84,13 @@ public class InquiryServiceImpl implements InquiryService {
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -109,14 +109,14 @@ public class InquiryServiceImpl implements InquiryService {
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
 
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -131,22 +131,20 @@ public class InquiryServiceImpl implements InquiryService {
         JSONObject json = new JSONObject();
         json.put("requestId", request);
         json.put("action", "inquiryReadAll");
-        json.put("inquiryNumber", "null");
-        json.put("inquiryWriter", "all");
 
         kafkaService.sendMessage(json, TOPIC);
 
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
 
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -165,13 +163,13 @@ public class InquiryServiceImpl implements InquiryService {
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -191,13 +189,13 @@ public class InquiryServiceImpl implements InquiryService {
         JSONObject response = new JSONObject();
         while(true){
             response = (JSONObject) redisTemplate.opsForHash().get(this.redisKey, request);
-            if( !(response.isEmpty())){
+            if( response != null){
                 break;
             }
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }

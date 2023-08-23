@@ -7,19 +7,20 @@ spring:
 # database 연결관련
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/springjdbc?createDatabaseIfNotExist=true
-    username: root
+    url: jdbc:mysql://rhljh201.codns.com:3306/sys?createDatabaseIfNotExist=true
+    username: user
     password: ?Qweasd7410
+
 # kafka 통신에 필요한 정보 및 직렬화
   kafka:
     producer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: 49.50.161.125:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 ## redis 통신 관련
 redis:
-  host: localhost
+  host: 49.50.161.125
   port: 6379
 
 # kafka TOPIC 및 Redis KEY 값
@@ -37,4 +38,12 @@ kafkaTOPIC:
   review: ReviewRequest
   salespost: SalesPostRequest
 
+
+## HTTP 관련
+server:
+  ssl:
+    key-store: keyfile.p12
+    key-store-type: PKCS12
+    key-store-password: asd123
+    key-store-alias: keyfile
 

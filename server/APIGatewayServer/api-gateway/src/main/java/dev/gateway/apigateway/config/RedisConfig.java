@@ -45,6 +45,7 @@ public class RedisConfig {
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
+
         // 모든 경우
         redisTemplate.setDefaultSerializer(new StringRedisSerializer());
 

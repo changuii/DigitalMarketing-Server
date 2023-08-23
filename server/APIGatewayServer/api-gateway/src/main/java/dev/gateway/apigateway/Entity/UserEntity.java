@@ -38,6 +38,7 @@ public class UserEntity implements UserDetails {
     private String birthday;
 
     private String address;
+    private String likes;
 
 
     @Builder.Default

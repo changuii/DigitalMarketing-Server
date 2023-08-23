@@ -33,7 +33,6 @@ public class SignServiceImpl implements SignService {
     public UserRepository userRepository;
     public JwtTokenProvider jwtTokenProvider;
     public PasswordEncoder passwordEncoder;
-
     @Autowired
     public SignServiceImpl(UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
@@ -120,24 +119,32 @@ public class SignServiceImpl implements SignService {
     }
 
     @Override
-    public ResponseEntity<JSONObject> signIn(String email, String password) throws RuntimeException {
+    public ResponseEntity<JSONObject> signIn(String email, String password) {
         logger.info("[getSignInResult] signDataHandler 로 회원 정보 요청");
         UserEntity userEntity = userRepository.getByUid(email);
         logger.info("[getSignInResult] e-mail : {}", email);
 
         logger.info("[getSignInResult] 패스워드 비교 수행");
-        // 패스워드 불일치
-        if(!passwordEncoder.matches(password, userEntity.getPassword())){
+        try{// 패스워드 불일치
+            if (!passwordEncoder.matches(password, userEntity.getPassword())) {
+                logger.info("패스워드 불일치");
+
+                JSONObject json = new JSONObject();
+                json.put("access_token", "Password mismatch");
+                return ResponseEntity.badRequest().body(json);
+            }
+        }catch (IllegalArgumentException e){
             JSONObject json = new JSONObject();
-            json.put("access_token", "fail");
+            json.put("access_token", "Email mismatch");
             return ResponseEntity.badRequest().body(json);
         }
+
 
         logger.info("[getSignInResult] 패스워드 일치");
         JSONObject json = new JSONObject();
         json.put("access_token", jwtTokenProvider.createToken(String.valueOf(userEntity.getUid()), userEntity.getRoles()));
-
-
+        json.put("name", userEntity.getName());
+        logger.info(json.get("name").toString());
 //        logger.info("[getSignInResult] SignInResultDto 객체 생성");
 //        SignInResultDto signInResultDto = SignInResultDto.builder()
 //                .token(jwtTokenProvider.createToken(String.valueOf(userEntity.getUid()), userEntity.getRoles()))

@@ -84,7 +84,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -111,7 +111,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -137,7 +137,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }
@@ -163,7 +163,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if(response.get("result").equals("success")){
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(200).body(response);
         }else{
             return ResponseEntity.badRequest().body(response);
         }

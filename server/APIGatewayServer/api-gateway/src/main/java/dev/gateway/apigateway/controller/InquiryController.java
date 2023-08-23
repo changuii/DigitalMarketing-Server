@@ -53,7 +53,7 @@ public class InquiryController {
 
     }
 
-    @PutMapping("/{postNum}")
+    @PutMapping
     public ResponseEntity<JSONObject> updateInquiry(
             @RequestBody JSONObject json
     ){
