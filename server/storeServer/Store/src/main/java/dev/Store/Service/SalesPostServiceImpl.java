@@ -2,6 +2,7 @@ package dev.Store.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.Store.DAO.SalesPostDAO;
+import dev.Store.Entity.Comment;
 import dev.Store.Entity.SalesPostEntity;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,16 @@ public class SalesPostServiceImpl implements SalesPostService{
         return resultJsonObject;
     }
 
+    @Override
+    public JSONObject createComment(JSONObject jsonObject){
+        String commentWriter = (String) jsonObject.get("commentWriter");
+        String commentContents = (String) jsonObject.get("commentContents");
+        Comment comment = new Comment(commentWriter, commentContents);
+
+        Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
+        String result = salesPostDAO.createPostComment(salesPostNumber, comment);
+        return resultJsonObject(result);
+    }
 
     @Override
     public JSONObject read(JSONObject jsonObject) {
@@ -112,9 +123,9 @@ public class SalesPostServiceImpl implements SalesPostService{
     @Override
     public JSONObject postLikeUpdate(JSONObject jsonObject){
         Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
-        String action = (String) jsonObject.get("disLike");
+        Boolean like = (Boolean) jsonObject.get("like");
 
-        Map<String, Object> resultMap = salesPostDAO.postLikeUpdate(salesPostNumber, action);
+        Map<String, Object> resultMap = salesPostDAO.postLikeUpdate(salesPostNumber, like);
         String result = (String) resultMap.get("result");
 
         JSONObject resultJsonObject = resultJsonObject(result);
@@ -136,7 +147,7 @@ public class SalesPostServiceImpl implements SalesPostService{
         JSONObject resultJsonObject = resultJsonObject(result);
         if (result.equals("success")) {
             Long resultPostHitCount = (Long) resultMap.get("data");
-            resultJsonObject.put("postLike", resultPostHitCount);
+            resultJsonObject.put("postHitCount", resultPostHitCount);
         }
 
         return resultJsonObject;
@@ -148,6 +159,15 @@ public class SalesPostServiceImpl implements SalesPostService{
         String result = salesPostDAO.delete(salesPostNumber);
         return resultJsonObject(result);
     }
+
+    @Override
+    public JSONObject deleteComment(JSONObject jsonObject){
+        String commentWriter = (String) jsonObject.get("commentWriter");
+        Long salesPostNumber = Long.parseLong((String) jsonObject.get("salesPostNumber"));
+        String result = salesPostDAO.deleteComment(salesPostNumber, commentWriter);
+        return resultJsonObject(result);
+    }
+
 
     @Override
     public SalesPostEntity jsonToEntity(JSONObject jsonObject) {

@@ -23,6 +23,7 @@ public class SalesPostController {
         this.redisTemplate = redisTemplate;
     }
     public JSONObject create(JSONObject jsonObject){return salesPostService.create(jsonObject);}
+    public JSONObject createComment(@RequestBody JSONObject jsonObject){return salesPostService.createComment(jsonObject);}
     public JSONObject read(JSONObject jsonObject){return salesPostService.read(jsonObject);}
     public JSONObject readAllByCategory(@RequestBody JSONObject jsonObject){return salesPostService.readAllByCategory(jsonObject);}
     public JSONObject readAll(){return salesPostService.readAll();}
@@ -30,6 +31,8 @@ public class SalesPostController {
     public JSONObject postLikeUpdate(JSONObject jsonObject){return salesPostService.postLikeUpdate(jsonObject);}
     public JSONObject postHitCountUpdate(JSONObject jsonObject){return salesPostService.postHitCountUpdate(jsonObject);}
     public JSONObject delete(JSONObject jsonObject){return salesPostService.delete(jsonObject);}
+
+    public JSONObject deleteComment(@RequestBody JSONObject jsonObject){return salesPostService.deleteComment(jsonObject);}
 
     @KafkaListener(topics = "SalesPostRequest", groupId = "SalesPost")
     public void getMessage(JSONObject jsonObject){
@@ -49,6 +52,10 @@ public class SalesPostController {
         logger.info("[Action: " + action + ", RequestId: " + requestId + "]");
         if ("salesPostCreate".equals(action)) {
             JSONObject resultJsonObject = create(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if ("salesPostCommentCreate".equals(action)){
+            JSONObject resultJsonObject = createComment(jsonObject);
             sendMessage(requestId, resultJsonObject);
         }
         if ("salesPostRead".equals(action)) {
@@ -77,6 +84,10 @@ public class SalesPostController {
         }
         if ("salesPostDelete".equals(action)) {
             JSONObject resultJsonObject = delete(jsonObject);
+            sendMessage(requestId, resultJsonObject);
+        }
+        if("salesPostCommentDelete".equals(action)){
+            JSONObject resultJsonObject = deleteComment(jsonObject);
             sendMessage(requestId, resultJsonObject);
         }
     }

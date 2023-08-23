@@ -1,5 +1,6 @@
 package dev.Store.DAO;
 
+import dev.Store.Entity.Comment;
 import dev.Store.Entity.ImageData;
 import dev.Store.Entity.Product;
 import dev.Store.Entity.SalesPostEntity;
@@ -29,6 +30,19 @@ public class SalesPostDAOImpl implements SalesPostDAO{
             result.put("result", "Error: SalesPost가 올바르게 저장되지 않았습니다.");
         }
         return result;
+    }
+
+    @Override
+    public String createPostComment(Long salesPostNumber, Comment comment){
+        SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNumber);
+
+        if (salesPostEntity != null) {
+            comment.setCommentDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            salesPostEntity.add(comment);
+            this.salesPostRepository.save(salesPostEntity);
+            return "success";
+        }
+        return "Error: Review가 올바르게 저장되지 않았습니다.";
     }
 
     @Override
@@ -116,15 +130,15 @@ public class SalesPostDAOImpl implements SalesPostDAO{
     }
 
     @Override
-    public Map<String, Object> postLikeUpdate(Long salesPostNumber, String action){
+    public Map<String, Object> postLikeUpdate(Long salesPostNumber, Boolean like){
         SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNumber);
         Map<String, Object> result = new HashMap<>();
 
         if(salesPostEntity != null){
-            if(action.equals("disLike")){
-                salesPostEntity.setPostLike(salesPostEntity.getPostLike()-1);
-            }else {
+            if(like){
                 salesPostEntity.setPostLike(salesPostEntity.getPostLike()+1);
+            }else {
+                salesPostEntity.setPostLike(salesPostEntity.getPostLike()-1);
             }
             result.put("data", salesPostEntity.getPostLike());
             result.put("result", "success");
@@ -158,6 +172,19 @@ public class SalesPostDAOImpl implements SalesPostDAO{
             return "success";
         } else{
             return "Error: 삭제하려고 하는 SalesPost가 존재하지 않습니다.";
+        }
+    }
+
+    @Override
+    public String deleteComment(Long salesPostNumber, String commentWriter){
+        SalesPostEntity salesPostEntity = salesPostRepository.findBySalesPostNumber(salesPostNumber);
+        Comment comment = salesPostEntity.findCommentByCommentWriter(commentWriter);
+        if(salesPostEntity != null && comment != null){
+            salesPostEntity.remove(comment);
+            salesPostRepository.save(salesPostEntity);
+            return "success";
+        } else{
+            return "Error: 삭제하려고 하는 Comment가 존재하지 않습니다.";
         }
     }
 }
