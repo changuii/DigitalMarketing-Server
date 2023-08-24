@@ -39,11 +39,4 @@ kafkaTOPIC:
   salespost: SalesPostRequest
 
 
-## HTTP 관련
-server:
-  ssl:
-    key-store: keyfile.p12
-    key-store-type: PKCS12
-    key-store-password: asd123
-    key-store-alias: keyfile
 
