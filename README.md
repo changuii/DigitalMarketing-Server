@@ -48,4 +48,8 @@ API 링크: https://www.notion.so/API-0d6d6a3d1366441684bb60328ebf7c64?pvs=4
 - kafka, zookeeper : docker-compose 사용
 - redis, MySQL : 공식 이미지 사용 
 
+`구조`  
+<img width="1454" alt="image" src="https://github.com/changuii/DigitalMarketing-Server/assets/122252160/c829afd3-72d2-43d6-b2e6-5d6964ecb4ca">
+
+
 
